@@ -1,0 +1,90 @@
+This document is here to discuss and formalize how we want to objectify our data list.
+I really want to discuss this more than the first model, and I want to carefully consider what is worth being changed to object and what is not.
+Both on a semantic level and a logistic standpoint.
+We want to be able to store the names of some entities, but we also want to have quick access to some data that is often read, without excessive and heavy data.
+I'll list some opinions and considerations.
+Objects will be named with a capital letter and between --- ---
+
+
+
+1. Static Data
+/*************/
+
+// Map object should be made to be easily instancied from a text file or another type with a pre-defined format, and available to all games currently using that map
+---
+Map
+---
+String name
+Continent continents[C]
+Territory territories[T]
+
+
+
+// Not even sure Continent should be an object, it's very little descriptive and fixed format data that could be contained in a single array
+// It's only really useful if we need to store the names in this case, but names are not used at all server side. It's only a client-side consideration.
+---------
+Continent
+---------
+String name
+int bonus | bonus, bonus_value, bonusValue? Naming convention needed
+
+int territories
+OR
+int territories[X]
+OR
+Territory territories[X]
+ /* I think either of the int options should be enough, there's no need to go overkill with object referencement when all we want is quick access
+  * int territories instead of int territories[X] increases the amount of calculation done, but reduces the amount of unnecessary saved data
+
+
+
+// Definitely better structured to go for an object for that one, since they all have a variable amount of neighbors, objectifying territory descriptors will help
+---------
+Territory
+---------
+String name
+int id | Do we want this? Could be used for fast indexation, might or might not be necessary
+
+Territory neighbors[X]
+OR
+int neighbors[X]
+ /* X = Number of neighbors of that territory
+  * neighbors[x] = Reference to adjacent territory object, OR index of adjacent territory
+  * Depends on how we do things, I'd rather go for int neighbors[X] in this case, to avoid multiple redundant cross-referencing
+  * Mostly because we don't need an actual graph, we're not doing pathfinding for any purpose, we only want to have access to adjacent territories as fast as possible
+  * int would be a fast index to use to check in Map.territories or Game.territories (They don't have the same format, but the same index, just gotta know what we're doing)
+  */
+
+
+
+2. Dynamic Data
+/**************/
+
+----
+Game
+----
+Map map
+int board[T][2] // Board state, territories occupation, as defined in the first document, using map to calculate and declare size?
+int tokens[4] // Drawing pool, individual player tokens will be in their player object, cleaner that way, I think?
+int exchangedSets // See question in first document
+Player players[P]
+int activePlayer, firstPlayer
+int phase
+int turnCapturedTerritories // Gotta find a more eloquent name
+
+
+
+------
+Player
+------
+String name
+int availableUnits // Not sure about this one, would this be a good place to put the current available units? Easy to access
+int tokens[4] // Personal tokens
+
+// Recorded individual data (during this game) that could be used to record stats at the end of the game could be stored here, here are some examples
+int totalCapturedTerritories
+int unitsKilled
+int unitsLost
+
+
+// If I'm forgetting anything important, be sure to mention it. We'll discuss and formalize all of this later.
