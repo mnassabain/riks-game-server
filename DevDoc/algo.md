@@ -52,7 +52,7 @@ ALGO
                 phase suivante
 
         // phase 3
-        Tant que ctivePlayer veut deplacer units
+        Tant que activePlayer veut deplacer units
             Choisir territoire allié = ta
             Si ta.units > 1 && allié adj.
                 Chosir allié adj.
