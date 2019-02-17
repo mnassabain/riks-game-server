@@ -50,11 +50,11 @@ int activePlayer
 int phase -1 - 2
 bool territoryCapture // Gotta find a more eloquent name
 
----------
+---------------------
 struct TerritoryState
----------
-int id
-list int neighbors[X]
+---------------------
+int owner
+int units
 
 
 
