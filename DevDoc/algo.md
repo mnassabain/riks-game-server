@@ -1,6 +1,5 @@
 ALGO
 ====
-
     INITIALISATION
     --------------
 
@@ -24,7 +23,7 @@ ALGO
         // activePlayer turn
 
         // phase 1
-        activePlayer.receiveUnits(p/r aux territoires & continents)
+        activePlayer.receiveUnits(min(3,nbTerritoiresAllies/3 + bonus continents))
         Tant que player.availableUnits > 0 || player.tokens > 4 
             Si activePlayer peut utiliser tokens
                 activePlayer.receiveUnits(n)
