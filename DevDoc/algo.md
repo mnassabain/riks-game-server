@@ -13,7 +13,7 @@ ALGO
         activePlayer := prochain joueur
 
     Tant qu'il y a des unités à placer
-        activePlayer place unité sur son territoire
+        activePlayer place unité sur un de ses territoires
         activePlayer := prochain joueur
 
 
