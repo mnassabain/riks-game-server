@@ -24,30 +24,35 @@ ALGO
 
         // phase 1
         activePlayer.receiveUnits(min(3,nbTerritoiresAllies/3 + bonus continents))
-        Tant que player.availableUnits > 0 || player.tokens > 4 
-            Si activePlayer peut utiliser tokens
-                activePlayer.receiveUnits(n)
-                activePlayer.loseTokens(m)
-                activePlayer.placeUnits()
+        Tant que player.availableUnits > 0 
+            Tant que player.tokens > 4 
+                Si activePlayer veut utiliser tokens
+                    activePlayer.receiveUnits(n)
+                    activePlayer.loseTokens(m)
+                
+            activePlayer.placeUnits()
 
         // phase 2
         Tant que activePlayer peut attaquer
             // attaque
-            Choisir territoire allié = ta
-                Si ta.units > 1 && ennemi adj.
-                    Choisir ennemi adj. = te
-                    Choisir units(1..min(3, ta.units-1))
-                    Prevenir joueur envahi = pEnvahi
-                    pEnvahi choisit units (1..min(2, te.units))
-                    Algo combat
-                    Si 1er territoire envahi
-                        Game.giveToken(activePlayer)
-                    Si pEnvahi eliminé
-                        activePlayer.takeTokens(pEnvahi.tokens)
-                        nombre de joueurs--
+            Si activePlayer veut attaquer
+                Choisir territoire allié = ta
+                    Si ta.units > 1 && ennemi adj.
+                        Choisir ennemi adj. = te
+                        Choisir units(1..min(3, ta.units-1))
+                        Prevenir joueur envahi = pEnvahi
+                        pEnvahi choisit units (1..min(2, te.units))
+                        Algo combat
+                        Si 1er territoire envahi
+                            Game.giveToken(activePlayer)
+                        Si pEnvahi eliminé
+                            activePlayer.takeTokens(pEnvahi.tokens)
+                            nombre de joueurs--
+            Sinon
+                phase suivante
 
         // phase 3
-        Tant que possibilité de fortification
+        Tant que ctivePlayer veut deplacer units
             Choisir territoire allié = ta
             Si ta.units > 1 && allié adj.
                 Chosir allié adj.
