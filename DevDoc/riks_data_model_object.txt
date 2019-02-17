@@ -2,6 +2,8 @@ Standardized data model
 Everything is fixed now, this document just needs better formatting
 Also some commenting will be added
 
+UML graph available at https://drive.google.com/file/d/1uLF_W17mbuPPefmdTpEUQohdF8R_UmLi/view?usp=sharing
+
 
 1. Static Data
 /*************/
