@@ -42,6 +42,30 @@ public:
   string getName();
 
   /**
+   * @brief nbTerritories : get the number of territories
+   * @return Number of territories
+   */
+  int nbTerritories();
+
+  /**
+   * @brief nbContinents : get the number of continents
+   * @return Number of continents
+   */
+  int nbContinents();
+
+  /**
+   * @brief getContinents : Getter on map's continents
+   * @return continents
+   */
+  list<Continent> getContinents();
+
+  /**
+   * @brief getTerritories : Getter on map's territories
+   * @return territories
+   */
+  list<Territory> getTerritories();
+
+  /**
    * @brief loadMap : load the reference of the map
    * @param name : name of the map to be loaded
    * @return Map reference
