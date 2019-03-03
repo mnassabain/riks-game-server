@@ -14,7 +14,12 @@ private:
   list <Territory> territories;
   static list <Map> maps;
 
-  //Constructor
+  //Constructors
+
+  /**
+   * @brief Map : Default constructor (debug map)
+   */
+  Map();
 
   /**
    * @brief Map : Constructor
