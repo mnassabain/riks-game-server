@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <list>
+#include <vector>
 #include <iterator>
 #include "Structs.h"
 
@@ -10,11 +10,16 @@ class Map {
 private:
   //Attributes
   string name;
-  list <Continent> continents;
-  list <Territory> territories;
-  static list <Map> maps;
+  vector <Continent> continents;
+  vector <Territory> territories;
+  static vector <Map> maps;
 
-  //Constructor
+  //Constructors
+
+  /**
+   * @brief Map : Default constructor (debug map)
+   */
+  Map();
 
   /**
    * @brief Map : Constructor
@@ -57,13 +62,13 @@ public:
    * @brief getContinents : Getter on map's continents
    * @return continents
    */
-  list<Continent> getContinents();
+  vector<Continent> getContinents();
 
   /**
    * @brief getTerritories : Getter on map's territories
    * @return territories
    */
-  list<Territory> getTerritories();
+  vector<Territory> getTerritories();
 
   /**
    * @brief loadMap : load the reference of the map

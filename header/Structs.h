@@ -1,14 +1,14 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-#include <list>
+#include <vector>
 using namespace std;
 
 //Territory
 struct Territory
 {
   int id;
-  list <int> neighbors;
+  vector <int> neighbors;
 };
 typedef struct Territory Territory;
 
