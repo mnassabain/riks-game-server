@@ -1,33 +1,33 @@
 #include "Game.h"
 
-void GameServer::start() {
+void Game::start() {
 }
 
-void GameServer::nextPlayer() {
+void Game::nextPlayer() {
 }
 
-void GameServer::nextPhase() {
+void Game::nextPhase() {
 }
 
-void GameServer::chooseFirstPlayer() {
+void Game::chooseFirstPlayer() {
 }
 
-int GameServer::useSet(int tok1, int tok2, int tok3) {
+int Game::useSet(int tok1, int tok2, int tok3) {
 	return 0;
 }
 
-void GameServer::solveCombat() {
+void Game::solveCombat() {
 }
 
-void GameServer::moveUnits(int source, int destination, int units) {
+void Game::moveUnits(int source, int destination, int units) {
 }
 
-void GameServer::setInitialReinforcement() {
+void Game::setInitialReinforcement() {
 }
 
-void GameServer::end() {
+void Game::end() {
 }
 
-int GameServer::updatePlayersStatsInDB() {
+int Game::updatePlayersStatsInDB() {
 	return 0;
 }
