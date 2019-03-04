@@ -75,3 +75,14 @@ vector<Territory> Map::getTerritories()
 {
   return vector<Territory>(this->territories);
 }
+
+bool Map::exists(string name)
+{
+  bool res = false;
+  for(int i = 0;!res && i<Map::maps.size();i++)
+  {
+    if(Map::maps.at(i).getName()==name)
+      res = true;
+  }
+  return res;
+}
