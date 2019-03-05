@@ -1,7 +1,9 @@
 #pragma once
 
+#include <iostream>
 #include "Player.h"
 #include "Map.h"
+#include "Structs.h"
 
 class Game {
 private:
@@ -15,9 +17,9 @@ private:
 	bool territoryCapture;
 	bool running;
 	int nbPlayer;
-	Map map;
+	// Map map;	commented out for now, as the constructor has been put in private
 	// board : list of TerritoryState
-	// players : list of Player
+	vector <Player> players; // players : list of Player
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
 
@@ -32,6 +34,9 @@ private:
 	void setInitialReinforcement();
 	void end();
 	int updatePlayersStatsInDB();
+
+	//Constructors
+	Game(string mapName, vector <string> playersNames);
 
 public:
 };

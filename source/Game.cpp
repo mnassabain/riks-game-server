@@ -1,11 +1,28 @@
 #include "Game.h"
 
+Game::Game(string mapName, vector <string> playersNames){
+	// what to do with the IDs?
+	this->totalExchangedSets = 0;
+	this->activePlayer = -1;
+	this->phase = -1;
+	this->territoryCapture = false;
+	this->running = false;
+	this->nbPlayer = playersNames.size();
+
+	// filling the `players` vector through the `playersNames` vector
+	for(int i = 0; i < this->nbPlayer; i++)
+	{
+		Player a(playersNames[i]);
+		this->players.push_back(a);
+	}
+}
+
 void Game::start() {
 }
 
 void Game::nextPlayer() {
-	//Considering that `activePlayer` can go from 0 to `nbPlayer - 1`
-	activePlayer = (activePlayer + 1) % (nbPlayer - 1);
+	// considering that `activePlayer` can go from 0 to `nbPlayer - 1`
+	activePlayer = (activePlayer + 1) % nbPlayer;
 	nextPhase();
 }
 
