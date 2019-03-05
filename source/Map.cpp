@@ -7,6 +7,7 @@ vector<Map> Map::maps = vector<Map>();
 Map::Map()
 {
   this->name="DebugMap";
+  this->maxPlayers=6;
   this->continents=vector<Continent>();
   this->territories=vector<Territory>();
 
@@ -20,12 +21,12 @@ Map::Map()
   c2.id=1;
   c2.bonus=2;
   c2.firstTerritory=3;
-  c2.lastTerritory=4;
+  c2.lastTerritory=5;
 
   continents.push_back(c1);
   continents.push_back(c2);
 
-  for(int i =0;i<5;i++)
+  for(int i =0;i<6;i++)
   {
     Territory t;
     t.id=i;

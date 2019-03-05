@@ -10,6 +10,7 @@ class Map {
 private:
   //Attributes
   string name;
+  int maxPlayers;
   vector <Continent> continents;
   vector <Territory> territories;
   static vector <Map> maps;
