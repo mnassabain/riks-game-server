@@ -8,7 +8,7 @@ void Game::start() {
 
 void Game::nextPlayer() {
 	//Considering that `activePlayer` can go from 0 to `nbPlayer - 1`
-	activePlayer = (activePlayer + 1) % (nbPlayer - 1);
+	activePlayer = (activePlayer + 1) % nbPlayer;
 	nextPhase();
 }
 
