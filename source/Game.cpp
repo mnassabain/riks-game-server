@@ -75,4 +75,38 @@ bool isRunning()
 	return this->running;
 }
 
+void Game::addPlayer(string name)
+{
+	if ((this->nbPlayer < this->maxPlayer) && (this->running == false))
+	{
+		this->nbPlayer++;
+		this->players.push_back(Player(name));
+	}
+}
+
 // Public constructors
+Game::Game(string mapName, string creatorId, int maxPlayer)
+{
+	// Setting up game ID
+	this->id = nextId;
+	nextId++;
+
+	// Loading up map
+	this->map = Map::loadMap(mapName);
+
+	// Initialization of lobby variables
+	this->running = false;
+
+	// Initialization of players
+	this->maxPlayer = maxPlayer; // To compare with map max players
+	this->nbPlayer = 0;
+	addPlayer(creatorId);
+
+	// Initialization of game variables
+	this->phase = -1;
+	this->activePlayer = -1;
+	this->totalExchangedSets = 0;
+	this->territoryCapture = false;
+	this->lastAttackedTerritory = -1;
+	this->lastAttackCapture = false;
+}

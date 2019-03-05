@@ -18,6 +18,7 @@ private:
 	bool territoryCapture;
 	bool running;
 	int nbPlayer;
+	int maxPlayer;
 	Map map;
 	vector <TerritoryState> board;
 	vector <Player> players;
@@ -43,7 +44,9 @@ public:
 	// Attributes
 	// Methods
 	bool isRunning();
+	void addPlayer(string name);
 	// Constructors
+	Game(string mapName, string creatorId, int maxPlayer); // Constructor used on lobby creation
 };
 
 #endif //GAME_H
