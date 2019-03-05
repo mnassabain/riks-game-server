@@ -7,7 +7,6 @@
 class GameServer {
 private:
     static std::vector<Game> games;
-    // field: Type ?
 
 public:
     static int main();
