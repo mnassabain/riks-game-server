@@ -1,10 +1,11 @@
 #include "../header/Game.h"
 
-Game::nextId = 0;
+int Game::nextId = 0;
 
 Game::Game(string mapName, vector <string> playersNames)
 {
-	// what to do with the IDs?
+	this->id = nextId;
+	nextId++;
 	this->totalExchangedSets = 0;
 	this->activePlayer = -1;
 	this->phase = -1;

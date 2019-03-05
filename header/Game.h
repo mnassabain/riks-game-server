@@ -19,13 +19,12 @@ private:
 	bool running;
 	int nbPlayer;
 	Map map;
-	// Map map;	commented out for now, as the constructor has been put in private
-	// board : list of TerritoryState
-	vector <Player> players; // players : list of Player
+	vector <TerritoryState> board;
+	vector <Player> players;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
 
-	//Methods
+	// Methods
 	void start();
 	void nextPlayer();
 	void nextPhase();
@@ -37,10 +36,13 @@ private:
 	void end();
 	int updatePlayersStatsInDB();
 
-	//Constructors
+	// Constructors
 	Game(string mapName, vector <string> playersNames);
 
 public:
+	// Attributes
+	// Methods
+	// Constructors
 };
 
 #endif //GAME_H
