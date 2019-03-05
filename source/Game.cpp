@@ -1,5 +1,8 @@
 #include "Game.h"
 
+Game::Game(string mapName, vector <string> playersNames){
+}
+
 void Game::start() {
 }
 
