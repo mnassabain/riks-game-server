@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
 #include <iostream>
 #include "Player.h"
@@ -41,3 +42,5 @@ private:
 
 public:
 };
+
+#endif //GAME_H

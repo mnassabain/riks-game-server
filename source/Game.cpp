@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "../header/Game.h"
 
 Game::Game(string mapName, vector <string> playersNames){
 	// what to do with the IDs?

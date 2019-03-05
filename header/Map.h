@@ -78,4 +78,5 @@ public:
    */
   static Map loadMap(string name);
 };
-#endif
+
+#endif //MAP_H
