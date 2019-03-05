@@ -45,6 +45,7 @@ public:
 	// Methods
 	bool isRunning();
 	void addPlayer(string name);
+	int getId();
 	// Constructors
 	Game(string mapName, string creatorId, int maxPlayer); // Constructor used on lobby creation
 };

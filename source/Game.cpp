@@ -84,6 +84,11 @@ void Game::addPlayer(string name)
 	}
 }
 
+int Game::getId()
+{
+	return this->id;
+}
+
 // Public constructors
 Game::Game(string mapName, string creatorId, int maxPlayer)
 {
