@@ -8,6 +8,7 @@ Game::Game(string mapName, vector <string> playersNames){
 	this->territoryCapture = false;
 	this->running = false;
 	this->nbPlayer = playersNames.size();
+	this->map = Map::loadMap(mapName);
 
 	// filling the `players` vector through the `playersNames` vector
 	for(int i = 0; i < this->nbPlayer; i++)
