@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "Game.h"
+#include "../header/Game.h"
 
 class GameServer {
 private:
