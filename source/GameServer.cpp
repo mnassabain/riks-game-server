@@ -32,5 +32,16 @@ void GameServer::createGame(std::string mapName, std::vector<std::string> player
 
 int GameServer::destroyGame(int id)
 {
-    return 0;
+    bool found = false;
+
+    for (int i = 0; i < games.size(); i++)
+    {
+        if (games[i].getId() == id)
+        {
+            games.erase(games.begin() + i);
+            found = true;
+        }
+    }
+
+    return found?0:-1;
 }
