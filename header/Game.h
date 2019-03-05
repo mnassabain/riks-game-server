@@ -17,7 +17,7 @@ private:
 	bool territoryCapture;
 	bool running;
 	int nbPlayer;
-	// Map map;
+	// Map map;	commented out for now, as the constructor has been put in private
 	// board : list of TerritoryState
 	vector <Player> players; // players : list of Player
 	int lastAttackedTerritory;
