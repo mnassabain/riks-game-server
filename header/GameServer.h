@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAMESERVER_H
+#define GAMESERVER_H
 
 #include <vector>
 #include <string>
@@ -16,3 +17,5 @@ public:
     static int destroyGame(int id);
 
 };
+
+#endif //GAMESERVER_H

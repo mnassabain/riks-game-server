@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
 #include <iostream>
 #include "Player.h"
@@ -8,7 +9,7 @@
 class Game {
 private:
 	// Attributes
-	static int nextId; // Initializing the static variable in a header doesn't seem to be possible
+	static int nextId;
 	int id;
 	int tokens[4];
 	int totalExchangedSets;
@@ -17,14 +18,14 @@ private:
 	bool territoryCapture;
 	bool running;
 	int nbPlayer;
+	int maxPlayer;
 	Map map;
-	// Map map;	commented out for now, as the constructor has been put in private
-	// board : list of TerritoryState
-	vector <Player> players; // players : list of Player
+	vector <TerritoryState> board;
+	vector <Player> players;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
 
-	//Methods
+	// Methods
 	void start();
 	void nextPlayer();
 	void nextPhase();
@@ -36,8 +37,16 @@ private:
 	void end();
 	int updatePlayersStatsInDB();
 
-	//Constructors
+	// Constructors
 	Game(string mapName, vector <string> playersNames);
 
 public:
+	// Attributes
+	// Methods
+	bool isRunning();
+	void addPlayer(string name);
+	// Constructors
+	Game(string mapName, string creatorId, int maxPlayer); // Constructor used on lobby creation
 };
+
+#endif //GAME_H

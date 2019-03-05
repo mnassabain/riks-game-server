@@ -1,4 +1,4 @@
-#include "GameServer.h"
+#include "../header/GameServer.h"
 
 
 std::vector<Game> GameServer::games;
