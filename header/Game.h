@@ -42,6 +42,7 @@ private:
 public:
 	// Attributes
 	// Methods
+	bool isRunning();
 	// Constructors
 };
 

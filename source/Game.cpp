@@ -2,26 +2,7 @@
 
 int Game::nextId = 0;
 
-Game::Game(string mapName, vector <string> playersNames)
-{
-	this->id = nextId;
-	nextId++;
-	this->totalExchangedSets = 0;
-	this->activePlayer = -1;
-	this->phase = -1;
-	this->territoryCapture = false;
-	this->running = false;
-	this->nbPlayer = playersNames.size();
-	this->map = Map::loadMap(mapName);
-
-	// filling the `players` vector through the `playersNames` vector
-	for(int i = 0; i < this->nbPlayer; i++)
-	{
-		Player a(playersNames[i]);
-		this->players.push_back(a);
-	}
-}
-
+// Private methods
 void Game::start()
 {
 }
@@ -66,3 +47,32 @@ int Game::updatePlayersStatsInDB()
 {
 	return 0;
 }
+
+// Private constructors
+Game::Game(string mapName, vector <string> playersNames)
+{
+	this->id = nextId;
+	nextId++;
+	this->totalExchangedSets = 0;
+	this->activePlayer = -1;
+	this->phase = -1;
+	this->territoryCapture = false;
+	this->running = false;
+	this->nbPlayer = playersNames.size();
+	this->map = Map::loadMap(mapName);
+
+	// filling the `players` vector through the `playersNames` vector
+	for (int i = 0; i < this->nbPlayer; i++)
+	{
+		Player a(playersNames[i]);
+		this->players.push_back(a);
+	}
+}
+
+// Public methods
+bool isRunning()
+{
+	return this->running;
+}
+
+// Public constructors
