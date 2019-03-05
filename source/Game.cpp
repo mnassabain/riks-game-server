@@ -103,15 +103,20 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->running = false;
 
 	// Initialization of players
-	this->maxPlayer = maxPlayer; // To compare with map max players
+	this->maxPlayer = maxPlayer; // To compare and min() with map.maxPlayers once we get the getter, also consistency changes with player/players
 	this->nbPlayer = 0;
 	addPlayer(creatorId);
 
-	// Initialization of game variables
+	// Initialization of game variables - Might be moved to the start() method
 	this->phase = -1;
 	this->activePlayer = -1;
+	this->tokens[0] = 2;
+	this->tokens[1] = 14;
+	this->tokens[2] = 14;
+	this->tokens[3] = 14;
 	this->totalExchangedSets = 0;
 	this->territoryCapture = false;
 	this->lastAttackedTerritory = -1;
 	this->lastAttackCapture = false;
+	// Reminder to add the board initialization
 }

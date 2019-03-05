@@ -9,19 +9,21 @@
 class Game {
 private:
 	// Attributes
+	// Lobby variables
 	static int nextId;
 	int id;
+	int maxPlayer;
+	int nbPlayer;
+	vector <Player> players;
+	bool running;
+	Map map;
+	// Game variables - Only available when Game is running
+	vector <TerritoryState> board;
+	int phase;
+	int activePlayer;
 	int tokens[4];
 	int totalExchangedSets;
-	int activePlayer;
-	int phase;
 	bool territoryCapture;
-	bool running;
-	int nbPlayer;
-	int maxPlayer;
-	Map map;
-	vector <TerritoryState> board;
-	vector <Player> players;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
 
