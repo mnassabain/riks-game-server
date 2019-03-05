@@ -9,7 +9,7 @@
 class Game {
 private:
 	// Attributes
-	static int nextId; // Initializing the static variable in a header doesn't seem to be possible
+	static int nextId;
 	int id;
 	int tokens[4];
 	int totalExchangedSets;
