@@ -17,11 +17,6 @@ private:
   //Constructors
 
   /**
-   * @brief Map : Default constructor (debug map)
-   */
-  Map();
-
-  /**
    * @brief Map : Constructor
    * @param file : path of the file used to create the map
    */
@@ -37,6 +32,12 @@ private:
    static bool exists(string name);
 
 public:
+
+  //Constructor
+  /**
+   * @brief Map : Default constructor (debug map)
+   */
+  Map();
 
   //Methods
 
