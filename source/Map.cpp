@@ -86,7 +86,7 @@ vector<Territory> Map::getTerritories()
 bool Map::exists(string name)
 {
   bool res = false;
-  for(int i = 0;!res && i<Map::maps.size();i++)
+  for(size_t i = 0;!res && i<Map::maps.size();i++)
   {
     if(Map::maps.at(i).getName()==name)
       res = true;
@@ -97,7 +97,7 @@ bool Map::exists(string name)
 int Map::getMapIndex(string name)
 {
   int res = -1;
-  for(int i = 0; res == -1 && i<Map::maps.size();i++)
+  for(size_t i = 0; res == -1 && i<Map::maps.size();i++)
   {
     if(Map::maps.at(i).getName()==name)
       res=i;
