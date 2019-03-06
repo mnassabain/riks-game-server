@@ -1,4 +1,4 @@
-TARGET = main
+TARGET = riks-server
 LIBS = -lm
 CC = g++
 CFLAGS = #-g -Wall
@@ -8,10 +8,11 @@ CFLAGS = #-g -Wall
 default: $(TARGET)
 all: default
 
-OBJECTS = $(patsubst source/%.cpp, source/%.o, $(wildcard source/*.cpp))
+OBJECTS = $(patsubst source/%.cpp, bin/%.o, $(wildcard source/*.cpp))
+# OBJECTS = $(wildcard bin/*.o)
 HEADERS = $(wildcard header/*.h)
 
-%.o: %.cpp $(HEADERS)
+bin/%.o: source/%.cpp $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
@@ -20,5 +21,5 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
 
 clean:
-	-rm -f source/*.o
+	-rm -f bin/*.o
 	-rm -f $(TARGET)
