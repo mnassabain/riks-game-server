@@ -1,7 +1,7 @@
 TARGET = riks-server
 LIBS = -lm
 CC = g++
-CFLAGS = #-g -Wall
+CFLAGS = -g -Wall
 
 .PHONY: default all clean
 
