@@ -10,10 +10,10 @@
 std::vector<Game> GameServer::games;
 
 
-int GameServer::main()
-{
-    return 0;
-}
+// int GameServer::main()
+// {
+//     return 0;
+// }
 
 
 void GameServer::listen()
