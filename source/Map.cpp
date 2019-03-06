@@ -42,12 +42,15 @@ Map::Map(string file)
 Map Map::loadMap(string name)
 {
   Map m;
-  if (Map::getMapIndex(name))
+  int tmp;
+  if ((tmp = Map::getMapIndex(name)) != -1)
   { 
+    m = maps.at(tmp);
+    cout<<">> "<<name<<" map has been demanded"<<endl;
   }
   else if(name == "DebugMap")
   {
-    cout<<"Loading DebugMap..."<<endl;
+    cout<<">> Loading DebugMap..."<<endl;
     m = Map();
     maps.push_back(m);
   }
