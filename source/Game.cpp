@@ -70,7 +70,7 @@ Game::Game(string mapName, vector <string> playersNames)
 }
 
 // Public methods
-bool isRunning()
+bool Game::isRunning()
 {
 	return this->running;
 }
