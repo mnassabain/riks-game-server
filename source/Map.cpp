@@ -42,7 +42,10 @@ Map::Map(string file)
 Map Map::loadMap(string name)
 {
   Map m;
-  if(name == "DebugMap")
+  if (Map::getMapIndex(name))
+  { 
+  }
+  else if(name == "DebugMap")
   {
     cout<<"Loading DebugMap..."<<endl;
     m = Map();
@@ -84,6 +87,17 @@ bool Map::exists(string name)
   {
     if(Map::maps.at(i).getName()==name)
       res = true;
+  }
+  return res;
+}
+
+int Map::getMapIndex(string name)
+{
+  int res = -1;
+  for(int i = 0; res == -1 && i<Map::maps.size();i++)
+  {
+    if(Map::maps.at(i).getName()==name)
+      res=i;
   }
   return res;
 }
