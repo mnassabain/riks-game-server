@@ -9,7 +9,6 @@ default: $(TARGET)
 all: default
 
 OBJECTS = $(patsubst source/%.cpp, bin/%.o, $(wildcard source/*.cpp))
-# OBJECTS = $(wildcard bin/*.o)
 HEADERS = $(wildcard header/*.h)
 
 bin/%.o: source/%.cpp $(HEADERS)
