@@ -3,12 +3,11 @@
 
 #include <vector>
 #include <string>
-#include "Game.h"
+#include "../header/Game.h"
 
 class GameServer {
 private:
     static std::vector<Game> games;
-    // field: Type ?
 
 public:
     static int main();
