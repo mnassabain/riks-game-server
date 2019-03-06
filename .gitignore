@@ -2,3 +2,5 @@
 *.o
 source/testmain.cpp
 *.h.gch
+bin/*.o
+riks-server
