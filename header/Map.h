@@ -31,6 +31,13 @@ private:
    * @return true if the map exists, false otherwise
    */
    static bool exists(string name);
+  
+  /**
+   * @brief getMapIndex : get the index of a Map in the maps list
+   * @param name : name of the map
+   * @return index of the map if it exists, -1 otherwise
+   */
+   static int getMapIndex(string name);
 
 public:
 

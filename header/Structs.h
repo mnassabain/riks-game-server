@@ -2,6 +2,7 @@
 #define STRUCTS_H
 
 #include <vector>
+#include <string>
 using namespace std;
 
 //Territory

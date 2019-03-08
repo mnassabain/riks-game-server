@@ -42,9 +42,15 @@ Map::Map(string file)
 Map Map::loadMap(string name)
 {
   Map m;
-  if(name == "DebugMap")
+  int tmp;
+  if ((tmp = Map::getMapIndex(name)) != -1)
+  { 
+    m = maps.at(tmp);
+    cout<<">> "<<name<<" map has been demanded"<<endl;
+  }
+  else if(name == "DebugMap")
   {
-    cout<<"Loading DebugMap..."<<endl;
+    cout<<">> Loading DebugMap..."<<endl;
     m = Map();
     maps.push_back(m);
   }
@@ -80,10 +86,21 @@ vector<Territory> Map::getTerritories()
 bool Map::exists(string name)
 {
   bool res = false;
-  for(int i = 0;!res && i<Map::maps.size();i++)
+  for(size_t i = 0;!res && i<Map::maps.size();i++)
   {
     if(Map::maps.at(i).getName()==name)
       res = true;
+  }
+  return res;
+}
+
+int Map::getMapIndex(string name)
+{
+  int res = -1;
+  for(size_t i = 0; res == -1 && i<Map::maps.size();i++)
+  {
+    if(Map::maps.at(i).getName()==name)
+      res=i;
   }
   return res;
 }

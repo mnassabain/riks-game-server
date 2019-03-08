@@ -2,9 +2,11 @@
 #define GAME_H
 
 #include <iostream>
+#include <string>
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
+using namespace std;
 
 class Game {
 private:
