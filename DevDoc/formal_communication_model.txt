@@ -1,0 +1,101 @@
+Standarized communication model
+The messages here are to be encapsulated on a higher level
+This document doesn't cover the actual encoding of messages and the high level user verification (tokens)
+
+The format used will be
+<ID> <Arguments> where ID is the type of message
+
+We will separate the message in two big categories. Game messages and Server messages.
+Game messages are messages that have to be forwarded to the proper Game instance and are messages containing game instructions, allowing the Game to proceed properly.
+Server messages are messages related to connectivity, features outside of the Game scope, and lobby management.
+This design is made to make Games autonomous and allow them ideally to function on their own server, directly receiving related messages once the game has officially started.
+isRunning is the go-to to know if a Game is currently running as a lobby or an actual game, allowing quick decision on discarding or forwarding of messages.
+
+More details will be provided at a later time about allowed messages.
+Also the list needs to be reworked slightly.
+
+1. Game messages
+/**************/
+a. Player -> Server
+-------------------
+PUT <Player> <Territory> <#Units>
+MOVE <Player> <Source Territory> <Destination Territory> <#Units>
+ATTACK <Player> <Source Territory> <Destination Territory> <#Units>
+DEFEND <Player> <#Units>
+END_PHASE <Player>
+USE_TOKENS <Player> <ID Token 1> <ID Token 2> <ID Token 3>
+
+SYNC_DEMAND
+POKE <Player>
+
+CHAT <Player> <Message>
+
+-Optional features-
+HOVER <Player> <Territory>
+SELECT_TOKEN <Player> <ID Token> <Slot>
+
+b. Server -> Players
+--------------------
+
+REINFORCEMENT <Player> <#Units>
+PUT <Player> <Territory> <#Units>
+MOVE <Player> <Source Territory> <Destination Territory> <#Units>
+ATTACKED <Attacker> <Defender> <Source Territory> <Destination Territory> <#Units>
+COMBAT_RESULTS <Attacker> <Defender> <Source Territory> <Destination Territory> <#Defending Units> <Attacker Loss> <Defender Loss>
+PLAYER ELIMINATION <Player>
+USE_TOKENS <Player> <ID Token 1> <ID Token 2> <ID Token 3>
+GIVE_TOKENS <Player> <#Token 0> <#Token 1> <#Token 2> <#Token 3>
+CURRENT_PHASE <Player> <ID Phase>
+
+GAME_OVER <Winner>
+GAME_STATUS <Complete status>
+
+CHAT <Player> <Message>
+
+-Optional features-
+HOVER <Player> <Territory>
+SELECT_TOKEN <Player> <ID Token> <Slot>
+
+c. Server -> Player
+-------------------
+ERROR <Player> <Type>
+POKE <Player>
+
+2. Server messages
+/****************/
+a. Player -> Server
+-------------------
+CONNECT <ID> <Hashed Password>
+SIGN_UP <ID> <Hashed Password>
+DISCONNECT <ID>
+LOBBY_LIST
+JOIN_LOBBY <ID> <ID Game> <Password>
+LEAVE_GAME <ID> <ID Game>
+CREATE_LOBBY <ID> <Lobby Name> <#Players> <Map>
+EDIT_LOBBY <ID> <ID Game> <Lobby Name> <#Players> <Map>
+KICK_FROM_LOBBY <ID> <ID Game> <ID Kick>
+START_GAME <ID> <ID Game>
+PLAYER_PROFILE <ID> <ID Requested>
+GAME_RESULTS <ID> <ID Game>
+MATCHMAKING
+
+
+b. Server -> Player
+--------------------
+SIGN_UP
+LOBBY_LIST | Will show locked lobbies, and not running games
+JOIN_LOBBY
+LOBBY_STATE
+CONNECT <Token>
+DISCONNECT
+LEAVE_GAME
+CREATE_LOBBY
+EDIT_LOBBY
+CLOSE_LOBBY
+KICK
+KICKED
+START_GAME
+PLAYER_PROFILE
+GAME_RESULTS
+ERROR <ID> <Message>
+MATCHMAKING
