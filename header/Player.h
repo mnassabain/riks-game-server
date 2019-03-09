@@ -8,12 +8,14 @@ class Player {
 public:
 	std::string name;
 	std::vector<int> tokens = std::vector<int>(4);
+    int idu;
     int reinforcement;
 	int victories;
     int defeats;
     int gained_territories;
     int lost_territories;
     int set_of_tokens[3];
+    int sets_of_tokens;
     bool isAlive;
     //Player();
     Player(std::string name);
@@ -25,6 +27,17 @@ public:
     void receiveTokens(int numberOfEachToken[4]);
     void removeTokens(int numberOfEachToken[4]);
     void give_reinforcement(int number_of_rein, int last_rein_val);
+    int get_victories();
+    int get_defeats();
+    int get_gained_territories();
+    int get_lost_territories();
+    int get_sets_of_tokens();
+    void set_victories();
+    void set_defeats();
+    void set_gained_territories();
+    void set_lost_territories();
+    void set_sets_of_tokens();
+    void die();
     //~Player();
 private:
 };
