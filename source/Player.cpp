@@ -1,11 +1,4 @@
 #include "../header/Player.h"
-#include "../header/Player.h"
-#include "mysql_connection.h"
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
-#include <cppconn/prepared_statement.h>
 using namespace std;
 
 Player::Player(string name)
@@ -64,9 +57,11 @@ void Player::hasSet(int tok1, int tok2, int tok3)
 		this->tokens[tok1] > 0 ? this->tokens[tok1] = 0 : this->tokens[tok1]--;
 		this->tokens[tok2] > 0 ? this->tokens[tok2] = 0 : this->tokens[tok2]--;
 		this->tokens[tok3] > 0 ? this->tokens[tok3] = 0 : this->tokens[tok3]--;
+
+		/* updating the number of set_of_tokens */
+		this->sets_of_tokens ++;
 	}
-	/* updating the number of set_of_tokens */
-	this->sets_of_tokens ++;
+
 }
 vector<int>Player::listTokens()   
 {

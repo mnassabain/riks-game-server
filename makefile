@@ -1,7 +1,7 @@
 TARGET = riks-server
 LIBS = -lm
 CC = g++
-CFLAGS = -g -Wall
+CFLAGS = -g 
 
 .PHONY: default all clean
 
@@ -17,7 +17,7 @@ bin/%.o: source/%.cpp $(HEADERS)
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+	$(CC) $(CDRIVA) $(OBJECTS) -Wall $(LIBS) -o $@
 
 clean:
 	-rm -f bin/*.o
