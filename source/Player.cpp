@@ -1,18 +1,65 @@
 #include "../header/Player.h"
-
+#include "../header/Player.h"
+#include "mysql_connection.h"
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
 using namespace std;
-
 
 Player::Player(string name)
 {
 
 	this->name = name;
-	this->tokens[0] = 0;
-	this->tokens[1] = 0;
-	this->tokens[2] = 0;
-	this->tokens[3] = 0;
-
+	for(size_t i = 0; i < 4; i++)
+	{
+		this->tokens[i] = 0;
+	}
     
+}
+void Player::get_player_stats()
+{
+try{
+	sql::Driver *driver;
+	sql::Connection *con;
+	sql::ResultSet *res;
+	sql::PreparedStatement *pstmt;
+	string request = "SELECT * FROM stats WHERE idu = ?";
+	int idu = 1;
+
+	/* Create a connection */
+	driver = get_driver_instance();
+	con = driver->connect("localhost:3306", "root", "test");
+	/* Connect to the MySQL test database */
+	con->setSchema("mytest");
+	pstmt = con->prepareStatement(request);
+	pstmt->setInt(1,idu);
+	res = pstmt->executeQuery();
+	if(res->rowsCount() == 1)
+	{
+		while(res->next())
+		{
+
+			this->victories          = res->getInt("victories");
+			this->defeats            = res->getInt("defeats");
+			this->gained_territories = res->getInt("gained_territories");
+			this->lost_territories   = res->getInt("lost_territories");
+			this->sets_of_tokens     = res->getInt("sets_of_tokens");
+
+		}
+
+	}
+  delete res;
+  delete pstmt;
+  delete con;
+} catch (sql::SQLException &e) {
+
+	cout << "# ERR: " << e.what();
+  	cout << " (MySQL error code: " << e.getErrorCode();
+  	cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+ 
+	}
 }
 bool Player::set_is_valid(int tok1, int tok2, int tok3)
 {
