@@ -18,58 +18,21 @@ Player::Player(string name)
 	{
 		this->tokens[i] = 0;
 	}
-	/* getting player's stats */
-	this->get_stats();
+	/* initializing with player stats */
+	this->victories          = 0;
+	this->defeats            = 0;
+	this->gained_territories = 0;
+	this->lost_territories   = 0;
+	this->sets_of_tokens     = 0;
     
 }
-void Player::get_stats()
-{
-try{
-	sql::Driver *driver;
-	sql::Connection *con;
-	sql::ResultSet *res;
-	sql::PreparedStatement *pstmt;
-	string request = "SELECT * FROM stats WHERE idu = ?";
-	int idu = 1;
 
-	/* Create a connection */
-	driver = get_driver_instance();
-	con = driver->connect("localhost:3306", "root", "test");
-	/* Connect to the MySQL test database */
-	con->setSchema("mytest");
-	pstmt = con->prepareStatement(request);
-	pstmt->setInt(1,idu);
-	res = pstmt->executeQuery();
-	if(res->rowsCount() == 1)
-	{
-		while(res->next())
-		{
-
-			this->victories          = res->getInt("victories");
-			this->defeats            = res->getInt("defeats");
-			this->gained_territories = res->getInt("gained_territories");
-			this->lost_territories   = res->getInt("lost_territories");
-			this->sets_of_tokens     = res->getInt("sets_of_tokens");
-
-		}
-
-	}
-
-  	delete res;
-  	delete pstmt;
-  	delete con;
-
-} 
-catch (sql::SQLException &e) {
-
-	cout << "# ERR: " << e.what();
-  	cout << " (MySQL error code: " << e.getErrorCode();
-  	cout << ", SQLState: " << e.getSQLState() << " )" << endl;
- 
-	}
-}
 bool Player::set_is_valid(int tok1, int tok2, int tok3)
 {
+	if(tok1 < 0 || tok2 < 0 || tok3 < 0)
+	{
+		return false;
+	}
 	return (tok1 != tok2 && tok1 != tok3 && tok2 != tok3) || (tok1 == tok2 && tok1 == tok3) ;
 }
 void Player::give_reinforcement(int number_of_rein, int last_rein_val)
@@ -143,6 +106,10 @@ void Player::removeTokens(int numberOfEachToken[4])
 	}
 
 }
+void Player::die()
+{
+	this->isAlive = false;
+}
 int Player::get_victories()
 {
 	return this->victories;
@@ -162,4 +129,24 @@ int Player::get_lost_territories()
 int Player::get_sets_of_tokens()
 {
 	return this->sets_of_tokens;
+}
+void Player::set_victories()
+{
+	this->victories ++;
+}
+void Player::set_defeats()
+{
+	this->defeats ++;
+}
+void Player::set_gained_territories()
+{
+	this->gained_territories ++;
+}
+void Player::set_lost_territories()
+{
+	this->lost_territories ++;
+}
+void Player::set_sets_of_tokens()
+{
+	this->sets_of_tokens ++;
 }
