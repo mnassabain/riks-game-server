@@ -1,7 +1,7 @@
 TARGET = riks-server
-LIBS = -lm -L./libs/libboost -lboost_system -lboost_chrono
+LIBS = -lm -L./libs/libboost -lboost_system -lboost_chrono -Wl,-rpath=./libs/libboost/
 CC = g++
-CFLAGS = -g -Wall -I./libs/ -Wl,-rpath=./libs/libboost/
+CFLAGS = -g -Wall -I./libs/
 
 .PHONY: default all clean
 
