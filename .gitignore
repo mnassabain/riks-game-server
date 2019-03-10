@@ -1,6 +1,7 @@
 .vscode/
 *.o
 source/testmain.cpp
+source/testapp
 *.h.gch
 bin/*.o
 riks-server
