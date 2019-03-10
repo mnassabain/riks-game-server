@@ -55,6 +55,7 @@ int GameServer::destroyGame(int id)
 
 
 /* sockets */
+
 void GameServer::init()
 {
     /* Set logging settings */ 
@@ -66,4 +67,17 @@ void GameServer::init()
 
     /* Register new message handler */
     endpoint.set_message_handler(&onMessage);
+}
+
+
+void GameServer::run()
+{
+    /* Listen on port */
+    endpoint.listen(SERVER_PORT);
+
+    /* Queues a connection accept operation */ 
+    endpoint.start_accept();
+
+    /* Start the Asio io_service run loop */
+    endpoint.run(); 
 }

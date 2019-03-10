@@ -10,6 +10,9 @@
 #include "../libs/websocketpp/server.hpp"
 
 
+#define SERVER_PORT 9002
+
+
 class GameServer {
 private:
     static std::vector<Game> games;
