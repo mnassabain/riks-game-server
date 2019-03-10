@@ -89,3 +89,10 @@ void GameServer::onMessage(GameServer::ConnectionHDL hdl, GameServer::MessagePtr
         << " and message: " << msg->get_payload()
         << std::endl;
 }
+
+
+/* debugging */
+int GameServer::nbGames()
+{
+    return games.size();
+}

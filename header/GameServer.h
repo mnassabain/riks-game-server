@@ -40,7 +40,7 @@ public:
     static void run();
 
     /* debugging */
-    static int nbGames() {return games.size();} 
+    static int nbGames();
 
 };
 
