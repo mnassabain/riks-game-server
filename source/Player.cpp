@@ -4,14 +4,14 @@ using namespace std;
 Player::Player(string name)
 {
 
-	/* initializing with player's id */
+	/* initializing with player's name */
 	this->name = name;
 	/* at the beiginning of the game, every player has 0 tokens  */
 	for(size_t i = 0; i < 4; i++)
 	{
 		this->tokens[i] = 0;
 	}
-	/* initializing with player stats */
+	/* initializing of player stats */
 	this->victories          = 0;
 	this->defeats            = 0;
 	this->gained_territories = 0;
@@ -91,7 +91,7 @@ void Player::hasSet(int tok1, int tok2, int tok3)
 	}
 
 }
-vector<int>Player::listTokens()   
+int* Player::listTokens()   
 {
 
 	return this->tokens;
@@ -100,12 +100,10 @@ vector<int>Player::listTokens()
 void Player::removeAllTokens()
 {
 
-	for(size_t j = 0;  j < tokens.size() ; j++)
+	for(size_t j = 0;  j < 4 ; j++)
 	{
 		this->tokens[j] = 0;
 	}
-
-	this->isAlive = false;
 
 }
 void Player::receiveToken(int type)
@@ -114,7 +112,7 @@ void Player::receiveToken(int type)
 }
 void Player::receiveTokens(int numberOfEachToken[4])
 {
-	for(size_t j = 0; j < this->tokens.size() ; j++)
+	for(size_t j = 0; j < 4 ; j++)
 	{
 		this->tokens[j] += numberOfEachToken[j];
 	}
@@ -128,10 +126,6 @@ void Player::removeTokens(int numberOfEachToken[4])
 		this->tokens[j] < numberOfEachToken[j] ? this->tokens[j] = 0 : this->tokens[j] = this->tokens[j] - numberOfEachToken[j];
 	}
 
-}
-void Player::die()
-{
-	this->isAlive = false;
 }
 int Player::get_victories()
 {
@@ -172,4 +166,9 @@ void Player::set_lost_territories()
 void Player::set_sets_of_tokens()
 {
 	this->sets_of_tokens ++;
+}
+/* what about the one (or those) who will get his tokens ? */
+void Player::die()
+{
+	this->isAlive = false;
 }
