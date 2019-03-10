@@ -12,6 +12,10 @@
 
 class GameServer {
 private:
+    /* typedefs for server endpoint and message pointer */
+    typedef websocketpp::server<websocketpp::config::asio> ServerEndpoint;
+    typedef ServerEndpoint::message_ptr MessagePtr;
+    
     static std::vector<Game> games;
 
 public:
