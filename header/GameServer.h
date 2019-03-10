@@ -36,8 +36,12 @@ public:
     static int destroyGame(int id);
 
     /* sockets */
+    /* initialises the server endpoint */
     static void init();
+
+    /* listens to incoming messages */
     static void run();
+
 
     /* debugging */
     static int nbGames();
