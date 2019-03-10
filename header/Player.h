@@ -7,8 +7,8 @@
 class Player {
 public:
 	std::string name;
-	std::vector<int> tokens = std::vector<int>(4);
-    int idu;
+	/*std::vector<int> tokens = std::vector<int>(4) */
+    int tokens[4];
     int reinforcement;
 	int victories;
     int defeats;
@@ -21,7 +21,8 @@ public:
     Player(std::string name);
     bool set_is_valid(int tok1, int tok2, int tok3);
 	void hasSet(int tok1, int tok2, int tok3);
-    std::vector<int>listTokens();
+    /*std::vector<int>listTokens(); */
+    int* listTokens();
     void removeAllTokens();
     void receiveToken(int type);
     void receiveTokens(int numberOfEachToken[4]);
