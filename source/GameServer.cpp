@@ -81,3 +81,11 @@ void GameServer::run()
     /* Start the Asio io_service run loop */
     endpoint.run(); 
 }
+
+
+void GameServer::onMessage(GameServer::ConnectionHDL hdl, GameServer::MessagePtr msg)
+{
+    std::cout << "Message received with HDL: " << hdl.lock().get()
+        << " and message: " << msg->get_payload()
+        << std::endl;
+}
