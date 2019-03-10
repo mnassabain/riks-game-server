@@ -1,5 +1,5 @@
 TARGET = riks-server
-LIBS = -lm -lboost_system -lboost_chrono
+LIBS = -lm -L./libs/libboost -lboost_system -lboost_chrono
 CC = g++
 CFLAGS = -g -Wall -I./libs/
 
