@@ -50,8 +50,14 @@ void Game::solveCombat()
 
 void Game::moveUnits(int source, int destination, int units)
 {
-	this -> board[source].units -= units;
-	this -> board[destination].units += units;
+	// checking the requirements of moving units
+	if(	this -> board[source].units > 1 &&
+		this -> activePlayer == this -> board[source].owner && 
+		this -> activePlayer == this -> board[destination].owner &&
+		areAdjacent(source, destination) ) {
+		this -> board[source].units -= units;
+		this -> board[destination].units += units;
+	}
 }
 
 void Game::setInitialReinforcement()
