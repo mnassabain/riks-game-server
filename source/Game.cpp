@@ -68,7 +68,7 @@ int Game::updatePlayersStatsInDB()
 }
 
 bool areAdjacent(int a, int b) {
-	return;
+	return true;
 }
 
 // Private constructors
