@@ -6,7 +6,7 @@ int Game::nextId = 0;
 void Game::start()
 {
 }
-
+// TODO: nextPhase, moveUnits, setInitialReinforcement 
 void Game::nextPlayer()
 {
 	// considering that `activePlayer` can go from 0 to `nbPlayer - 1`
@@ -30,6 +30,7 @@ void Game::nextPlayer()
 
 void Game::nextPhase()
 {
+	this -> phase = (this -> phase + 1) % 3;
 }
 
 void Game::chooseFirstPlayer()
