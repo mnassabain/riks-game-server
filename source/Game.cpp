@@ -22,6 +22,7 @@ void Game::nextPlayer()
 		this->end();
 	}
 	else {
+		// we move to the next phase
 		this -> activePlayer = idPlayer;
 		nextPhase();
 	}
