@@ -1,14 +1,15 @@
 <name>
 <max_players>
-
 <continents_number>
-<id> <bonus> <first_territory> <last_territory>
-.
-.
-<id> <bonus> <first_territory> <last_territory>
-
 <countries_number>
-<id> <neighbor> .. <neighbor>
+
+<idc> <bonus> <first_territory> <last_territory>
 .
 .
-<id> <neighbor> .. <neighbor>
+<idc> <bonus> <first_territory> <last_territory>
+
+
+<idt> <neighbor> .. <neighbor>
+.
+.
+<idt> <neighbor> .. <neighbor>
