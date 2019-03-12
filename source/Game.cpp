@@ -27,7 +27,7 @@ void Game::nextPlayer()
 		nextPhase();
 	}
 }
-//  moveUnits, setInitialReinforcement 
+
 void Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
