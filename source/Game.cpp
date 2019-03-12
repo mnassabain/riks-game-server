@@ -10,7 +10,13 @@ void Game::start()
 void Game::nextPlayer()
 {
 	// considering that `activePlayer` can go from 0 to `nbPlayer - 1`
-	activePlayer = (activePlayer + 1) % nbPlayer;
+	int idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+
+	// don't pass the turn to an eliminated player
+	while (!this -> players[idPlayer].isAlive) {
+		idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+	}
+	this -> activePlayer = idPlayer;
 	nextPhase();
 }
 
