@@ -8,7 +8,6 @@
 .
 <idc> <bonus> <first_territory> <last_territory>
 
-
 <idt> <neighbor> .. <neighbor>
 .
 .
