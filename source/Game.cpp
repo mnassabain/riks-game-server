@@ -50,6 +50,14 @@ void Game::solveCombat()
 
 void Game::moveUnits(int source, int destination, int units)
 {
+	// checking the requirements of moving units
+	if(	this -> board[source].units > 1 &&
+		this -> activePlayer == this -> board[source].owner && 
+		this -> activePlayer == this -> board[destination].owner &&
+		areAdjacent(source, destination) ) {
+		this -> board[source].units -= units;
+		this -> board[destination].units += units;
+	}
 }
 
 void Game::setInitialReinforcement()
@@ -63,6 +71,10 @@ void Game::end()
 int Game::updatePlayersStatsInDB()
 {
 	return 0;
+}
+
+bool areAdjacent(int a, int b) {
+	return true;
 }
 
 // Private constructors
