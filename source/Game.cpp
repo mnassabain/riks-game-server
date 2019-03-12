@@ -27,7 +27,7 @@ void Game::nextPlayer()
 		nextPhase();
 	}
 }
-
+//  moveUnits, setInitialReinforcement 
 void Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
@@ -50,6 +50,8 @@ void Game::solveCombat()
 
 void Game::moveUnits(int source, int destination, int units)
 {
+	this -> board[source].units -= units;
+	this -> board[destination].units += units;
 }
 
 void Game::setInitialReinforcement()
