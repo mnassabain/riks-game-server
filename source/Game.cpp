@@ -32,6 +32,7 @@ void Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this -> phase = (this -> phase + 1) % 3;
+	// is this method where we start to implement some game logic?
 }
 
 void Game::chooseFirstPlayer()
