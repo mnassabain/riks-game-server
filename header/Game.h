@@ -38,6 +38,7 @@ private:
 	void setInitialReinforcement();
 	void end();
 	int updatePlayersStatsInDB();
+	bool areAdjacent(int a, int b);
 
 	// Constructors
 	Game(string mapName, vector <string> playersNames);

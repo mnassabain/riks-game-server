@@ -67,6 +67,10 @@ int Game::updatePlayersStatsInDB()
 	return 0;
 }
 
+bool areAdjacent(int a, int b) {
+	return;
+}
+
 // Private constructors
 Game::Game(string mapName, vector <string> playersNames)
 {
