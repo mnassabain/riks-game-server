@@ -16,8 +16,15 @@ void Game::nextPlayer()
 	while (!this -> players[idPlayer].isAlive) {
 		idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
 	}
-	this -> activePlayer = idPlayer;
-	nextPhase();
+
+	if(idPlayer == this -> activePlayer) {
+		// the game ends in that case, nobody is alive except the activePlayer
+		this->end();
+	}
+	else {
+		this -> activePlayer = idPlayer;
+		nextPhase();
+	}
 }
 
 void Game::nextPhase()
