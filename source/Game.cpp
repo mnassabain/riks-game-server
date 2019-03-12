@@ -10,12 +10,29 @@ void Game::start()
 void Game::nextPlayer()
 {
 	// considering that `activePlayer` can go from 0 to `nbPlayer - 1`
-	activePlayer = (activePlayer + 1) % nbPlayer;
-	nextPhase();
+	int idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+
+	// don't pass the turn to an eliminated player
+	while (!this -> players[idPlayer].isAlive) {
+		idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+	}
+
+	if(idPlayer == this -> activePlayer) {
+		// the game ends in that case, nobody is alive except the activePlayer
+		this->end();
+	}
+	else {
+		// we move to the next phase
+		this -> activePlayer = idPlayer;
+		nextPhase();
+	}
 }
 
 void Game::nextPhase()
 {
+	// considering that `phase` can go from 0 to 2
+	this -> phase = (this -> phase + 1) % 3;
+	// is this method where we start to implement some game logic?
 }
 
 void Game::chooseFirstPlayer()
