@@ -136,8 +136,15 @@ int Game::updatePlayersStatsInDB()
 	return 0;
 }
 
-bool Game::areAdjacent(int a, int b) { // Let's not forget to finish this function
-	return true;
+bool Game::areAdjacent(int a, int b) {
+	vector<int> aNeighbors = this -> map.getTerritories()[a].neighbors;
+
+	// checking if `b` is in the `neighbors` vector of the `a` territory
+	if(std::find(aNeighbors.begin(), aNeighbors.end(), b) != aNeighbors.end()) {
+    	return true;
+	} 
+	else 
+		return false;
 }
 
 // Public methods

@@ -32,27 +32,122 @@ private:
 	bool lastAttackCapture;
 
 	// Methods
+
+	/**
+	 * @brief 
+	 * 
+	 */
 	void start();
+
+	/**
+	 * @brief nextPlayer : Passes the turn to the next player
+	 * 
+	 */
 	void nextPlayer();
+
+	/**
+	 * @brief nextPhase : Goes to the next phase
+	 * 
+	 */
 	void nextPhase();
+
+	/**
+	 * @brief 
+	 * 
+	 */
 	void chooseFirstPlayer();
+
+	/**
+	 * @brief 
+	 * 
+	 * @param tok1 
+	 * @param tok2 
+	 * @param tok3 
+	 * @return int 
+	 */
 	int useSet(int tok1, int tok2, int tok3);
 	int currentSetValue();
 	void putUnits(int territory, int units);
+	/**
+	 * @brief 
+	 * 
+	 */
 	void solveCombat();
-	void moveUnits(int source, int destination, int units);
-	void setInitialReinforcement();
-	void end();
-	int updatePlayersStatsInDB();
-	bool areAdjacent(int a, int b);
 
+	/**
+	 * @brief moveUnits : Moving units from one territory to another
+	 * 
+	 * @param source 
+	 * @param destination 
+	 * @param units 
+	 */
+	void moveUnits(int source, int destination, int units);
+
+	/**
+	 * @brief Set the Initial Reinforcement object
+	 * 
+	 */
+	void setInitialReinforcement();
+
+	/**
+	 * @brief 
+	 * 
+	 */
+	void end();
+
+	/**
+	 * @brief 
+	 * 
+	 * @return int 
+	 */
+	int updatePlayersStatsInDB();
+
+	/**
+	 * @brief areAdjacent : Checks if `a` and `b` are neighbors
+	 * 
+	 * @param a 
+	 * @param b 
+	 * @return true 
+	 * @return false 
+	 */
+	bool areAdjacent(int a, int b);
+	// Constructors
 public:
 	// Attributes
+
 	// Methods
+
+	/**
+	 * @brief 
+	 * 
+	 * @return true 
+	 * @return false 
+	 */
 	bool isRunning();
+
+	/**
+	 * @brief 
+	 * 
+	 * @param name 
+	 */
 	void addPlayer(string name);
+
+	/**
+	 * @brief Get the Id object
+	 * 
+	 * @return int 
+	 */
 	int getId();
+	
 	// Constructors
+
+	/**
+	 * @brief Construct a new Game object
+	 * 
+	 * @param mapName 
+	 * @param creatorId 
+	 * @param maxPlayer 
+	 */
 	Game(string mapName, string creatorId, int maxPlayer); // Constructor used on lobby creation
 };
 
