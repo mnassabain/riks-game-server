@@ -22,13 +22,13 @@ void Game::start()
 	blank.owner = -1;
 	blank.units = 0;
 	// Adding one blank TerritoryState per territory
-	int limit = this->map.nbTerritories;
+	int limit = this->map.nbTerritories();
 	for (int i = 0; i < limit; i++) {
 		this->board.push_back(blank);
 	}
 
 	// Everything is ready to start the game, the lobby now becomes a running game
-	this->isRunning = true;
+	this -> running = true;
 }
 
 void Game::nextPlayer()
@@ -181,7 +181,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->running = false;
 
 	// Initialization of players
-	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers);
+	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
 	this->nbPlayer = 0;
 	addPlayer(creatorId);
 }

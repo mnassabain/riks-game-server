@@ -71,7 +71,7 @@ void Player::give_reinforcement(int number_of_rein, int last_rein_val)
 		this->reinforcement = last_rein_val + 5 ;
 	}
 }
-void Player::hasSet(int tok1, int tok2, int tok3)
+bool Player::hasSet(int tok1, int tok2, int tok3)
 {
 	/* check if set of tokens is valid */
 	if(set_is_valid(tok1,tok2,tok3))
@@ -89,7 +89,7 @@ void Player::hasSet(int tok1, int tok2, int tok3)
 		/* updating the number of set_of_tokens */
 		this->sets_of_tokens ++;
 	}
-
+	return true;
 }
 int* Player::listTokens()   
 {
