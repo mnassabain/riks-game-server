@@ -3,7 +3,10 @@
 
 #include <vector>
 #include <iterator>
+#include <fstream>
+#include <sstream>
 #include "Structs.h"
+#include "utils.h"
 
 using namespace std;
 class Map {
@@ -19,9 +22,9 @@ private:
 
   /**
    * @brief Map : Constructor
-   * @param file : path of the file used to create the map
+   * @param file : map name
    */
-  Map(string file);
+  Map(string name);
 
   //Methods
 
@@ -31,7 +34,7 @@ private:
    * @return true if the map exists, false otherwise
    */
    static bool exists(string name);
-  
+
   /**
    * @brief getMapIndex : get the index of a Map in the maps list
    * @param name : name of the map
@@ -54,6 +57,12 @@ public:
    * @return map name
    */
   string getName();
+
+  /**
+   * @brief getMaxPlayers : Getter on map's maximum number of players
+   * @return map max players
+   */
+  int getMaxPlayers();
 
   /**
    * @brief nbTerritories : get the number of territories
@@ -82,7 +91,7 @@ public:
   /**
    * @brief loadMap : load the reference of the map
    * @param name : name of the map to be loaded
-   * @return Map reference
+   * @return Map reference (DebugMap if the map file doesn't exists)
    */
   static Map loadMap(string name);
 };

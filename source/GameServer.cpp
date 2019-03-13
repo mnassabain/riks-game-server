@@ -9,11 +9,7 @@
 
 std::vector<Game> GameServer::games;
 
-
-// int GameServer::main()
-// {
-//     return 0;
-// }
+GameServer::ServerEndpoint GameServer::endpoint;
 
 
 void GameServer::listen()
@@ -55,4 +51,48 @@ int GameServer::destroyGame(int id)
     }
 
     return found?0:-1;
+}
+
+
+/* sockets */
+
+void GameServer::init()
+{
+    /* Set logging settings */ 
+    endpoint.set_error_channels(websocketpp::log::elevel::all); 
+    endpoint.set_access_channels(websocketpp::log::alevel::all ^ websocketpp::log::alevel::frame_payload);
+
+    /* Initialize Asio */
+    endpoint.init_asio(); 
+
+    /* Register new message handler */
+    endpoint.set_message_handler(&onMessage);
+}
+
+
+void GameServer::run()
+{
+    /* Listen on port */
+    endpoint.listen(SERVER_PORT);
+
+    /* Queues a connection accept operation */ 
+    endpoint.start_accept();
+
+    /* Start the Asio io_service run loop */
+    endpoint.run(); 
+}
+
+
+void GameServer::onMessage(GameServer::ConnectionHDL hdl, GameServer::MessagePtr msg)
+{
+    std::cout << "Message received with HDL: " << hdl.lock().get()
+        << " and message: " << msg->get_payload()
+        << std::endl;
+}
+
+
+/* debugging */
+int GameServer::nbGames()
+{
+    return games.size();
 }

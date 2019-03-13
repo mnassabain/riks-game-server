@@ -1,7 +1,7 @@
 TARGET = riks-server
-LIBS = -lm
+LIBS = -lm -L./libs/libboost -L./libs/libsqlapi -lboost_system -lboost_chrono -Wl,-rpath=./libs/libboost/
 CC = g++
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -I./libs/ -I./libs/sqlapi
 
 .PHONY: default all clean
 
@@ -17,7 +17,7 @@ bin/%.o: source/%.cpp $(HEADERS)
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+	$(CC) $(CDRIVA) $(OBJECTS) -Wall $(LIBS) -o $@
 
 clean:
 	-rm -f bin/*.o
