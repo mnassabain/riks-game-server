@@ -66,8 +66,10 @@ private:
 	 * @return int 
 	 */
 	int useSet(int tok1, int tok2, int tok3);
+
 	int currentSetValue();
 	void putUnits(int territory, int units);
+
 	/**
 	 * @brief 
 	 * 
@@ -111,7 +113,9 @@ private:
 	 * @return false 
 	 */
 	bool areAdjacent(int a, int b);
+
 	// Constructors
+
 public:
 	// Attributes
 
@@ -138,7 +142,7 @@ public:
 	 * @return int 
 	 */
 	int getId();
-	
+
 	// Constructors
 
 	/**
