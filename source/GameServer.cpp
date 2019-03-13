@@ -39,7 +39,7 @@ int GameServer::destroyGame(int id)
     bool found = false;
 
     /* for each game in the games list .. */
-    for (int i = 0; i < games.size() && !found; i++)
+    for (size_t i = 0; i < games.size() && !found; i++)
     {
         /* .. we test the id .. */
         if (games[i].getId() == id)
