@@ -12,20 +12,22 @@ using namespace std;
 class Game {
 private:
 	// Attributes
-
+	// Lobby variables // Gotta remember to add a string name for the lobby and change the public constructor to reflect the change
 	static int nextId;
 	int id;
+	int maxPlayer;
+	int nbPlayer;
+	vector <Player> players;
+	bool running;
+	Map map;
+	// Game variables - Only available when Game is running
+	vector <TerritoryState> board;
+	int phase;
+	int activePlayer;
 	int tokens[4];
 	int totalExchangedSets;
-	int activePlayer;
-	int phase;
+	// Turn variables - Reset after each turn
 	bool territoryCapture;
-	bool running;
-	int nbPlayer;
-	int maxPlayer;
-	Map map;
-	vector <TerritoryState> board;
-	vector <Player> players;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
 
@@ -64,7 +66,8 @@ private:
 	 * @return int 
 	 */
 	int useSet(int tok1, int tok2, int tok3);
-
+	int currentSetValue();
+	void putUnits(int territory, int units);
 	/**
 	 * @brief 
 	 * 
@@ -108,11 +111,7 @@ private:
 	 * @return false 
 	 */
 	bool areAdjacent(int a, int b);
-
 	// Constructors
-
-	Game(string mapName, vector <string> playersNames);
-
 public:
 	// Attributes
 

@@ -172,3 +172,18 @@ void Player::die()
 {
 	this->isAlive = false;
 }
+
+void Player::addReinforcement(int reinforcement)
+{
+	this->reinforcement += reinforcement;
+}
+
+void Player::spendReinforcement(int reinforcement)
+{
+	this->reinforcement -= reinforcement;
+}
+
+int Player::getReinforcement()
+{
+	return this->reinforcement;
+}

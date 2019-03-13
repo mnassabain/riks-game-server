@@ -64,7 +64,7 @@ Map Map::loadMap(string name)
     ifstream mapFile("maps/"+name+".map", ios::in);
     if(!mapFile)
     {
-      cout<<"Map >> Cannont open file "<<name<<".map ! Returning DebugMap"<<endl;
+      cout<<"Map >> Cannot open file "<<name<<".map ! Returning DebugMap"<<endl;
       m=Map();
     }
     else
