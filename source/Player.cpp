@@ -6,7 +6,7 @@ Player::Player(string name)
 
 	/* initializing with player's name */
 	this->name = name;
-	/* at the beiginning of the game, every player has 0 tokens  */
+	/* at the beiginning of the game, every player has 0 tokens  */  
 	for(size_t i = 0; i < 4; i++)
 	{
 		this->tokens[i] = 0;
@@ -71,25 +71,35 @@ void Player::give_reinforcement(int number_of_rein, int last_rein_val)
 		this->reinforcement = last_rein_val + 5 ;
 	}
 }
-void Player::hasSet(int tok1, int tok2, int tok3)
+bool Player::hasSet(int tok1, int tok2, int tok3)
 {
 	/* check if set of tokens is valid */
-	if(set_is_valid(tok1,tok2,tok3))
-	{
+
 		/* build set of tokens */
-		this->set_of_tokens[0] = tok1;
-		this->set_of_tokens[1] = tok2;   
-		this->set_of_tokens[2] = tok3;   
+		//this->set_of_tokens[0] = tok1;
+		//this->set_of_tokens[1] = tok2;   
+		//this->set_of_tokens[2] = tok3;   
 		    
 		/* remove tokens from the list of tokens */
-		this->tokens[tok1] == 0 ? this->tokens[tok1] = 0 : this->tokens[tok1]--;
-		this->tokens[tok2] == 0 ? this->tokens[tok2] = 0 : this->tokens[tok2]--;
-		this->tokens[tok3] == 0 ? this->tokens[tok3] = 0 : this->tokens[tok3]--;
-
-		/* updating the number of set_of_tokens */
-		this->sets_of_tokens ++;
-	}
-
+		//this->tokens[tok1] == 0 ? this->tokens[tok1] = 0 : this->tokens[tok1]--;
+		//this->tokens[tok2] == 0 ? this->tokens[tok2] = 0 : this->tokens[tok2]--;
+		//this->tokens[tok3] == 0 ? this->tokens[tok3] = 0 : this->tokens[tok3]--;
+		
+		 if(this->tokens[tok1] == 0)
+		 {
+			 return false;
+		 }
+		 if(this->tokens[tok2] == 0 )
+		 {
+			return false;
+		 }
+		 
+		 if(this->tokens[tok3] == 0)
+		 {
+			return false;
+		 }
+		 
+	return true;
 }
 int* Player::listTokens()   
 {
@@ -171,4 +181,19 @@ void Player::set_sets_of_tokens()
 void Player::die()
 {
 	this->isAlive = false;
+}
+
+void Player::addReinforcement(int reinforcement)
+{
+	this->reinforcement += reinforcement;
+}
+
+void Player::spendReinforcement(int reinforcement)
+{
+	this->reinforcement -= reinforcement;
+}
+
+int Player::getReinforcement()
+{
+	return this->reinforcement;
 }

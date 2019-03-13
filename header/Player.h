@@ -20,7 +20,7 @@ public:
     //Player();
     Player(std::string name);
     bool set_is_valid(int tok1, int tok2, int tok3);
-	void hasSet(int tok1, int tok2, int tok3);
+	bool hasSet(int tok1, int tok2, int tok3);
     /*std::vector<int>listTokens(); */
     int* listTokens();
     void removeAllTokens();
@@ -39,6 +39,9 @@ public:
     void set_lost_territories();
     void set_sets_of_tokens();
     void die();
+	void addReinforcement(int reinforcement);
+	void spendReinforcement(int reinforcement);
+	int getReinforcement();
     //~Player();
 private:
 };
