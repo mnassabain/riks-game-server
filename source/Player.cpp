@@ -12,8 +12,6 @@ Player::Player(string name)
 		this->tokens[i] = 0;
 	}
 	/* initializing of player stats */
-	this->victories          = 0;
-	this->defeats            = 0;
 	this->gained_territories = 0;
 	this->lost_territories   = 0;
 	this->sets_of_tokens     = 0;
@@ -56,35 +54,9 @@ bool Player::set_is_valid(int tok1, int tok2, int tok3)
 	}
 	
 }
-void Player::give_reinforcement(int number_of_rein, int last_rein_val)
-{
-	if(number_of_rein < 1)
-	{
-		this->reinforcement = 4 ;
-	}
-	else if(number_of_rein > 1 && number_of_rein < 4)   
-	{
-		this->reinforcement = last_rein_val + 2 ;   
-	}
-	else
-	{
-		this->reinforcement = last_rein_val + 5 ;
-	}
-}
-bool Player::hasSet(int tok1, int tok2, int tok3)
-{
-	/* check if set of tokens is valid */
 
-		/* build set of tokens */
-		//this->set_of_tokens[0] = tok1;
-		//this->set_of_tokens[1] = tok2;   
-		//this->set_of_tokens[2] = tok3;   
-		    
-		/* remove tokens from the list of tokens */
-		//this->tokens[tok1] == 0 ? this->tokens[tok1] = 0 : this->tokens[tok1]--;
-		//this->tokens[tok2] == 0 ? this->tokens[tok2] = 0 : this->tokens[tok2]--;
-		//this->tokens[tok3] == 0 ? this->tokens[tok3] = 0 : this->tokens[tok3]--;
-		
+bool Player::hasSet(int tok1, int tok2, int tok3)
+{	
 		 if(this->tokens[tok1] == 0)
 		 {
 			 return false;
@@ -137,14 +109,7 @@ void Player::removeTokens(int numberOfEachToken[4])
 	}
 
 }
-int Player::get_victories()
-{
-	return this->victories;
-}
-int Player::get_defeats()
-{
-	return this->defeats;
-}
+
 int Player::get_gained_territories()
 {
 	return this->gained_territories;
@@ -157,23 +122,16 @@ int Player::get_sets_of_tokens()
 {
 	return this->sets_of_tokens;
 }
-void Player::set_victories()
-{
-	this->victories ++;
-}
-void Player::set_defeats()
-{
-	this->defeats ++;
-}
-void Player::set_gained_territories()
+
+void Player::add_gained_territories()
 {
 	this->gained_territories ++;
 }
-void Player::set_lost_territories()
+void Player::add_lost_territories()
 {
 	this->lost_territories ++;
 }
-void Player::set_sets_of_tokens()
+void Player::add_sets_of_tokens()
 {
 	this->sets_of_tokens ++;
 }
