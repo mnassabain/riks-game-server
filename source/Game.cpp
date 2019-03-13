@@ -32,7 +32,7 @@ void Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this -> phase = (this -> phase + 1) % 3;
-	// is this method where we start to implement some game logic?
+	// is this method where we start to implement some game logic? // Nah, basically all the game logic will be running by received messages, kinda
 }
 
 void Game::chooseFirstPlayer()
@@ -51,7 +51,7 @@ void Game::solveCombat()
 void Game::moveUnits(int source, int destination, int units)
 {
 	// checking the requirements of moving units
-	if(	this -> board[source].units > 1 &&
+	if(	this -> board[source].units - units >= 1 &&
 		this -> activePlayer == this -> board[source].owner && 
 		this -> activePlayer == this -> board[destination].owner &&
 		areAdjacent(source, destination) ) {
@@ -73,7 +73,7 @@ int Game::updatePlayersStatsInDB()
 	return 0;
 }
 
-bool areAdjacent(int a, int b) {
+bool areAdjacent(int a, int b) { // Let's not forget to finish this function
 	return true;
 }
 

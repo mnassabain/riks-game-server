@@ -11,7 +11,7 @@ using namespace std;
 class Game {
 private:
 	// Attributes
-	// Lobby variables
+	// Lobby variables // Gotta remember to add a string name for the lobby and change the public constructor to reflect the change
 	static int nextId;
 	int id;
 	int maxPlayer;
