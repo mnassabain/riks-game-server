@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
@@ -25,6 +26,7 @@ private:
 	int activePlayer;
 	int tokens[4];
 	int totalExchangedSets;
+	// Turn variables - Reset after each turn
 	bool territoryCapture;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
@@ -35,15 +37,14 @@ private:
 	void nextPhase();
 	void chooseFirstPlayer();
 	int useSet(int tok1, int tok2, int tok3);
+	int currentSetValue();
+	void putUnits(int territory, int units);
 	void solveCombat();
 	void moveUnits(int source, int destination, int units);
 	void setInitialReinforcement();
 	void end();
 	int updatePlayersStatsInDB();
 	bool areAdjacent(int a, int b);
-
-	// Constructors
-	Game(string mapName, vector <string> playersNames);
 
 public:
 	// Attributes

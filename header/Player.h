@@ -39,6 +39,9 @@ public:
     void set_lost_territories();
     void set_sets_of_tokens();
     void die();
+	void addReinforcement(int reinforcement);
+	void spendReinforcement(int reinforcement);
+	int getReinforcement();
     //~Player();
 private:
 };
