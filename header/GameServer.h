@@ -15,21 +15,22 @@ using namespace std;
 #define SERVER_PORT 9002
 
 
+/* typedefs for server endpoint, message pointer and connection HDL */
+typedef websocketpp::server<websocketpp::config::asio> ServerEndpoint;
+typedef ServerEndpoint::message_ptr Message;
+typedef websocketpp::connection_hdl Connection;
+
+
 class GameServer {
 private:
     static vector<Game> games;
 
     /* sockets */
-    /* typedefs for server endpoint, message pointer and connection HDL */
-    typedef websocketpp::server<websocketpp::config::asio> ServerEndpoint;
-    typedef ServerEndpoint::message_ptr MessagePtr;
-    typedef websocketpp::connection_hdl ConnectionHDL;
-    
     /* server endpoint */
     static ServerEndpoint endpoint;
 
     /* message handler */
-    static void onMessage(ConnectionHDL hdl, MessagePtr msg);
+    static void onMessage(Connection connection, Message msg);
 
 public:
     static void listen();

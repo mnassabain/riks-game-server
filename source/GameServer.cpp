@@ -9,7 +9,7 @@
 
 vector<Game> GameServer::games;
 
-GameServer::ServerEndpoint GameServer::endpoint;
+ServerEndpoint GameServer::endpoint;
 
 
 void GameServer::listen()
@@ -60,7 +60,8 @@ void GameServer::init()
 {
     /* Set logging settings */ 
     endpoint.set_error_channels(websocketpp::log::elevel::all); 
-    endpoint.set_access_channels(websocketpp::log::alevel::all ^ websocketpp::log::alevel::frame_payload);
+    endpoint.set_access_channels(websocketpp::log::alevel::all ^
+        websocketpp::log::alevel::frame_payload);
 
     /* Initialize Asio */
     endpoint.init_asio(); 
@@ -83,11 +84,9 @@ void GameServer::run()
 }
 
 
-void GameServer::onMessage(GameServer::ConnectionHDL hdl, GameServer::MessagePtr msg)
+void GameServer::onMessage(Connection connection, Message msg)
 {
-    cout << "Message received with HDL: " << hdl.lock().get()
-        << " and message: " << msg->get_payload()
-        << endl;
+    cout << "Message received: " << msg->get_payload() << endl;
 }
 
 
