@@ -30,10 +30,13 @@ private:
     static ServerEndpoint endpoint;
 
     /* open connection list */
-    static vector<Connection> connections;
+    static vector<Connection&> connections;
 
     /* message handler */
     static void onMessage(Connection connection, Message msg);
+
+    /* open connection handler */
+    static void onOpenConnection(Connection connection);
 
 public:
     static void listen();
