@@ -1,6 +1,8 @@
 #ifndef GAMESERVER_H
 #define GAMESERVER_H
 
+using namespace std;
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,7 +17,7 @@
 
 class GameServer {
 private:
-    static std::vector<Game> games;
+    static vector<Game> games;
 
     /* sockets */
     /* typedefs for server endpoint, message pointer and connection HDL */
@@ -31,8 +33,8 @@ private:
 
 public:
     static void listen();
-    static void treatMessage(std::string message);
-    static void createGame(std::string mapName, std::vector<std::string> playersNames);
+    static void treatMessage(string message);
+    static void createGame(string mapName, vector<string> playersNames);
     static int destroyGame(int id);
 
     /* sockets */

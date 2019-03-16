@@ -7,7 +7,7 @@
 /* debug */
 
 
-std::vector<Game> GameServer::games;
+vector<Game> GameServer::games;
 
 GameServer::ServerEndpoint GameServer::endpoint;
 
@@ -18,13 +18,13 @@ void GameServer::listen()
 }
 
 
-void GameServer::treatMessage(std::string message)
+void GameServer::treatMessage(string message)
 {
 
 }
 
 
-void GameServer::createGame(std::string mapName, std::vector<std::string> playersNames)
+void GameServer::createGame(string mapName, vector<string> playersNames)
 {
     /* create a new game */
     Game newGame(mapName, playersNames[0], MAX_PLAYERS);
@@ -85,9 +85,9 @@ void GameServer::run()
 
 void GameServer::onMessage(GameServer::ConnectionHDL hdl, GameServer::MessagePtr msg)
 {
-    std::cout << "Message received with HDL: " << hdl.lock().get()
+    cout << "Message received with HDL: " << hdl.lock().get()
         << " and message: " << msg->get_payload()
-        << std::endl;
+        << endl;
 }
 
 
