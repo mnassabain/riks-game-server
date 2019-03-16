@@ -10,6 +10,7 @@
 vector<Game> GameServer::games;
 
 ServerEndpoint GameServer::endpoint;
+vector<Connection> GameServer::connections;
 
 
 void GameServer::listen()

@@ -29,6 +29,9 @@ private:
     /* server endpoint */
     static ServerEndpoint endpoint;
 
+    /* open connection list */
+    static vector<Connection> connections;
+
     /* message handler */
     static void onMessage(Connection connection, Message msg);
 
