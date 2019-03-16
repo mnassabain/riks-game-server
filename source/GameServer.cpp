@@ -10,7 +10,7 @@
 vector<Game> GameServer::games;
 
 ServerEndpoint GameServer::endpoint;
-vector<Connection&> GameServer::connections;
+vector<Connection*> GameServer::connections;
 
 
 void GameServer::listen()
@@ -85,6 +85,20 @@ void GameServer::run()
 }
 
 
+void GameServer::stop()
+{
+    /* stop accepting new connections */
+    endpoint.stop_listening();
+
+    /* close all existing connections */
+    for(unsigned int i = 0; i < connections.size(); i++)
+    {
+        endpoint.close(*(connections[0]), websocketpp::close::status::going_away, 
+            "Server shutdown");
+    }
+}
+
+
 void GameServer::onMessage(Connection connection, Message msg)
 {
     cout << "Message received: " << msg->get_payload() << endl;
@@ -94,7 +108,7 @@ void GameServer::onMessage(Connection connection, Message msg)
 void GameServer::onOpenConnection(Connection connection)
 {
     /* add newly opened connection to connections list */
-    connections.push_back(connection);
+    connections.push_back(&connection);
 }
 
 

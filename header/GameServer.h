@@ -30,7 +30,7 @@ private:
     static ServerEndpoint endpoint;
 
     /* open connection list */
-    static vector<Connection&> connections;
+    static vector<Connection*> connections;
 
     /* message handler */
     static void onMessage(Connection connection, Message msg);
@@ -50,6 +50,9 @@ public:
 
     /* listens to incoming messages */
     static void run();
+
+    /* stops server */
+    static void stop();
 
 
     /* debugging */
