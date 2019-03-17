@@ -41,7 +41,18 @@ void GameServer::treatMessage(string message)
             break;
 
         case CODE_ERROR:
-            cout << "Error" << endl;
+            cout << "Error: " << jmessage[1] << endl;
+            break;
+
+        case CODE_CREATE_LOBBY:
+            cout << "User " << jmessage[1] << ": attempt to create lobby "
+                << jmessage[2] << "of max players " << jmessage[3]
+                << "and on map " << jmessage[4] << endl;
+
+            createGame("DebugMap", jmessage[1]);
+
+            cout << "Lobby created" << endl;
+            
             break;
 
         default:
@@ -50,10 +61,10 @@ void GameServer::treatMessage(string message)
 }
 
 
-void GameServer::createGame(string mapName, vector<string> playersNames)
+void GameServer::createGame(string mapName, string host)
 {
     /* create a new game */
-    Game newGame(mapName, playersNames[0], MAX_PLAYERS);
+    Game newGame(mapName, host, MAX_PLAYERS);
 
     /* copy the new object into the games list */
     games.push_back(newGame);

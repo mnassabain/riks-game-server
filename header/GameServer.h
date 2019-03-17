@@ -50,7 +50,7 @@ public:
     static void treatMessage(string message);
 
     /* game control methods */
-    static void createGame(string mapName, vector<string> playersNames);
+    static void createGame(string mapName, string host);
     static int destroyGame(int id);
 
     /* debugging */
