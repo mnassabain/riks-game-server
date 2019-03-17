@@ -1,15 +1,19 @@
 #ifndef GAMESERVER_H
 #define GAMESERVER_H
 
-using namespace std;
-
 #include <iostream>
 #include <vector>
 #include <string>
 #include "../header/Game.h"
+#include "../header/MessageCode.h"
 
 #include "../libs/websocketpp/config/asio_no_tls.hpp"
 #include "../libs/websocketpp/server.hpp"
+
+#include "../libs/json/json.hpp"
+
+using namespace std;
+using json = nlohmann::json;
 
 #define SERVER_PORT 9002
 
@@ -54,4 +58,4 @@ public:
 
 };
 
-#endif //GAMESERVER_H
+#endif // GAMESERVER_H

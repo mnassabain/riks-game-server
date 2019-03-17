@@ -19,7 +19,34 @@ void GameServer::listen()
 
 void GameServer::treatMessage(string message)
 {
+    json jmessage = json::parse(message);
 
+    MessageCode code = jmessage[0];
+    switch(code)
+    {
+        case CODE_SIGN_UP:
+            cout << "Creating new user (id = " << jmessage[1]
+                << ", password = " << jmessage[2] << ")" << endl;
+            /* insert into db */
+            break;
+
+        case CODE_CONNECT:
+            cout << "Connection attempt by user (id = " << jmessage[1]
+                << ", password = " << jmessage[2] << ")" << endl;
+            /* ... */
+            break;
+
+        case CODE_DISCONNECT:
+            cout << "User disconnected (id = " << jmessage[1] << ")" << endl;
+            break;
+
+        case CODE_ERROR:
+            cout << "Error" << endl;
+            break;
+
+        default:
+            cout << "Unhandled message code" << endl;
+    }
 }
 
 
@@ -140,12 +167,16 @@ void GameServer::onMessage(Connection connection, Message msg)
     if (msg->get_payload() == "stop-server")
     {
         stop();
+        return;
     }
 
     if (msg->get_payload() == "nb-connections")
     {
         cout << "Number of connections: " << connections.size() << endl;
+        return;
     }
+
+    treatMessage(msg->get_payload());
 }
 
 
