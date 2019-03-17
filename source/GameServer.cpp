@@ -70,10 +70,10 @@ void GameServer::init()
         /* Initialize Asio */
         endpoint.init_asio(); 
 
-        /* Register new message handler */
+        /* Register new handlers */
         endpoint.set_message_handler(&onMessage);
-
         endpoint.set_open_handler(&onOpenConnection);
+        endpoint.set_close_handler(&onCloseConnection);
     }
     catch(websocketpp::exception e)
     {
@@ -141,6 +141,11 @@ void GameServer::onMessage(Connection connection, Message msg)
     {
         stop();
     }
+
+    if (msg->get_payload() == "nb-connections")
+    {
+        cout << "Number of connections: " << connections.size() << endl;
+    }
 }
 
 
@@ -148,6 +153,24 @@ void GameServer::onOpenConnection(Connection connection)
 {
     /* add newly opened connection to connections list */
     connections.push_back(connection);
+}
+
+
+void GameServer::onCloseConnection(Connection connection)
+{
+    bool found = false;
+
+    /* naive removing connection */
+    for (unsigned int i = 0; i < connections.size() && !found; i++)
+    {
+        if (connections[i].lock().get() == connection.lock().get())
+        {
+            connections.erase(connections.begin() + i);
+            cout << "Removing connection " << connection.lock().get() 
+                << ": connection closed" << endl;
+            found = true;
+        }
+    }
 }
 
 

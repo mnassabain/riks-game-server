@@ -36,6 +36,7 @@ private:
     /* connection & communication handlers */
     static void onMessage(Connection connection, Message msg);
     static void onOpenConnection(Connection connection);
+    static void onCloseConnection(Connection connection);
 
 
 
