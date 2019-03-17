@@ -1,21 +1,19 @@
 #include "../header/GameServer.h"
 
 /* debug */
-
 #define MAX_PLAYERS 6
 
-/* debug */
 
 
 vector<Game> GameServer::games;
-
 ServerEndpoint GameServer::endpoint;
 vector<Connection> GameServer::connections;
 
 
 void GameServer::listen()
 {
-
+    init();
+    run();
 }
 
 
@@ -40,7 +38,7 @@ int GameServer::destroyGame(int id)
     bool found = false;
 
     /* for each game in the games list .. */
-    for (size_t i = 0; i < games.size() && !found; i++)
+    for (unsigned int i = 0; i < games.size() && !found; i++)
     {
         /* .. we test the id .. */
         if (games[i].getId() == id)
@@ -55,25 +53,33 @@ int GameServer::destroyGame(int id)
 }
 
 
-/* sockets */
+/* PRIVATE METHODS */
 
 void GameServer::init()
 {
-    /* reuse 9002 address */
-    endpoint.set_reuse_addr(true);
+    try
+    {
+        /* reuse 9002 address */
+        endpoint.set_reuse_addr(true);
 
-    /* Set logging settings */ 
-    endpoint.set_error_channels(websocketpp::log::elevel::all); 
-    endpoint.set_access_channels(websocketpp::log::alevel::all ^
-        websocketpp::log::alevel::frame_payload);
+        /* Set logging settings */ 
+        endpoint.set_error_channels(websocketpp::log::elevel::all); 
+        endpoint.set_access_channels(websocketpp::log::alevel::all ^
+            websocketpp::log::alevel::frame_payload);
 
-    /* Initialize Asio */
-    endpoint.init_asio(); 
+        /* Initialize Asio */
+        endpoint.init_asio(); 
 
-    /* Register new message handler */
-    endpoint.set_message_handler(&onMessage);
+        /* Register new message handler */
+        endpoint.set_message_handler(&onMessage);
 
-    endpoint.set_open_handler(&onOpenConnection);
+        endpoint.set_open_handler(&onOpenConnection);
+    }
+    catch(websocketpp::exception e)
+    {
+        cout << "server init error: " << e.what() << endl;
+        exit(1);
+    }
 }
 
 
@@ -145,7 +151,8 @@ void GameServer::onOpenConnection(Connection connection)
 }
 
 
-/* debugging */
+/* DEBUGGING */
+
 int GameServer::nbGames()
 {
     return games.size();
