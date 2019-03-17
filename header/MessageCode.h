@@ -4,10 +4,54 @@
 
 typedef enum
 {
+    /* general */
     CODE_ERROR,
+
+    /* connection */
     CODE_SIGN_UP,
     CODE_CONNECT,
-    CODE_DISCONNECT
+    CODE_DISCONNECT,
+
+    /* lobby & matchmaking */
+    CODE_LOBBY_LIST,
+    CODE_CREATE_LOBBY,
+    CODE_JOIN_LOBBY,
+    CODE_EDIT_LOBBY,
+    CODE_LOBBY_STATE,
+    CODE_KICK_FROM_LOBBY,
+    CODE_KICKED,
+    CODE_CLOSE_LOBBY,
+    CODE_START_GAME,
+    CODE_LEAVE_GAME,
+
+    /* misc */
+    CODE_GAME_RESULTS,
+    CODE_PLAYER_PROFILE,
+    CODE_MATCHMAKING,
+
+    /* gameplay */
+    CODE_PUT,
+    CODE_MOVE,
+    CODE_ATTACK,
+    CODE_DEFEND,
+    CODE_END_PHASE,
+    CODE_USE_TOKENS,
+    CODE_REINFORCEMENT,
+    
+    CODE_ATTACKED,
+    CODE_COMBAT_RESULTS,
+    CODE_PLAYER_ELIMINATION,
+    CODE_GIVE_TOKENS,
+    CODE_CURRENT_PHASE,
+    CODE_GAME_OVER,
+    CODE_GAME_STATUS,
+
+    CODE_SYNC_DEMAND,
+    CODE_POKE,
+    CODE_CHAT,
+
+    CODE_HOVER,
+    CODE_SELECT_TOKEN,
 
 } MessageCode;
 
