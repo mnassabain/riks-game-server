@@ -2,6 +2,7 @@
 
 /* debug */
 #define MAX_PLAYERS 6
+#define MAX_GAMES   10
 
 
 
@@ -17,43 +18,164 @@ void GameServer::listen()
 }
 
 
-void GameServer::treatMessage(string message)
+string GameServer::treatMessage(string message)
 {
     json jmessage = json::parse(message);
+    json response;
+
+    if (jmessage.size() <= 0)
+    {
+        response.push_back(CODE_UNHANDLED);
+        return response;
+    }
 
     MessageCode code = jmessage[0];
     switch(code)
     {
         case CODE_SIGN_UP:
+            if (jmessage.size() < 3)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "Creating new user (id = " << jmessage[1]
                 << ", password = " << jmessage[2] << ")" << endl;
             /* insert into db */
+            response.push_back(CODE_SIGN_UP);
             break;
 
         case CODE_CONNECT:
+            if (jmessage.size() < 3)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "Connection attempt by user (id = " << jmessage[1]
                 << ", password = " << jmessage[2] << ")" << endl;
             /* ... */
+            response.push_back(CODE_CONNECT);
+            response.push_back(1234); // token
             break;
 
         case CODE_DISCONNECT:
+            if (jmessage.size() < 2)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "User disconnected (id = " << jmessage[1] << ")" << endl;
+            response.push_back(CODE_DISCONNECT);
             break;
 
         case CODE_ERROR:
-            cout << "Error" << endl;
+            if (jmessage.size() < 2)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
+            cout << "Error: " << jmessage[1] << endl;
+            response.push_back(CODE_ERROR);
             break;
 
+        case CODE_CREATE_LOBBY:
+            if (jmessage.size() < 5)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
+            cout << "User " << jmessage[1] << ": attempt to create lobby "
+                << jmessage[2] << "of max players " << jmessage[3]
+                << "and on map " << jmessage[4] << endl;
+
+            createGame(jmessage[4], jmessage[1], jmessage[3]);
+            cout << "Lobby created" << endl;
+            
+            response.push_back(CODE_CREATE_LOBBY);
+            break;
+
+        case CODE_LOBBY_LIST:
+            if (jmessage.size() < 1)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
+            cout << "Received lobby list demand" << endl;
+            response.push_back(CODE_LOBBY_LIST);
+
+            {
+                int nb = 0;
+                for (unsigned int i = 0; nb < MAX_GAMES && i < games.size();
+                    i++)
+                {
+                    if (!games[i].isRunning())
+                    {
+                        response.push_back("game"/*games[i].toString()*/);
+                        nb++;
+                    }
+                }
+            }
+            break;
+
+        case CODE_JOIN_LOBBY:
+            if (jmessage.size() < 4)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
+            cout << "User " << jmessage[1] << " tried to join lobby with id: "
+                << jmessage[2] << "and password: \"" << jmessage[3]
+                << "\"" << endl;
+
+            {
+                bool found = false;
+                for (unsigned int i = 0; i < games.size() && !found; i++)
+                {
+                    if (games[i].getId() == jmessage[2])
+                    {
+                        found = true;
+                        if (false/*games[i].isFull()*/)
+                        {
+                            response.push_back(CODE_ERROR);
+                            response.push_back("Lobby is full");
+                        }
+                        else
+                        {
+                            games[i].addPlayer(jmessage[1]);
+                            response.push_back(CODE_JOIN_LOBBY);
+                        }
+                    }
+                }
+            }
+            break;
+
+        
         default:
             cout << "Unhandled message code" << endl;
+            response.push_back(CODE_UNHANDLED);
     }
+
+    return response.dump();
 }
 
 
-void GameServer::createGame(string mapName, vector<string> playersNames)
+void GameServer::createGame(string mapName, string host, int nbPlayers)
 {
     /* create a new game */
-    Game newGame(mapName, playersNames[0], MAX_PLAYERS);
+    Game newGame(mapName, host, MAX_PLAYERS);
 
     /* copy the new object into the games list */
     games.push_back(newGame);
@@ -176,7 +298,9 @@ void GameServer::onMessage(Connection connection, Message msg)
         return;
     }
 
-    treatMessage(msg->get_payload());
+    string response = treatMessage(msg->get_payload());
+
+    endpoint.send(connection, response, websocketpp::frame::opcode::text);
 }
 
 
