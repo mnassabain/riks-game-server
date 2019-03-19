@@ -55,17 +55,14 @@ string GameServer::treatMessage(string message)
                 << jmessage[2] << "of max players " << jmessage[3]
                 << "and on map " << jmessage[4] << endl;
 
-            createGame("DebugMap", jmessage[1]);
-
+            createGame(jmessage[4], jmessage[1], jmessage[3]);
             cout << "Lobby created" << endl;
             
             response.push_back(CODE_CREATE_LOBBY);
-
             break;
 
         default:
             cout << "Unhandled message code" << endl;
-
             response.push_back(CODE_UNHANDLED);
     }
 
@@ -73,7 +70,7 @@ string GameServer::treatMessage(string message)
 }
 
 
-void GameServer::createGame(string mapName, string host)
+void GameServer::createGame(string mapName, string host, int nbPlayers)
 {
     /* create a new game */
     Game newGame(mapName, host, MAX_PLAYERS);
