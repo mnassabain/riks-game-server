@@ -47,7 +47,7 @@ private:
 public:
     /* server control methods */
     static void listen();
-    static void treatMessage(string message);
+    static string treatMessage(string message);
 
     /* game control methods */
     static void createGame(string mapName, string host);

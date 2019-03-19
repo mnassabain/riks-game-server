@@ -6,6 +6,7 @@ typedef enum
 {
     /* general */
     CODE_ERROR,
+    CODE_UNHANDLED,
 
     /* connection */
     CODE_SIGN_UP,
