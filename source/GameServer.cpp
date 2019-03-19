@@ -2,6 +2,7 @@
 
 /* debug */
 #define MAX_PLAYERS 6
+#define MAX_GAMES   10
 
 
 
@@ -61,6 +62,53 @@ string GameServer::treatMessage(string message)
             response.push_back(CODE_CREATE_LOBBY);
             break;
 
+        case CODE_LOBBY_LIST:
+            cout << "Received lobby list demand" << endl;
+            response.push_back(CODE_LOBBY_LIST);
+
+            {
+                int nb = 0;
+                for (unsigned int i = 0; nb < MAX_GAMES && i < games.size();
+                    i++)
+                {
+                    if (!games[i].isRunning())
+                    {
+                        response.push_back("game"/*games[i].toString()*/);
+                        nb++;
+                    }
+                }
+            }
+            break;
+
+        case CODE_JOIN_LOBBY:
+            cout << "User " << jmessage[1] << " tried to join lobby with id: "
+                << jmessage[2] << "and password: \"" << jmessage[3]
+                << "\"" << endl;
+
+            {
+                bool found = false;
+                for (unsigned int i = 0; i < games.size() && !found; i++)
+                {
+                    if (games[i].getId() == jmessage[2])
+                    {
+                        found = true;
+                        if (false/*games[i].isFull()*/)
+                        {
+                            response.push_back(CODE_ERROR);
+                            response.push_back("Lobby is full");
+                        }
+                        else
+                        {
+                            games[i].addPlayer(jmessage[1]);
+                            response.push_back(CODE_JOIN_LOBBY);
+                        }
+                    }
+                }
+            }
+
+            break;
+
+        
         default:
             cout << "Unhandled message code" << endl;
             response.push_back(CODE_UNHANDLED);
