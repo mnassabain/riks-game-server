@@ -23,10 +23,23 @@ string GameServer::treatMessage(string message)
     json jmessage = json::parse(message);
     json response;
 
+    if (jmessage.size() <= 0)
+    {
+        response.push_back(CODE_UNHANDLED);
+        return response;
+    }
+
     MessageCode code = jmessage[0];
     switch(code)
     {
         case CODE_SIGN_UP:
+            if (jmessage.size() < 3)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "Creating new user (id = " << jmessage[1]
                 << ", password = " << jmessage[2] << ")" << endl;
             /* insert into db */
@@ -34,6 +47,13 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_CONNECT:
+            if (jmessage.size() < 3)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "Connection attempt by user (id = " << jmessage[1]
                 << ", password = " << jmessage[2] << ")" << endl;
             /* ... */
@@ -42,16 +62,37 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_DISCONNECT:
+            if (jmessage.size() < 2)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "User disconnected (id = " << jmessage[1] << ")" << endl;
             response.push_back(CODE_DISCONNECT);
             break;
 
         case CODE_ERROR:
+            if (jmessage.size() < 2)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "Error: " << jmessage[1] << endl;
             response.push_back(CODE_ERROR);
             break;
 
         case CODE_CREATE_LOBBY:
+            if (jmessage.size() < 5)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "User " << jmessage[1] << ": attempt to create lobby "
                 << jmessage[2] << "of max players " << jmessage[3]
                 << "and on map " << jmessage[4] << endl;
@@ -63,6 +104,13 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_LOBBY_LIST:
+            if (jmessage.size() < 1)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "Received lobby list demand" << endl;
             response.push_back(CODE_LOBBY_LIST);
 
@@ -81,6 +129,13 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_JOIN_LOBBY:
+            if (jmessage.size() < 4)
+            {
+                response.push_back(CODE_ERROR);
+                response.push_back("Invalid message");
+                break;
+            }
+
             cout << "User " << jmessage[1] << " tried to join lobby with id: "
                 << jmessage[2] << "and password: \"" << jmessage[3]
                 << "\"" << endl;
@@ -105,7 +160,6 @@ string GameServer::treatMessage(string message)
                     }
                 }
             }
-
             break;
 
         
