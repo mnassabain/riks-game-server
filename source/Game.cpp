@@ -144,10 +144,10 @@ bool Game::isValidSet(int tok1, int tok2, int tok3)
 
 void Game::grantToken()
 {
-	// To do : Random a token from the list and grant it to player - Meanwhile infinite wildcards
-
-	tokens[0]--;
-	players[activePlayer].receiveToken(0);
+	// Granting a random token to the player
+	int r = intRand(0, 3);
+	tokens[r]--;
+	players[activePlayer].receiveToken(r);
 }
 
 void Game::putUnits(int territory, int units)
