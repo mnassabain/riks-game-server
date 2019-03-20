@@ -40,7 +40,7 @@ public:
 	void spendReinforcement(int reinforcement);
 	int getReinforcement();
 
-	string getName();
+	std::string getName();
 private:
 };
 
