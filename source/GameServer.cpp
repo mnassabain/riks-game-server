@@ -165,21 +165,40 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_CREATE_LOBBY:
-            if (jmessage.size() < 5)
+
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                response["type"] = CODE_CREATE_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message";
                 break;
             }
 
-            cout << "User " << jmessage[1] << ": attempt to create lobby "
-                << jmessage[2] << "of max players " << jmessage[3]
-                << "and on map " << jmessage[4] << endl;
+            if (!jmessage["data"].count("playerID") ||
+                !jmessage["data"].count("lobbyName") ||
+                !jmessage["data"].count("nbPlayers") ||
+                !jmessage["data"].count("map"))
+            {
+                response["type"] = CODE_CREATE_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message";
+                break;
+            }
 
-            createGame(jmessage[4], jmessage[1], jmessage[3]);
+            cout << "User " << jmessage["data"]["playerID"] 
+                << ": attempt to create lobby "
+                << jmessage["data"]["lobbyName"] 
+                << "of max players " << jmessage["data"]["nbPlayers"]
+                << "and on map " << jmessage["data"]["map"] << endl;
+
+            createGame(jmessage["data"]["map"], jmessage["data"]["playerID"],
+                jmessage["data"]["nbPlayers"]);
+
             cout << "Lobby created" << endl;
             
-            response.push_back(CODE_CREATE_LOBBY);
+            response["type"] = CODE_CREATE_LOBBY;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
             break;
 
         case CODE_LOBBY_LIST:
