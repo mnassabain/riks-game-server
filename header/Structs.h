@@ -31,4 +31,12 @@ struct TerritoryState
 };
 typedef struct TerritoryState TerritoryState;
 
+//CombatOutcome
+struct CombatOutcome
+{
+	int attackerLoss;
+	int defenderLoss;
+};
+typedef struct CombatOutcome CombatOutcome;
+
 #endif //STRUCTS_H

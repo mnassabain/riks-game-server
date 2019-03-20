@@ -6,16 +6,20 @@
 
 class Player {
 public:
+	// Player status
 	std::string name;
-	/*std::vector<int> tokens = std::vector<int>(4) */
     int tokens[4];
     int reinforcement;
-    int gained_territories;
-    int lost_territories;
-    int sets_of_tokens;
-    bool isAlive;
+	bool isAlive;
+
+	// Player stats
+    int territoriesCaptured;
+    int territoriesLost;
+	int unitsKilled;
+	int unitsLost;
+    int setsSpent;
+
     Player(std::string name);
-    bool set_is_valid(int tok1, int tok2, int tok3);
 	bool hasSet(int tok1, int tok2, int tok3);
     /*std::vector<int>listTokens(); */
     int* listTokens();
@@ -23,15 +27,14 @@ public:
     void receiveToken(int type);
     void receiveTokens(int numberOfEachToken[4]);
     void removeTokens(int numberOfEachToken[4]);
-    int get_victories();
-    int get_defeats();
-    int get_gained_territories();
-    int get_lost_territories();
-    int get_sets_of_tokens();
-    void add_gained_territories();
-    void add_lost_territories();
-    void add_sets_of_tokens();
+    int getTerritoriesCaptured();
+    int GetTerritoriesLost();
+    int getSetsSpent();
+    void addTerritoriesCaptured();
+    void addTerritoriesLost();
+    void addSetsSpent();
     void die();
+
 	void addReinforcement(int reinforcement);
 	void spendReinforcement(int reinforcement);
 	int getReinforcement();

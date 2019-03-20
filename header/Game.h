@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cmath>
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
@@ -15,6 +16,7 @@ private:
 	// Lobby variables // Gotta remember to add a string name for the lobby and change the public constructor to reflect the change
 	static int nextId;
 	int id;
+	string name;
 	int maxPlayer;
 	int nbPlayer;
 	vector <Player> players;
@@ -68,13 +70,14 @@ private:
 	int useSet(int tok1, int tok2, int tok3);
 
 	int currentSetValue();
+	bool isValidSet(int tok1, int tok2, int tok3);
 	void putUnits(int territory, int units);
 
 	/**
 	 * @brief 
 	 * 
 	 */
-	void solveCombat();
+	CombatOutcome solveCombat(int attackers, int defenders);
 
 	/**
 	 * @brief moveUnits : Moving units from one territory to another
@@ -152,7 +155,8 @@ public:
 	 * @param creatorId 
 	 * @param maxPlayer 
 	 */
-	Game(string mapName, string creatorId, int maxPlayer); // Constructor used on lobby creation
+	Game(string mapName, string creatorId, int maxPlayer);
+	Game(string mapName, string creatorId, int maxPlayer, string lobbyName); // Constructor used on lobby creation
 };
 
 #endif //GAME_H

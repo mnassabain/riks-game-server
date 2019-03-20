@@ -12,48 +12,12 @@ Player::Player(string name)
 		this->tokens[i] = 0;
 	}
 	/* initializing of player stats */
-	this->gained_territories = 0;
-	this->lost_territories   = 0;
-	this->sets_of_tokens     = 0;
+	this->territoriesCaptured = 0;
+	this->territoriesLost   = 0;
+	this->setsSpent     = 0;
     
 }
 
-bool Player::set_is_valid(int tok1, int tok2, int tok3)
-{
-	int list_tokens[3] = {tok1, tok2, tok3};
-	/* list of tokens which are not jokers */
-	vector<int>res;
-
-	/* checking if token type values are between 0 and 3 (0 and 3 included) */
-	if( (tok1 < 0 || tok1 > 3) || (tok2 < 0 || tok2 > 3) || (tok3 < 0 || tok3 > 3) )
-	{
-		return false;
-	}
-	else
-	{
-		/* looking for the joker token  (type = 3 ) */
-		for(size_t j = 0 ; j < 3; j++)
-		{
-			if(list_tokens[j] != 3)
-			{
-				res.push_back(list_tokens[j]);
-			}
-			
-		}
-		/* a set of tokens containing a joker is  valid */
-		if(res.size() < 3 )
-		{
-			return true;
-		}
-		else
-		{ 
-			return (res[0] != res[1] && res[0] != res[2] && res[1] != res[2]) || (res[0] == res[1] && res[0] == res[2]) ;
-		}
-		
-		
-	}
-	
-}
 
 bool Player::hasSet(int tok1, int tok2, int tok3)
 {	
@@ -110,30 +74,30 @@ void Player::removeTokens(int numberOfEachToken[4])
 
 }
 
-int Player::get_gained_territories()
+int Player::getTerritoriesCaptured()
 {
-	return this->gained_territories;
+	return this->territoriesCaptured;
 }
-int Player::get_lost_territories()
+int Player::GetTerritoriesLost()
 {
-	return this->lost_territories;
+	return this->territoriesLost;
 }
-int Player::get_sets_of_tokens()
+int Player::getSetsSpent()
 {
-	return this->sets_of_tokens;
+	return this->setsSpent;
 }
 
-void Player::add_gained_territories()
+void Player::addTerritoriesCaptured()
 {
-	this->gained_territories ++;
+	this->territoriesCaptured ++;
 }
-void Player::add_lost_territories()
+void Player::addTerritoriesLost()
 {
-	this->lost_territories ++;
+	this->territoriesLost ++;
 }
-void Player::add_sets_of_tokens()
+void Player::addSetsSpent()
 {
-	this->sets_of_tokens ++;
+	this->setsSpent ++;
 }
 /* what about the one (or those) who will get his tokens ? */
 void Player::die()

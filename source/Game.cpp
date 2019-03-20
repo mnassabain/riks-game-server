@@ -96,6 +96,34 @@ int Game::currentSetValue()
 	}
 }
 
+bool Game::isValidSet(int tok1, int tok2, int tok3)
+{
+	// Basic check
+	if ((tok1 < 0) || (tok1 > 3)) return false;
+	if ((tok2 < 0) || (tok2 > 3)) return false;
+	if ((tok3 < 0) || (tok3 > 3)) return false;
+
+	int tokens[4] = {0};
+	int i;
+	tokens[tok1]++;
+	tokens[tok2]++;
+	tokens[tok3]++;
+
+	// Set is valid if there's at least one wildcard
+	if (tokens[0] > 0) return true;
+
+	// Set is valid if there's 3 of any of the tokens
+	for (i = 1; i <= 3; i++) {
+		if (tokens[i] == 3) return true;
+	}
+
+	// Set is valid if all 3 tokens have a 1 value. This works considering the previous checks.
+	for (i = 1; i <= 3; i++) {
+		if (tokens[i] != 1) return false;
+	}
+	return true;
+}
+
 void Game::putUnits(int territory, int units)
 {
 	if ((this->activePlayer == this->board[this->activePlayer].owner) && (this->players[this->activePlayer].getReinforcement() >= units)) {
@@ -104,8 +132,66 @@ void Game::putUnits(int territory, int units)
 	}
 }
 
-void Game::solveCombat()
+CombatOutcome Game::solveCombat(int attackers, int defenders)
 {
+	CombatOutcome result;
+	result.attackerLoss = 0;
+	result.defenderLoss = 0;
+	
+	int limit = pow(6, attackers + defenders);
+	int roll = 0; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+
+	// Calculating unit loss for all 6 possible combat setups
+	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
+	// 3 Attackers
+	if (attackers == 3) {
+		// 2 defenders
+		if (defenders == 2) {
+			if (roll < 2275) result.attackerLoss++;
+			else result.defenderLoss++;
+
+			if (roll < 2275 + 2611) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+		// 1 defender
+		if (defenders == 1) {
+			if (roll < 441) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+	}
+
+	// 2 Attackers
+	if (attackers == 2) {
+		// 2 defenders
+		if (defenders == 2) {
+			if (roll < 581) result.attackerLoss++;
+			else result.defenderLoss++;
+
+			if (roll < 581 + 420) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+		// 1 defender
+		if (defenders == 1) {
+			if (roll < 91) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+	}
+
+	// 1 Attacker
+	if (attackers == 1) {
+		// 2 defenders
+		if (defenders == 2) {
+			if (roll < 161) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+		// 1 defender
+		if (defenders == 1) {
+			if (roll < 21) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+	}
+
+	return CombatOutcome();
 }
 
 void Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
@@ -184,4 +270,25 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
 	this->nbPlayer = 0;
 	addPlayer(creatorId);
+}
+
+Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
+{
+	// Setting up game ID
+	this->id = nextId;
+	nextId++;
+
+	// Loading up map
+	this->map = Map::loadMap(mapName);
+
+	// Initialization of lobby variables
+	this->running = false;
+
+	// Initialization of players
+	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
+	this->nbPlayer = 0;
+	addPlayer(creatorId);
+
+	// Setting up lobby name
+	this->name.assign(lobbyName);
 }
