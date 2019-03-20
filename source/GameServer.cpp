@@ -125,15 +125,31 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_DISCONNECT:
-            if (jmessage.size() < 2)
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                response["type"] = CODE_DISCONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = 
+                    "Invalid message format; insufficient parameters";
                 break;
             }
 
-            cout << "User disconnected (id = " << jmessage[1] << ")" << endl;
-            response.push_back(CODE_DISCONNECT);
+            if (!jmessage["data"].count("id"))
+            {
+                response["type"] = CODE_DISCONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = 
+                    "Invalid message format; insufficient parameters";
+                break;
+            }
+
+            cout << "User disconnected (id = " << jmessage["data"]["id"] 
+                << ")" << endl;
+
+
+            response["type"] = CODE_DISCONNECT;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
             break;
 
         case CODE_ERROR:
