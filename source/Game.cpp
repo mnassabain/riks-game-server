@@ -132,6 +132,68 @@ void Game::putUnits(int territory, int units)
 	}
 }
 
+CombatOutcome Game::solveCombat(int attackers, int defenders)
+{
+	CombatOutcome result;
+	result.attackerLoss = 0;
+	result.defenderLoss = 0;
+	
+	int limit = pow(6, attackers + defenders);
+	int roll = 0; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+
+	// Calculating unit loss for all 6 possible combat setups
+	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
+	// 3 Attackers
+	if (attackers == 3) {
+		// 2 defenders
+		if (defenders == 2) {
+			if (roll < 2275) result.attackerLoss++;
+			else result.defenderLoss++;
+
+			if (roll < 2275 + 2611) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+		// 1 defender
+		if (defenders == 1) {
+			if (roll < 441) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+	}
+
+	// 2 Attackers
+	if (attackers == 2) {
+		// 2 defenders
+		if (defenders == 2) {
+			if (roll < 581) result.attackerLoss++;
+			else result.defenderLoss++;
+
+			if (roll < 581 + 420) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+		// 1 defender
+		if (defenders == 1) {
+			if (roll < 91) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+	}
+
+	// 1 Attacker
+	if (attackers == 1) {
+		// 2 defenders
+		if (defenders == 2) {
+			if (roll < 161) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+		// 1 defender
+		if (defenders == 1) {
+			if (roll < 21) result.attackerLoss++;
+			else result.defenderLoss++;
+		}
+	}
+
+	return CombatOutcome();
+}
+
 void Game::solveCombat()
 {
 }

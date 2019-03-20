@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cmath>
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
@@ -76,7 +77,7 @@ private:
 	 * @brief 
 	 * 
 	 */
-	void solveCombat();
+	CombatOutcome solveCombat(int attackers, int defenders);
 
 	/**
 	 * @brief moveUnits : Moving units from one territory to another
