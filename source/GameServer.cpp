@@ -3,6 +3,7 @@
 /* debug */
 #define MAX_PLAYERS 6
 #define MAX_GAMES   10
+#define DB_NAME "DB/riksserverdb.db"
 
 
 
@@ -80,12 +81,71 @@ string GameServer::treatMessage(string message)
                 << ", password = " << jmessage["data"]["password"] << ")" 
                 << endl;
 
-            /* insert into db */
+	    {//====insertion into db====
 
-            response["type"] = CODE_SIGN_UP;
-            response["data"]["error"] = false;
-            response["data"]["response"] = "Success";
-            
+	    sqlite3* db;
+	    int returnCode = 0;
+	    sqlite3_stmt* stmt = NULL;
+
+	    //Connection
+	    returnCode = sqlite3_open_v2(DB_NAME,&db,SQLITE_OPEN_READWRITE,NULL);
+	    
+	    if(returnCode)//Connection error
+	    {
+		cout<<"SIGN_UP : DB connection error : "<<sqlite3_errmsg(db)<<endl;
+		sqlite3_close(db);
+		response["type"]= CODE_SIGN_UP;
+		response["data"]["error"]=true;
+		response["data"]["response"]="Data Base connection error";
+	    }
+	    else//DB is connected
+	    {
+		returnCode = sqlite3_prepare(db,"Insert into users values(null,?,?)",-1,&stmt,0);
+		if(returnCode)//Error when creating request
+		{
+			cout<<"SIGN_UP : Insert preparing error"<<endl;
+			sqlite3_close(db);
+			response["type"]= CODE_SIGN_UP;
+			response["data"]["error"]=true;
+			response["data"]["response"]="Error during Insertion preparing";
+
+		}
+		else//No preparing error
+		{
+			if(sqlite3_bind_text(stmt,1,(char*)jmessage["data"]["id"], jmessage["data"]["id"].length,SQLITE_STATIC) || sqlite3_bind_text(stmt,2,(char*)jmessage["data"]["password"], jmessage["data"]["password"].length,SQLITE_STATIC) ) //Error while binding parameters
+			{
+			  cout<<"SIGN_UP : Binding parmeters error"<<endl;
+			  sqlite3_close(db);
+			  response["type"]= CODE_SIGN_UP;
+			  response["data"]["error"]=true;
+			  response["data"]["response"]="Error during binding";
+			}
+			else//No binding error
+			{
+			  if(sqlite3_step(stmt) != SQLITE_DONE)
+			  {	  
+			    cout<<"SIGN_UP : Insert step (executing) error"<<endl;
+			    sqlite3_close(db);
+		 	    response["type"]= CODE_SIGN_UP;
+			    response["data"]["error"]=true;
+			    response["data"]["response"]="Error during Insertion execution";
+			  }
+			  else// SIGN_UP Success
+			  {
+
+			    cout<<"SIGN_UP : Success inserting new user"<<endl;
+			    sqlite3_close(db);
+			    response["type"]= CODE_SIGN_UP;
+			    response["data"]["error"]=false;
+			    response["data"]["response"]="Success";
+			  }
+			}
+		}
+	    }
+
+
+            sqlite3_finalize(stmt);
+	    }
             break;
 
         case CODE_CONNECT:
