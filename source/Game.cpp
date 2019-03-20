@@ -194,10 +194,6 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	return CombatOutcome();
 }
 
-void Game::solveCombat()
-{
-}
-
 void Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
 {
 	// checking the requirements of moving units
