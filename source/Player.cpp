@@ -12,9 +12,9 @@ Player::Player(string name)
 		this->tokens[i] = 0;
 	}
 	/* initializing of player stats */
-	this->gained_territories = 0;
-	this->lost_territories   = 0;
-	this->sets_of_tokens     = 0;
+	this->territoriesCaptured = 0;
+	this->territoriesLost   = 0;
+	this->setsSpent     = 0;
     
 }
 
@@ -74,30 +74,30 @@ void Player::removeTokens(int numberOfEachToken[4])
 
 }
 
-int Player::get_gained_territories()
+int Player::getTerritoriesCaptured()
 {
-	return this->gained_territories;
+	return this->territoriesCaptured;
 }
-int Player::get_lost_territories()
+int Player::GetTerritoriesLost()
 {
-	return this->lost_territories;
+	return this->territoriesLost;
 }
-int Player::get_sets_of_tokens()
+int Player::getSetsSpent()
 {
-	return this->sets_of_tokens;
+	return this->setsSpent;
 }
 
-void Player::add_gained_territories()
+void Player::addTerritoriesCaptured()
 {
-	this->gained_territories ++;
+	this->territoriesCaptured ++;
 }
-void Player::add_lost_territories()
+void Player::addTerritoriesLost()
 {
-	this->lost_territories ++;
+	this->territoriesLost ++;
 }
-void Player::add_sets_of_tokens()
+void Player::addSetsSpent()
 {
-	this->sets_of_tokens ++;
+	this->setsSpent ++;
 }
 /* what about the one (or those) who will get his tokens ? */
 void Player::die()
