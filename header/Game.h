@@ -69,6 +69,7 @@ private:
 	int useSet(int tok1, int tok2, int tok3);
 
 	int currentSetValue();
+	bool isValidSet(int tok1, int tok2, int tok3);
 	void putUnits(int territory, int units);
 
 	/**

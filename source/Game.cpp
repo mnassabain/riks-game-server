@@ -96,6 +96,34 @@ int Game::currentSetValue()
 	}
 }
 
+bool Game::isValidSet(int tok1, int tok2, int tok3)
+{
+	// Basic check
+	if ((tok1 < 0) || (tok1 > 3)) return false;
+	if ((tok2 < 0) || (tok2 > 3)) return false;
+	if ((tok3 < 0) || (tok3 > 3)) return false;
+
+	int tokens[4] = {0};
+	int i;
+	tokens[tok1]++;
+	tokens[tok2]++;
+	tokens[tok3]++;
+
+	// Set is valid if there's at least one wildcard
+	if (tokens[0] > 0) return true;
+
+	// Set is valid if there's 3 of any of the tokens
+	for (i = 1; i <= 3; i++) {
+		if (tokens[i] == 3) return true;
+	}
+
+	// Set is valid if all 3 tokens have a 1 value. This works considering the previous checks.
+	for (i = 1; i <= 3; i++) {
+		if (tokens[i] != 1) return false;
+	}
+	return true;
+}
+
 void Game::putUnits(int territory, int units)
 {
 	if ((this->activePlayer == this->board[this->activePlayer].owner) && (this->players[this->activePlayer].getReinforcement() >= units)) {
