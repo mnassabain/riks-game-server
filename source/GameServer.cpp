@@ -63,7 +63,8 @@ string GameServer::treatMessage(string message)
             }
             else
             {
-                if (!jmessage["data"].count("id") || !jmessage["data"].count("password"))
+                if (!jmessage["data"].count("id") 
+                    || !jmessage["data"].count("password"))
                 {
                     response["type"] = CODE_SIGN_UP;
                     response["data"]["error"] = true;
@@ -88,19 +89,39 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_CONNECT:
-        
-            if (jmessage.size() < 3)
+
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                response["type"] = CODE_CONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = 
+                    "Invalid message format; insufficient parameters";
+
                 break;
             }
+            else
+            {
+                if (!jmessage["data"].count("id") 
+                    || !jmessage["data"].count("password"))
+                {
+                    response["type"] = CODE_CONNECT;
+                    response["data"]["error"] = true;
+                    response["data"]["response"] = 
+                        "Invalid message format; insufficient parameters";
 
-            cout << "Connection attempt by user (id = " << jmessage[1]
-                << ", password = " << jmessage[2] << ")" << endl;
+                    break;
+                }
+            }
+
+            cout << "Connection attempt by user (id = " 
+                << jmessage["data"]["id"] << ", password = " 
+                << jmessage["data"]["password"] << ")" << endl;
+                
             /* ... */
-            response.push_back(CODE_CONNECT);
-            response.push_back(1234); // token
+            
+            response["type"] = CODE_CONNECT;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
             break;
 
         case CODE_DISCONNECT:
