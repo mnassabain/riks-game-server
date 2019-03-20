@@ -1,0 +1,19 @@
+
+{
+    type: "CONNECT",
+    data: {
+        id: "...",
+        pwd: "..."
+    }
+}
+
+
+response:
+
+{
+    type: "CONNECT",
+    data: {
+        error: bool
+        response: "..."
+    }
+}
