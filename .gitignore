@@ -5,3 +5,4 @@ source/testapp
 *.h.gch
 bin/*.o
 riks-server
+./message-sender/message-sender

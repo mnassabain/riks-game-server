@@ -14,6 +14,10 @@ isRunning is the go-to to know if a Game is currently running as a lobby or an a
 More details will be provided at a later time about allowed messages.
 Also the list needs to be reworked slightly.
 
+Note : All messages will start with the Player Name/ID and their token for identification purpose.
+In the following document, all instances of <Player> are their number in the ordered game player list. Not their name/ID.
+We need a better name for that field. I'll refer to that as Order for now.
+
 1. Game messages
 /**************/
 a. Player -> Server

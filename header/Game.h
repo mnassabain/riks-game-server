@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <cmath>
+#include <random>
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
@@ -17,6 +18,7 @@ private:
 	static int nextId;
 	int id;
 	string name;
+	string password;
 	int maxPlayer;
 	int nbPlayer;
 	vector <Player> players;
@@ -32,6 +34,8 @@ private:
 	bool territoryCapture;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
+	// Combat handler - Used to save combat context between messages, to handle combat properly - Has to be reset after each combat is done
+	CombatHandler combat;
 
 	// Methods
 
@@ -59,6 +63,8 @@ private:
 	 */
 	void chooseFirstPlayer();
 
+	void turnReinforcement();
+
 	/**
 	 * @brief 
 	 * 
@@ -71,6 +77,7 @@ private:
 
 	int currentSetValue();
 	bool isValidSet(int tok1, int tok2, int tok3);
+	void grantToken();
 	void putUnits(int territory, int units);
 
 	/**
@@ -138,6 +145,8 @@ public:
 	 * @param name 
 	 */
 	void addPlayer(string name);
+	void removePlayer(string name);
+	int getPlayerOrder(string name);
 
 	/**
 	 * @brief Get the Id object
@@ -145,6 +154,22 @@ public:
 	 * @return int 
 	 */
 	int getId();
+
+	/**
+	* @brief Send a message to the Game object and process it
+	*
+	* @return string
+	*/
+	string message(string message);
+
+	/**
+	 * @brief Returns a random value between min and max (both included)
+	 * 
+	 * @param min 
+	 * @param max 
+	 * @return int 
+	 */
+	int intRand(int min, int max);
 
 	// Constructors
 
