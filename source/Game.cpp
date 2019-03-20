@@ -185,3 +185,24 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->nbPlayer = 0;
 	addPlayer(creatorId);
 }
+
+Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
+{
+	// Setting up game ID
+	this->id = nextId;
+	nextId++;
+
+	// Loading up map
+	this->map = Map::loadMap(mapName);
+
+	// Initialization of lobby variables
+	this->running = false;
+
+	// Initialization of players
+	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
+	this->nbPlayer = 0;
+	addPlayer(creatorId);
+
+	// Setting up lobby name
+	this->name.assign(lobbyName);
+}

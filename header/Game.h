@@ -15,6 +15,7 @@ private:
 	// Lobby variables // Gotta remember to add a string name for the lobby and change the public constructor to reflect the change
 	static int nextId;
 	int id;
+	string name;
 	int maxPlayer;
 	int nbPlayer;
 	vector <Player> players;
@@ -152,7 +153,8 @@ public:
 	 * @param creatorId 
 	 * @param maxPlayer 
 	 */
-	Game(string mapName, string creatorId, int maxPlayer); // Constructor used on lobby creation
+	Game(string mapName, string creatorId, int maxPlayer);
+	Game(string mapName, string creatorId, int maxPlayer, string lobbyName); // Constructor used on lobby creation
 };
 
 #endif //GAME_H
