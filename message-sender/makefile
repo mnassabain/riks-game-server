@@ -1,2 +1,2 @@
 all:
-	g++ -g -std=c++11 -Wall -o message-sender message-sender.cpp -L../libs/libboost -lboost_system -lboost_chrono -lboost_random -lboost_thread -lpthread -Wl,-rpath=./libs/libboost/
+	g++ -g -std=c++11 -Wall -I../libs/ -o message-sender message-sender.cpp -L../libs/libboost -lboost_system -lboost_chrono -lboost_random -lboost_thread -lpthread -Wl,-rpath=./libs/libboost/
