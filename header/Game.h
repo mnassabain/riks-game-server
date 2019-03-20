@@ -32,6 +32,8 @@ private:
 	bool territoryCapture;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
+	// Combat handler - Used to save combat context between messages, to handle combat properly - Has to be reset after each combat is done
+	CombatHandler combat;
 
 	// Methods
 

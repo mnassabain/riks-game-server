@@ -13,9 +13,17 @@ void Game::start()
 	this->tokens[2] = 14;
 	this->tokens[3] = 14;
 	this->totalExchangedSets = 0;
+	// Initialization of turn variables
 	this->territoryCapture = false;
 	this->lastAttackedTerritory = -1;
 	this->lastAttackCapture = false;
+	// Initialization of combat handler
+	this->combat.attackerId = -1;
+	this->combat.defenderId = -1;
+	this->combat.source = -1;
+	this->combat.destination = -1;
+	this->combat.attackerUnits = -1;
+	this->combat.defenderUnits = -1;
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
 	TerritoryState blank;
