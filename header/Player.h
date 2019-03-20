@@ -15,7 +15,6 @@ public:
     int sets_of_tokens;
     bool isAlive;
     Player(std::string name);
-    bool set_is_valid(int tok1, int tok2, int tok3);
 	bool hasSet(int tok1, int tok2, int tok3);
     /*std::vector<int>listTokens(); */
     int* listTokens();
