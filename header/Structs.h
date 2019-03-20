@@ -39,4 +39,16 @@ struct CombatOutcome
 };
 typedef struct CombatOutcome CombatOutcome;
 
+//CombatHandler
+struct CombatHandler
+{
+	int attackerId;
+	int defenderId;
+	int source;
+	int destination;
+	int attackerUnits;
+	int defenderUnits;
+};
+typedef struct CombatHandler CombatHandler;
+
 #endif //STRUCTS_H
