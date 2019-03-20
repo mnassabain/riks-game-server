@@ -17,6 +17,7 @@ private:
 	static int nextId;
 	int id;
 	string name;
+	string password;
 	int maxPlayer;
 	int nbPlayer;
 	vector <Player> players;

@@ -278,6 +278,12 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
 	this->nbPlayer = 0;
 	addPlayer(creatorId);
+
+	// Setting up default lobby name
+	this->name.assign(creatorId << "'s Lobby");
+
+	// Setting up default password
+	this->password.assign("");
 }
 
 Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
@@ -299,4 +305,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
 
 	// Setting up lobby name
 	this->name.assign(lobbyName);
+
+	// Setting up default password
+	this->password.assign("");
 }
