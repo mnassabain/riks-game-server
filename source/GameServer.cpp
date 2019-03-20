@@ -20,33 +20,75 @@ void GameServer::listen()
 
 string GameServer::treatMessage(string message)
 {
-    json jmessage = json::parse(message);
+    json jmessage;
     json response;
 
-    if (jmessage.size() <= 0)
+    try
     {
-        response.push_back(CODE_UNHANDLED);
-        return response;
+        jmessage = json::parse(message);
+    }
+    catch(exception e)
+    {
+        json response;
+        cout << "Caught exception: " << e.what() << endl;
+
+        response["type"] = CODE_UNHANDLED;
+        response["data"]["error"] = true;
+        response["data"]["response"] = "Invalid message";
+        return response.dump();
     }
 
-    MessageCode code = jmessage[0];
+
+    if (jmessage.size() <= 0 || !jmessage.count("type"))
+    {
+        response["type"] = CODE_UNHANDLED;
+        response["data"]["error"] = true;
+        response["data"]["response"] = "Invalid message";
+        return response.dump();
+    }
+
+    MessageCode code = jmessage["type"];
     switch(code)
     {
         case CODE_SIGN_UP:
-            if (jmessage.size() < 3)
+
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                response["type"] = CODE_SIGN_UP;
+                response["data"]["error"] = true;
+                response["data"]["response"] = 
+                    "Invalid message format; insufficient parameters";
+
                 break;
             }
+            else
+            {
+                if (!jmessage["data"].count("id") || !jmessage["data"].count("password"))
+                {
+                    response["type"] = CODE_SIGN_UP;
+                    response["data"]["error"] = true;
+                    response["data"]["response"] = 
+                        "Invalid message format; insufficient parameters";
 
-            cout << "Creating new user (id = " << jmessage[1]
-                << ", password = " << jmessage[2] << ")" << endl;
+                    break;
+                }
+            }
+            
+
+            cout << "Creating new user (id = " << jmessage["data"]["id"]
+                << ", password = " << jmessage["data"]["password"] << ")" 
+                << endl;
+
             /* insert into db */
-            response.push_back(CODE_SIGN_UP);
+
+            response["type"] = CODE_SIGN_UP;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
+            
             break;
 
         case CODE_CONNECT:
+        
             if (jmessage.size() < 3)
             {
                 response.push_back(CODE_ERROR);
