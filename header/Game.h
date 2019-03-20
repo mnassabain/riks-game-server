@@ -62,6 +62,8 @@ private:
 	 */
 	void chooseFirstPlayer();
 
+	void turnReinforcement();
+
 	/**
 	 * @brief 
 	 * 
@@ -74,6 +76,7 @@ private:
 
 	int currentSetValue();
 	bool isValidSet(int tok1, int tok2, int tok3);
+	void grantToken();
 	void putUnits(int territory, int units);
 
 	/**
@@ -141,6 +144,8 @@ public:
 	 * @param name 
 	 */
 	void addPlayer(string name);
+	void removePlayer(string name);
+	int getPlayerOrder(string name);
 
 	/**
 	 * @brief Get the Id object
@@ -148,6 +153,13 @@ public:
 	 * @return int 
 	 */
 	int getId();
+
+	/**
+	* @brief Send a message to the Game object and process it
+	*
+	* @return string
+	*/
+	string message(string message);
 
 	// Constructors
 

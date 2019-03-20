@@ -25,6 +25,7 @@ public:
     int* listTokens();
     void removeAllTokens();
     void receiveToken(int type);
+	void removeToken(int type);
     void receiveTokens(int numberOfEachToken[4]);
     void removeTokens(int numberOfEachToken[4]);
     int getTerritoriesCaptured();
@@ -38,6 +39,8 @@ public:
 	void addReinforcement(int reinforcement);
 	void spendReinforcement(int reinforcement);
 	int getReinforcement();
+
+	string getName();
 private:
 };
 
