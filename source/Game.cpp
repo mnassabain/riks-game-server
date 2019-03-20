@@ -289,6 +289,13 @@ int Game::getId()
 	return this->id;
 }
 
+int Game::intRand(int min, int max) {
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_real_distribution<float> dist(min, max);
+	return (int) dist(mt);
+}
+
 // This is where most of the game logic will happen
 // The message received must have all arguments separated with ','
 // The message returned can be several messages, all separated with ';'

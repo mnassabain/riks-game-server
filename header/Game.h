@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <cmath>
+#include <random>
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
@@ -160,6 +161,8 @@ public:
 	* @return string
 	*/
 	string message(string message);
+
+	int intRand(int min, int max);
 
 	// Constructors
 
