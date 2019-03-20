@@ -202,15 +202,12 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_LOBBY_LIST:
-            if (jmessage.size() < 1)
-            {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
-                break;
-            }
 
             cout << "Received lobby list demand" << endl;
-            response.push_back(CODE_LOBBY_LIST);
+
+            response["type"] = CODE_LOBBY_LIST;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
 
             {
                 int nb = 0;
@@ -219,7 +216,8 @@ string GameServer::treatMessage(string message)
                 {
                     if (!games[i].isRunning())
                     {
-                        response.push_back("game"/*games[i].toString()*/);
+                        response["data"]["gameList"].push_back(
+                            "game"/*games[i].toString()*/);
                         nb++;
                     }
                 }
