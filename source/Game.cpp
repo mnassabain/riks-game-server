@@ -73,7 +73,7 @@ void Game::nextPhase()
 
 void Game::chooseFirstPlayer()
 {
-	this->activePlayer = 0; // To be replaced with a rand
+	this -> activePlayer = intRand(0, this -> nbPlayer - 1);
 }
 
 void Game::turnReinforcement()
