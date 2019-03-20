@@ -316,7 +316,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	addPlayer(creatorId);
 
 	// Setting up default lobby name
-	this->name.assign(creatorId << "'s Lobby");
+	this->name.assign(creatorId);
 
 	// Setting up default password
 	this->password.assign("");
