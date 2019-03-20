@@ -11,6 +11,8 @@
 #include "../libs/websocketpp/server.hpp"
 
 #include "../libs/json/json.hpp"
+#include "../libs/sqlite/sqlite3.h"
+#include <string.h>
 
 using namespace std;
 using json = nlohmann::json;
