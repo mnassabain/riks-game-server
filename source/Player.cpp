@@ -56,6 +56,10 @@ void Player::receiveToken(int type)
 {
 	this->tokens[type]++;
 }
+void Player::removeToken(int type)
+{
+	this->tokens[type]--;
+}
 void Player::receiveTokens(int numberOfEachToken[4])
 {
 	for(size_t j = 0; j < 4 ; j++)
@@ -118,4 +122,9 @@ void Player::spendReinforcement(int reinforcement)
 int Player::getReinforcement()
 {
 	return this->reinforcement;
+}
+
+string Player::getName()
+{
+	return this->name;
 }

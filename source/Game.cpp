@@ -13,9 +13,17 @@ void Game::start()
 	this->tokens[2] = 14;
 	this->tokens[3] = 14;
 	this->totalExchangedSets = 0;
+	// Initialization of turn variables
 	this->territoryCapture = false;
 	this->lastAttackedTerritory = -1;
 	this->lastAttackCapture = false;
+	// Initialization of combat handler
+	this->combat.attackerId = -1;
+	this->combat.defenderId = -1;
+	this->combat.source = -1;
+	this->combat.destination = -1;
+	this->combat.attackerUnits = -1;
+	this->combat.defenderUnits = -1;
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
 	TerritoryState blank;
@@ -68,10 +76,20 @@ void Game::chooseFirstPlayer()
 	this->activePlayer = 0; // To be replaced with a rand
 }
 
+void Game::turnReinforcement()
+{
+	int reinforcement = 0;
+
+	this->players[this->activePlayer].addReinforcement(reinforcement);
+}
+
 int Game::useSet(int tok1, int tok2, int tok3)
 {
 	if (players[this->activePlayer].hasSet(tok1, tok2, tok3)) {
 		// Removing tokens from player
+		players[this->activePlayer].removeToken(tok1);
+		players[this->activePlayer].removeToken(tok2);
+		players[this->activePlayer].removeToken(tok3);
 		// Adding tokens back to the pool
 		this->tokens[tok1]++;
 		this->tokens[tok2]++;
@@ -122,6 +140,14 @@ bool Game::isValidSet(int tok1, int tok2, int tok3)
 		if (tokens[i] != 1) return false;
 	}
 	return true;
+}
+
+void Game::grantToken()
+{
+	// To do : Random a token from the list and grant it to player - Meanwhile infinite wildcards
+
+	tokens[0]--;
+	players[activePlayer].receiveToken(0);
 }
 
 void Game::putUnits(int territory, int units)
@@ -248,9 +274,27 @@ void Game::addPlayer(string name)
 	}
 }
 
+void Game::removePlayer(string name)
+{
+}
+
+// Will return -1 if the player isn't in this game/lobby
+int Game::getPlayerOrder(string name)
+{
+	return -1;
+}
+
 int Game::getId()
 {
 	return this->id;
+}
+
+// This is where most of the game logic will happen
+// The message received must have all arguments separated with ','
+// The message returned can be several messages, all separated with ';'
+string Game::message(string message)
+{
+	return string();
 }
 
 // Public constructors
@@ -270,6 +314,12 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
 	this->nbPlayer = 0;
 	addPlayer(creatorId);
+
+	// Setting up default lobby name
+	this->name.assign(creatorId);
+
+	// Setting up default password
+	this->password.assign("");
 }
 
 Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
@@ -291,4 +341,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
 
 	// Setting up lobby name
 	this->name.assign(lobbyName);
+
+	// Setting up default password
+	this->password.assign("");
 }
