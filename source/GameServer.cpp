@@ -144,7 +144,7 @@ string GameServer::treatMessage(string message, Connection connection)
             /* ... */
 
             /* move from unregistered connections into registered clients */
-            clients.emplace(jmessage["userID"], connection);
+            clients.emplace(jmessage["data"]["userID"], connection);
 
             /* remove from unregistered connections */
             {
@@ -523,10 +523,20 @@ void GameServer::onMessage(Connection connection, Message msg)
 
     if (msg->get_payload() == "nb-connections")
     {
-        cout << "Number of connections: " 
-            << clients.size() + unregisteredConnections.size() 
-            << endl;
+        cout << "Number of connections: " << nbConnections()<< endl;
+        return;
+    }
 
+    if (msg->get_payload() == "nb-unregistered-connections")
+    {
+        cout << "Number of unregistered connections: " 
+            << nbUnregisteredConnections() << endl;
+        return;
+    }
+
+    if (msg->get_payload() == "nb-clients")
+    {
+        cout << "Number of clients: " << nbClients() << endl;
         return;
     }
 
@@ -590,4 +600,20 @@ void GameServer::errorResponse(json& response, MessageCode code, string message)
 int GameServer::nbGames()
 {
     return games.size();
+}
+
+
+int GameServer::nbConnections()
+{
+    return nbClients() + nbUnregisteredConnections();
+}
+
+int GameServer::nbClients()
+{
+    return clients.size();
+}
+
+int GameServer::nbUnregisteredConnections()
+{
+    return unregisteredConnections.size();
 }

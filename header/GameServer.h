@@ -58,6 +58,9 @@ public:
 
     /* debugging */
     static int nbGames();
+    static int nbConnections();
+    static int nbClients();
+    static int nbUnregisteredConnections();
 
 };
 
