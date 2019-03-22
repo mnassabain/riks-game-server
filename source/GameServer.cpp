@@ -29,8 +29,7 @@ string GameServer::treatMessage(string message)
     }
     catch(exception e)
     {
-        json response;
-        cout << "Caught exception: " << e.what() << endl;
+        cout << "JSON parse exception: " << e.what() << endl;
 
         response["type"] = CODE_UNHANDLED;
         response["data"]["error"] = true;
@@ -63,8 +62,8 @@ string GameServer::treatMessage(string message)
             }
             else
             {
-                if (!jmessage["data"].count("id") 
-                    || !jmessage["data"].count("password"))
+                if (!jmessage["data"].count("userID") 
+                    || !jmessage["data"].count("userPassword"))
                 {
                     response["type"] = CODE_SIGN_UP;
                     response["data"]["error"] = true;
@@ -76,8 +75,8 @@ string GameServer::treatMessage(string message)
             }
             
 
-            cout << "Creating new user (id = " << jmessage["data"]["id"]
-                << ", password = " << jmessage["data"]["password"] << ")" 
+            cout << "Creating new user (id = " << jmessage["data"]["userID"]
+                << ", password = " << jmessage["data"]["userPassword"] << ")" 
                 << endl;
 
             /* insert into db */
@@ -101,8 +100,8 @@ string GameServer::treatMessage(string message)
             }
             else
             {
-                if (!jmessage["data"].count("id") 
-                    || !jmessage["data"].count("password"))
+                if (!jmessage["data"].count("userID") 
+                    || !jmessage["data"].count("userPassword"))
                 {
                     response["type"] = CODE_CONNECT;
                     response["data"]["error"] = true;
@@ -114,8 +113,8 @@ string GameServer::treatMessage(string message)
             }
 
             cout << "Connection attempt by user (id = " 
-                << jmessage["data"]["id"] << ", password = " 
-                << jmessage["data"]["password"] << ")" << endl;
+                << jmessage["data"]["userID"] << ", password = " 
+                << jmessage["data"]["userPassword"] << ")" << endl;
                 
             /* ... */
             
@@ -134,7 +133,7 @@ string GameServer::treatMessage(string message)
                 break;
             }
 
-            if (!jmessage["data"].count("id"))
+            if (!jmessage["data"].count("userID"))
             {
                 response["type"] = CODE_DISCONNECT;
                 response["data"]["error"] = true;
@@ -143,7 +142,7 @@ string GameServer::treatMessage(string message)
                 break;
             }
 
-            cout << "User disconnected (id = " << jmessage["data"]["id"] 
+            cout << "User disconnected (id = " << jmessage["data"]["userID"] 
                 << ")" << endl;
 
 
@@ -174,10 +173,11 @@ string GameServer::treatMessage(string message)
                 break;
             }
 
-            if (!jmessage["data"].count("playerID") ||
+            if (!jmessage["data"].count("userID") ||
                 !jmessage["data"].count("lobbyName") ||
-                !jmessage["data"].count("nbPlayers") ||
-                !jmessage["data"].count("map"))
+                !jmessage["data"].count("lobbyPassword") ||
+                !jmessage["data"].count("maxPlayers") ||
+                !jmessage["data"].count("mapName"))
             {
                 response["type"] = CODE_CREATE_LOBBY;
                 response["data"]["error"] = true;
@@ -185,14 +185,15 @@ string GameServer::treatMessage(string message)
                 break;
             }
 
-            cout << "User " << jmessage["data"]["playerID"] 
+            cout << "User " << jmessage["data"]["userID"] 
                 << ": attempt to create lobby "
-                << jmessage["data"]["lobbyName"] 
-                << "of max players " << jmessage["data"]["nbPlayers"]
-                << "and on map " << jmessage["data"]["map"] << endl;
+                << jmessage["data"]["lobbyName"]
+                << "with password" << jmessage["data"]["lobbyPassword"]
+                << "of max players " << jmessage["data"]["maxPlayers"]
+                << "and on map " << jmessage["data"]["mapName"] << endl;
 
-            createGame(jmessage["data"]["map"], jmessage["data"]["playerID"],
-                jmessage["data"]["nbPlayers"]);
+            createGame(jmessage["data"]["mapName"], jmessage["data"]["userID"],
+                jmessage["data"]["maxPlayers"]);
 
             cout << "Lobby created" << endl;
             
