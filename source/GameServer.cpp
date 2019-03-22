@@ -8,7 +8,8 @@
 
 vector<Game> GameServer::games;
 ServerEndpoint GameServer::endpoint;
-vector<Connection> GameServer::connections;
+map<string, Connection> GameServer::clients;
+vector<Connection> GameServer::unregisteredConnections;
 
 
 void GameServer::listen()
@@ -18,7 +19,7 @@ void GameServer::listen()
 }
 
 
-string GameServer::treatMessage(string message)
+string GameServer::treatMessage(string message, Connection connection)
 {
     json jmessage;
     json response;
@@ -141,6 +142,26 @@ string GameServer::treatMessage(string message)
                 << jmessage["data"]["userPassword"] << ")" << endl;
                 
             /* ... */
+
+            /* move from unregistered connections into registered clients */
+            clients.emplace(jmessage["userID"], connection);
+
+            /* remove from unregistered connections */
+            {
+                bool found = false;
+                for (unsigned int i = 0; 
+                    i < unregisteredConnections.size() && !found; 
+                    i++)
+                {
+                    if (unregisteredConnections[i].lock().get() == 
+                        connection.lock().get())
+                    {
+                        found = true;
+                        unregisteredConnections.erase(
+                            unregisteredConnections.begin() + i);
+                    }
+                }
+            }
             
             response["type"] = CODE_CONNECT;
             response["data"]["error"] = false;
@@ -459,12 +480,27 @@ void GameServer::stop()
     }
 
     /* close all existing connections */
-    for(unsigned int i = 0; i < connections.size(); i++)
+    map<string, Connection>::iterator i;
+    for(i = clients.begin(); i != clients.end(); i++)
     {
         try
         {
-            endpoint.pause_reading(connections[i]);
-            endpoint.close(connections[i], 
+            endpoint.pause_reading(i->second);
+            endpoint.close(i->second, 
+                websocketpp::close::status::going_away, "Server shutdown");
+        }
+        catch(websocketpp::exception e)
+        {
+            cout << "close connection exception: " << e.what() << endl;
+        }
+    }
+
+    for (unsigned int j = 0; j < unregisteredConnections.size(); j++)
+    {
+        try
+        {
+            endpoint.pause_reading(unregisteredConnections[j]);
+            endpoint.close(unregisteredConnections[j], 
                 websocketpp::close::status::going_away, "Server shutdown");
         }
         catch(websocketpp::exception e)
@@ -487,11 +523,14 @@ void GameServer::onMessage(Connection connection, Message msg)
 
     if (msg->get_payload() == "nb-connections")
     {
-        cout << "Number of connections: " << connections.size() << endl;
+        cout << "Number of connections: " 
+            << clients.size() + unregisteredConnections.size() 
+            << endl;
+
         return;
     }
 
-    string response = treatMessage(msg->get_payload());
+    string response = treatMessage(msg->get_payload(), connection);
 
     endpoint.send(connection, response, websocketpp::frame::opcode::text);
 }
@@ -500,7 +539,7 @@ void GameServer::onMessage(Connection connection, Message msg)
 void GameServer::onOpenConnection(Connection connection)
 {
     /* add newly opened connection to connections list */
-    connections.push_back(connection);
+    unregisteredConnections.push_back(connection);
 }
 
 
@@ -508,12 +547,27 @@ void GameServer::onCloseConnection(Connection connection)
 {
     bool found = false;
 
-    /* naive removing connection */
-    for (unsigned int i = 0; i < connections.size() && !found; i++)
+    /* check clients list */
+    map<string, Connection>::iterator i;
+    for (i = clients.begin(); i != clients.end(); i++)
     {
-        if (connections[i].lock().get() == connection.lock().get())
+        if (i->second.lock().get() == connection.lock().get())
         {
-            connections.erase(connections.begin() + i);
+            found = true;
+            clients.erase(i);
+        }
+    }
+
+
+    if (found)
+        return;
+
+    /* check unregistered connections */
+    for (unsigned int j = 0; j < unregisteredConnections.size() && !found; j++)
+    {
+        if (unregisteredConnections[j].lock().get() == connection.lock().get())
+        {
+            unregisteredConnections.erase(unregisteredConnections.begin() + j);
             cout << "Removing connection " << connection.lock().get() 
                 << ": connection closed" << endl;
             found = true;
