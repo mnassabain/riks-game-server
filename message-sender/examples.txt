@@ -1,0 +1,32 @@
+send 0 {"type": 2, "data": {"userID": "monid", "userPassword": "mdp"}}
+
+send 0 {"type": 2, "data": {"userID": "monid", "userPassword": 2}}
+
+send 0 {"type": 2, "data": {"id": "monid", "userPassword": "mdp"}}
+send 0 {"type": 2, "data": {"userID": "monid", "password": "mdp"}}
+send 0 {"type": 2, "userID": "monid", "userPassword": "mdp"}}
+
+
+send 0 {"type": 3, "data": {"userID": "monid", "userPassword": "mdp"}}
+
+send 0 {"type": 3, "data": {"id": "monid", "userPassword": "mdp"}}
+send 0 {"type": 3, "data": {"userID": "monid", "password": "mdp"}}
+send 0 {"type": 3, "userID": "monid", "userPassword": "mdp"}}
+
+
+send 0 {"type": 4, "data": {"userID": "monid"}}
+
+send 0 {"type": 4}
+send 0 {"type": 4, "userID": "monid"}
+
+
+send 0 {"type": 6, "data": {"userID": "monid", "lobbyName": "monlobby", "lobbyPassword": "", "maxPlayers": 6, "mapName": "world"}}
+
+send 0 {"type": 6, "data": {"userID": "monid", "lobbyName": "monlobby", "maxPlayers": 6, "mapName": "world"}}
+send 0 {"type": 6, "userID": "monid", "lobbyName": "monlobby", "lobbyPassword": "", "maxPlayers": 6, "mapName": "world"}
+
+
+send 0 {"type": 5}
+
+
+send 0 {"type": 7, "data": {"playerID": "monid", "lobbyID": 0, "lobbyPassword": ""}}

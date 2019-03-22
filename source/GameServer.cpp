@@ -8,7 +8,8 @@
 
 vector<Game> GameServer::games;
 ServerEndpoint GameServer::endpoint;
-vector<Connection> GameServer::connections;
+map<string, Connection> GameServer::clients;
+vector<Connection> GameServer::unregisteredConnections;
 
 
 void GameServer::listen()
@@ -18,7 +19,7 @@ void GameServer::listen()
 }
 
 
-string GameServer::treatMessage(string message)
+string GameServer::treatMessage(string message, Connection connection)
 {
     json jmessage;
     json response;
@@ -29,21 +30,22 @@ string GameServer::treatMessage(string message)
     }
     catch(exception e)
     {
-        json response;
-        cout << "Caught exception: " << e.what() << endl;
+        cout << "JSON parse exception: " << e.what() << endl;
 
-        response["type"] = CODE_UNHANDLED;
-        response["data"]["error"] = true;
-        response["data"]["response"] = "Invalid message";
+        errorResponse(response, CODE_ERROR, "Invalid message format");
         return response.dump();
     }
 
 
     if (jmessage.size() <= 0 || !jmessage.count("type"))
     {
-        response["type"] = CODE_UNHANDLED;
-        response["data"]["error"] = true;
-        response["data"]["response"] = "Invalid message";
+        errorResponse(response, CODE_ERROR, "Invalid message format");
+        return response.dump();
+    }
+
+    if (!jmessage["type"].is_number())
+    {
+        errorResponse(response, CODE_ERROR, "Invalid message type");
         return response.dump();
     }
 
@@ -54,30 +56,41 @@ string GameServer::treatMessage(string message)
 
             if (!jmessage.count("data"))
             {
-                response["type"] = CODE_SIGN_UP;
-                response["data"]["error"] = true;
-                response["data"]["response"] = 
-                    "Invalid message format; insufficient parameters";
+                errorResponse(response, CODE_SIGN_UP, 
+                    "Invalid message format; insufficient parameters");
 
                 break;
             }
-            else
-            {
-                if (!jmessage["data"].count("id") 
-                    || !jmessage["data"].count("password"))
-                {
-                    response["type"] = CODE_SIGN_UP;
-                    response["data"]["error"] = true;
-                    response["data"]["response"] = 
-                        "Invalid message format; insufficient parameters";
 
-                    break;
-                }
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_SIGN_UP, 
+                    "Invalid message data types");
+
+                break;
+            }
+
+            if (!jmessage["data"].count("userID") 
+                || !jmessage["data"].count("userPassword"))
+            {
+                errorResponse(response, CODE_SIGN_UP, 
+                    "Invalid message format; insufficient parameters");
+
+                break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string() ||
+                !jmessage["data"]["userPassword"].is_string())
+            {
+                errorResponse(response, CODE_SIGN_UP, 
+                    "Invalid message data types");
+
+                break;
             }
             
 
-            cout << "Creating new user (id = " << jmessage["data"]["id"]
-                << ", password = " << jmessage["data"]["password"] << ")" 
+            cout << "Creating new user (id = " << jmessage["data"]["userID"]
+                << ", password = " << jmessage["data"]["userPassword"] << ")" 
                 << endl;
 
             /* insert into db */
@@ -92,32 +105,63 @@ string GameServer::treatMessage(string message)
 
             if (!jmessage.count("data"))
             {
-                response["type"] = CODE_CONNECT;
-                response["data"]["error"] = true;
-                response["data"]["response"] = 
-                    "Invalid message format; insufficient parameters";
+                errorResponse(response, CODE_CONNECT, 
+                    "Invalid message format; insufficient parameters");
 
                 break;
             }
-            else
-            {
-                if (!jmessage["data"].count("id") 
-                    || !jmessage["data"].count("password"))
-                {
-                    response["type"] = CODE_CONNECT;
-                    response["data"]["error"] = true;
-                    response["data"]["response"] = 
-                        "Invalid message format; insufficient parameters";
 
-                    break;
-                }
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_CONNECT,
+                    "Invalid message data types");
+
+                break;
             }
 
+            if (!jmessage["data"].count("userID") 
+                || !jmessage["data"].count("userPassword"))
+            {
+                errorResponse(response, CODE_CONNECT, 
+                    "Invalid message format; insufficient parameters");
+
+                break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string() ||
+                !jmessage["data"]["userPassword"].is_string())
+            {
+                errorResponse(response, CODE_CONNECT,
+                    "Invalid message data types");
+
+                break;   
+            }
+            
             cout << "Connection attempt by user (id = " 
-                << jmessage["data"]["id"] << ", password = " 
-                << jmessage["data"]["password"] << ")" << endl;
+                << jmessage["data"]["userID"] << ", password = " 
+                << jmessage["data"]["userPassword"] << ")" << endl;
                 
             /* ... */
+
+            /* move from unregistered connections into registered clients */
+            clients.emplace(jmessage["data"]["userID"], connection);
+
+            /* remove from unregistered connections */
+            {
+                bool found = false;
+                for (unsigned int i = 0; 
+                    i < unregisteredConnections.size() && !found; 
+                    i++)
+                {
+                    if (unregisteredConnections[i].lock().get() == 
+                        connection.lock().get())
+                    {
+                        found = true;
+                        unregisteredConnections.erase(
+                            unregisteredConnections.begin() + i);
+                    }
+                }
+            }
             
             response["type"] = CODE_CONNECT;
             response["data"]["error"] = false;
@@ -125,57 +169,120 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_DISCONNECT:
-            if (jmessage.size() < 2)
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                errorResponse(response, CODE_DISCONNECT, 
+                    "Invalid message; insufficient parameters");
+
                 break;
             }
 
-            cout << "User disconnected (id = " << jmessage[1] << ")" << endl;
-            response.push_back(CODE_DISCONNECT);
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_DISCONNECT, 
+                    "Invalid message data types");
+
+                break;
+            }
+
+            if (!jmessage["data"].count("userID"))
+            {
+                errorResponse(response, CODE_DISCONNECT, 
+                    "Invalid message format; insufficient parameters");
+                    
+                break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string())
+            {
+                errorResponse(response, CODE_DISCONNECT, 
+                    "Invalid message data types");
+                
+                break;
+            }
+
+            cout << "User disconnected (id = " << jmessage["data"]["userID"] 
+                << ")" << endl;
+
+
+            response["type"] = CODE_DISCONNECT;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
             break;
 
         case CODE_ERROR:
-            if (jmessage.size() < 2)
-            {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
-                break;
-            }
 
-            cout << "Error: " << jmessage[1] << endl;
-            response.push_back(CODE_ERROR);
+            /* ? */
+            errorResponse(response, CODE_ERROR, "Error");
+
             break;
 
         case CODE_CREATE_LOBBY:
-            if (jmessage.size() < 5)
+
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                errorResponse(response, CODE_CREATE_LOBBY,
+                    "Invalid message; insufficient parameters");
+
                 break;
             }
 
-            cout << "User " << jmessage[1] << ": attempt to create lobby "
-                << jmessage[2] << "of max players " << jmessage[3]
-                << "and on map " << jmessage[4] << endl;
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_CREATE_LOBBY,
+                    "Invalid message data types");
 
-            createGame(jmessage[4], jmessage[1], jmessage[3]);
+                break;
+            }
+
+            if (!jmessage["data"].count("userID") ||
+                !jmessage["data"].count("lobbyName") ||
+                !jmessage["data"].count("lobbyPassword") ||
+                !jmessage["data"].count("maxPlayers") ||
+                !jmessage["data"].count("mapName"))
+            {
+                errorResponse(response, CODE_CREATE_LOBBY,
+                    "Invalid message; insufficient parameters");
+
+                break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string() ||
+                !jmessage["data"]["lobbyName"].is_string() ||
+                !jmessage["data"]["lobbyPassword"].is_string() ||
+                !jmessage["data"]["maxPlayers"].is_number() ||
+                !jmessage["data"]["mapName"].is_string())
+            {
+                errorResponse(response, CODE_CREATE_LOBBY,
+                    "Invalid message data types");
+
+                break;
+            }
+
+            cout << "User " << jmessage["data"]["userID"] 
+                << ": attempt to create lobby "
+                << jmessage["data"]["lobbyName"]
+                << "with password" << jmessage["data"]["lobbyPassword"]
+                << "of max players " << jmessage["data"]["maxPlayers"]
+                << "and on map " << jmessage["data"]["mapName"] << endl;
+
+            createGame(jmessage["data"]["mapName"], jmessage["data"]["userID"],
+                jmessage["data"]["maxPlayers"]);
+
             cout << "Lobby created" << endl;
             
-            response.push_back(CODE_CREATE_LOBBY);
+            response["type"] = CODE_CREATE_LOBBY;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
             break;
 
         case CODE_LOBBY_LIST:
-            if (jmessage.size() < 1)
-            {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
-                break;
-            }
 
             cout << "Received lobby list demand" << endl;
-            response.push_back(CODE_LOBBY_LIST);
+
+            response["type"] = CODE_LOBBY_LIST;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
 
             {
                 int nb = 0;
@@ -184,7 +291,8 @@ string GameServer::treatMessage(string message)
                 {
                     if (!games[i].isRunning())
                     {
-                        response.push_back("game"/*games[i].toString()*/);
+                        response["data"]["gameList"].push_back(
+                            "game"/*games[i].toJSON()*/);
                         nb++;
                     }
                 }
@@ -192,35 +300,77 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_JOIN_LOBBY:
-            if (jmessage.size() < 4)
+
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                errorResponse(response, CODE_JOIN_LOBBY,
+                    "Invalid message; insufficient parameters");
+
                 break;
             }
 
-            cout << "User " << jmessage[1] << " tried to join lobby with id: "
-                << jmessage[2] << "and password: \"" << jmessage[3]
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_JOIN_LOBBY,
+                    "Invalid message data types");
+
+                break;
+            }    
+            
+            if (!jmessage["data"].count("playerID") ||
+                !jmessage["data"].count("lobbyID") ||
+                !jmessage["data"].count("lobbyPassword")
+                )
+            {
+                errorResponse(response, CODE_JOIN_LOBBY,
+                    "Invalid message; insufficient parameters");
+
+                break;
+            }
+
+            if (!jmessage["data"]["playerID"].is_string() ||
+                !jmessage["data"]["lobbyID"].is_number() ||
+                !jmessage["data"]["lobbyPassword"].is_string())
+            {
+                errorResponse(response, CODE_JOIN_LOBBY,
+                    "Invalid message data types");
+
+                break;
+            }
+
+            cout << "User " << jmessage["data"]["playerID"] 
+                << " tried to join lobby with id: "
+                << jmessage["data"]["lobbyID"] 
+                << "and password: \"" << jmessage["data"]["lobbyPassword"]
                 << "\"" << endl;
 
             {
                 bool found = false;
                 for (unsigned int i = 0; i < games.size() && !found; i++)
                 {
-                    if (games[i].getId() == jmessage[2])
+                    if (games[i].getId() == jmessage["data"]["lobbyID"])
                     {
                         found = true;
                         if (false/*games[i].isFull()*/)
                         {
-                            response.push_back(CODE_ERROR);
-                            response.push_back("Lobby is full");
+                            errorResponse(response, CODE_JOIN_LOBBY,
+                                "Lobby is full");
                         }
                         else
                         {
-                            games[i].addPlayer(jmessage[1]);
-                            response.push_back(CODE_JOIN_LOBBY);
+                            games[i].addPlayer(jmessage["data"]["playerID"]);
+
+                            response["type"] = CODE_JOIN_LOBBY;
+                            response["data"]["error"] = false;
+                            response["data"]["response"] = "Success";
                         }
                     }
+                }
+
+                if (!found)
+                {
+                    errorResponse(response, CODE_JOIN_LOBBY,
+                    "Lobby not found");
                 }
             }
             break;
@@ -228,7 +378,8 @@ string GameServer::treatMessage(string message)
         
         default:
             cout << "Unhandled message code" << endl;
-            response.push_back(CODE_UNHANDLED);
+
+            errorResponse(response, CODE_JOIN_LOBBY, "Unrecognized message");
     }
 
     return response.dump();
@@ -329,13 +480,28 @@ void GameServer::stop()
     }
 
     /* close all existing connections */
-    for(unsigned int i = 0; i < connections.size(); i++)
+    map<string, Connection>::iterator i;
+    for(i = clients.begin(); i != clients.end(); i++)
     {
         try
         {
-            endpoint.pause_reading(connections[i]);
-            endpoint.close(connections[i], websocketpp::close::status::going_away, 
-                "Server shutdown");
+            endpoint.pause_reading(i->second);
+            endpoint.close(i->second, 
+                websocketpp::close::status::going_away, "Server shutdown");
+        }
+        catch(websocketpp::exception e)
+        {
+            cout << "close connection exception: " << e.what() << endl;
+        }
+    }
+
+    for (unsigned int j = 0; j < unregisteredConnections.size(); j++)
+    {
+        try
+        {
+            endpoint.pause_reading(unregisteredConnections[j]);
+            endpoint.close(unregisteredConnections[j], 
+                websocketpp::close::status::going_away, "Server shutdown");
         }
         catch(websocketpp::exception e)
         {
@@ -357,11 +523,24 @@ void GameServer::onMessage(Connection connection, Message msg)
 
     if (msg->get_payload() == "nb-connections")
     {
-        cout << "Number of connections: " << connections.size() << endl;
+        cout << "Number of connections: " << nbConnections()<< endl;
         return;
     }
 
-    string response = treatMessage(msg->get_payload());
+    if (msg->get_payload() == "nb-unregistered-connections")
+    {
+        cout << "Number of unregistered connections: " 
+            << nbUnregisteredConnections() << endl;
+        return;
+    }
+
+    if (msg->get_payload() == "nb-clients")
+    {
+        cout << "Number of clients: " << nbClients() << endl;
+        return;
+    }
+
+    string response = treatMessage(msg->get_payload(), connection);
 
     endpoint.send(connection, response, websocketpp::frame::opcode::text);
 }
@@ -370,7 +549,7 @@ void GameServer::onMessage(Connection connection, Message msg)
 void GameServer::onOpenConnection(Connection connection)
 {
     /* add newly opened connection to connections list */
-    connections.push_back(connection);
+    unregisteredConnections.push_back(connection);
 }
 
 
@@ -378,12 +557,27 @@ void GameServer::onCloseConnection(Connection connection)
 {
     bool found = false;
 
-    /* naive removing connection */
-    for (unsigned int i = 0; i < connections.size() && !found; i++)
+    /* check clients list */
+    map<string, Connection>::iterator i;
+    for (i = clients.begin(); i != clients.end(); i++)
     {
-        if (connections[i].lock().get() == connection.lock().get())
+        if (i->second.lock().get() == connection.lock().get())
         {
-            connections.erase(connections.begin() + i);
+            found = true;
+            clients.erase(i);
+        }
+    }
+
+
+    if (found)
+        return;
+
+    /* check unregistered connections */
+    for (unsigned int j = 0; j < unregisteredConnections.size() && !found; j++)
+    {
+        if (unregisteredConnections[j].lock().get() == connection.lock().get())
+        {
+            unregisteredConnections.erase(unregisteredConnections.begin() + j);
             cout << "Removing connection " << connection.lock().get() 
                 << ": connection closed" << endl;
             found = true;
@@ -392,9 +586,34 @@ void GameServer::onCloseConnection(Connection connection)
 }
 
 
+void GameServer::errorResponse(json& response, MessageCode code, string message)
+{
+    response["type"] = code;
+    response["data"]["error"] = true;
+    response["data"]["response"] = message;
+}
+
+
+
 /* DEBUGGING */
 
 int GameServer::nbGames()
 {
     return games.size();
+}
+
+
+int GameServer::nbConnections()
+{
+    return nbClients() + nbUnregisteredConnections();
+}
+
+int GameServer::nbClients()
+{
+    return clients.size();
+}
+
+int GameServer::nbUnregisteredConnections()
+{
+    return unregisteredConnections.size();
 }
