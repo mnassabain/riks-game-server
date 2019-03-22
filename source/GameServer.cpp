@@ -31,18 +31,26 @@ string GameServer::treatMessage(string message)
     {
         cout << "JSON parse exception: " << e.what() << endl;
 
-        response["type"] = CODE_UNHANDLED;
+        response["type"] = CODE_ERROR;
         response["data"]["error"] = true;
-        response["data"]["response"] = "Invalid message";
+        response["data"]["response"] = "Invalid message format";
         return response.dump();
     }
 
 
     if (jmessage.size() <= 0 || !jmessage.count("type"))
     {
-        response["type"] = CODE_UNHANDLED;
+        response["type"] = CODE_ERROR;
         response["data"]["error"] = true;
-        response["data"]["response"] = "Invalid message";
+        response["data"]["response"] = "Invalid message format";
+        return response.dump();
+    }
+
+    if (!jmessage["type"].is_string())
+    {
+        response["type"] = CODE_ERROR;
+        response["data"]["error"] = true;
+        response["data"]["response"] = "Invalid message type";
         return response.dump();
     }
 
@@ -60,18 +68,33 @@ string GameServer::treatMessage(string message)
 
                 break;
             }
-            else
-            {
-                if (!jmessage["data"].count("userID") 
-                    || !jmessage["data"].count("userPassword"))
-                {
-                    response["type"] = CODE_SIGN_UP;
-                    response["data"]["error"] = true;
-                    response["data"]["response"] = 
-                        "Invalid message format; insufficient parameters";
 
-                    break;
-                }
+            if (!jmessage["data"].is_object())
+            {
+                response["type"] = CODE_SIGN_UP;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
+            }
+
+            if (!jmessage["data"].count("userID") 
+                || !jmessage["data"].count("userPassword"))
+            {
+                response["type"] = CODE_SIGN_UP;
+                response["data"]["error"] = true;
+                response["data"]["response"] = 
+                    "Invalid message format; insufficient parameters";
+
+                break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string() ||
+                !jmessage["data"]["userPassword"].is_string())
+            {
+                response["type"] = CODE_SIGN_UP;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
+
+                break;
             }
             
 
@@ -98,20 +121,37 @@ string GameServer::treatMessage(string message)
 
                 break;
             }
-            else
-            {
-                if (!jmessage["data"].count("userID") 
-                    || !jmessage["data"].count("userPassword"))
-                {
-                    response["type"] = CODE_CONNECT;
-                    response["data"]["error"] = true;
-                    response["data"]["response"] = 
-                        "Invalid message format; insufficient parameters";
 
-                    break;
-                }
+            if (!jmessage["data"].is_object())
+            {
+                response["type"] = CODE_CONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
+
+                break;
             }
 
+            if (!jmessage["data"].count("userID") 
+                || !jmessage["data"].count("userPassword"))
+            {
+                response["type"] = CODE_CONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = 
+                    "Invalid message format; insufficient parameters";
+
+                break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string() ||
+                !jmessage["data"]["userPassword"].is_string())
+            {
+                response["type"] = CODE_CONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
+
+                break;   
+            }
+            
             cout << "Connection attempt by user (id = " 
                 << jmessage["data"]["userID"] << ", password = " 
                 << jmessage["data"]["userPassword"] << ")" << endl;
@@ -133,6 +173,15 @@ string GameServer::treatMessage(string message)
                 break;
             }
 
+            if (!jmessage["data"].is_object())
+            {
+                response["type"] = CODE_DISCONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
+
+                break;
+            }
+
             if (!jmessage["data"].count("userID"))
             {
                 response["type"] = CODE_DISCONNECT;
@@ -140,6 +189,13 @@ string GameServer::treatMessage(string message)
                 response["data"]["response"] = 
                     "Invalid message format; insufficient parameters";
                 break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string())
+            {
+                response["type"] = CODE_DISCONNECT;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
             }
 
             cout << "User disconnected (id = " << jmessage["data"]["userID"] 
@@ -152,15 +208,12 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_ERROR:
-            if (jmessage.size() < 2)
-            {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
-                break;
-            }
 
-            cout << "Error: " << jmessage[1] << endl;
-            response.push_back(CODE_ERROR);
+            /* ? */
+            response["type"] = CODE_ERROR;
+            response["data"]["error"] = true;
+            response["data"]["response"] = "Error";
+
             break;
 
         case CODE_CREATE_LOBBY:
@@ -173,6 +226,14 @@ string GameServer::treatMessage(string message)
                 break;
             }
 
+            if (!jmessage["data"].is_object())
+            {
+                response["type"] = CODE_CREATE_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
+                break;
+            }
+
             if (!jmessage["data"].count("userID") ||
                 !jmessage["data"].count("lobbyName") ||
                 !jmessage["data"].count("lobbyPassword") ||
@@ -182,6 +243,18 @@ string GameServer::treatMessage(string message)
                 response["type"] = CODE_CREATE_LOBBY;
                 response["data"]["error"] = true;
                 response["data"]["response"] = "Invalid message";
+                break;
+            }
+
+            if (!jmessage["data"]["userID"].is_string() ||
+                !jmessage["data"]["lobbyName"].is_string() ||
+                !jmessage["data"]["lobbyPassword"].is_string() ||
+                !jmessage["data"]["maxPlayers"].is_number() ||
+                !jmessage["data"]["mapName"].is_string())
+            {
+                response["type"] = CODE_CREATE_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
                 break;
             }
 
@@ -234,7 +307,14 @@ string GameServer::treatMessage(string message)
                 response["data"]["response"] = "Invalid message";
 
                 break;
-            }            
+            }
+
+            if (!jmessage["data"].is_object())
+            {
+                response["type"] = CODE_JOIN_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
+            }    
             
             if (!jmessage["data"].count("playerID") ||
                 !jmessage["data"].count("lobbyID") ||
@@ -246,6 +326,15 @@ string GameServer::treatMessage(string message)
                 response["data"]["response"] = "Invalid message";
 
                 break;
+            }
+
+            if (!jmessage["data"]["playerID"].is_string() ||
+                !jmessage["data"]["lobbyID"].is_number() ||
+                !jmessage["data"]["lobbyPassword"].is_string())
+            {
+                response["type"] = CODE_JOIN_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message data types";
             }
 
             cout << "User " << jmessage["data"]["playerID"] 
