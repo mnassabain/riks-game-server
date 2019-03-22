@@ -217,7 +217,7 @@ string GameServer::treatMessage(string message)
                     if (!games[i].isRunning())
                     {
                         response["data"]["gameList"].push_back(
-                            "game"/*games[i].toString()*/);
+                            "game"/*games[i].toJSON()*/);
                         nb++;
                     }
                 }
@@ -225,33 +225,53 @@ string GameServer::treatMessage(string message)
             break;
 
         case CODE_JOIN_LOBBY:
-            if (jmessage.size() < 4)
+
+            if (!jmessage.count("data"))
             {
-                response.push_back(CODE_ERROR);
-                response.push_back("Invalid message");
+                response["type"] = CODE_JOIN_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message";
+
+                break;
+            }            
+            
+            if (!jmessage["data"].count("playerID") ||
+                !jmessage["data"].count("lobbyID") ||
+                !jmessage["data"].count("lobbyPassword")
+                )
+            {
+                response["type"] = CODE_JOIN_LOBBY;
+                response["data"]["error"] = true;
+                response["data"]["response"] = "Invalid message";
+
                 break;
             }
 
-            cout << "User " << jmessage[1] << " tried to join lobby with id: "
-                << jmessage[2] << "and password: \"" << jmessage[3]
+            cout << "User " << jmessage["data"]["playerID"] 
+                << " tried to join lobby with id: "
+                << jmessage["data"]["lobbyID"] 
+                << "and password: \"" << jmessage["data"]["lobbyPassword"]
                 << "\"" << endl;
 
             {
                 bool found = false;
                 for (unsigned int i = 0; i < games.size() && !found; i++)
                 {
-                    if (games[i].getId() == jmessage[2])
+                    if (games[i].getId() == jmessage["data"]["lobbyID"])
                     {
                         found = true;
                         if (false/*games[i].isFull()*/)
                         {
-                            response.push_back(CODE_ERROR);
-                            response.push_back("Lobby is full");
+                            response["type"] = CODE_JOIN_LOBBY;
+                            response["data"]["error"] = true;
+                            response["data"]["response"] = "Lobby is full";
                         }
                         else
                         {
                             games[i].addPlayer(jmessage[1]);
-                            response.push_back(CODE_JOIN_LOBBY);
+                            response["type"] = CODE_JOIN_LOBBY;
+                            response["data"]["error"] = false;
+                            response["data"]["response"] = "Success";
                         }
                     }
                 }
@@ -261,7 +281,9 @@ string GameServer::treatMessage(string message)
         
         default:
             cout << "Unhandled message code" << endl;
-            response.push_back(CODE_UNHANDLED);
+            response["type"] = CODE_UNHANDLED;
+            response["data"]["error"] = true;
+            response["data"]["response"] = "Unrecognized message";
     }
 
     return response.dump();
