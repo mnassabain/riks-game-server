@@ -42,6 +42,8 @@ private:
     static void onOpenConnection(Connection connection);
     static void onCloseConnection(Connection connection);
 
+    /* other communication methods */
+    static void errorResponse(json& response, MessageCode code, string message);
 
 
 public:
