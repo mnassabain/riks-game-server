@@ -269,12 +269,19 @@ string GameServer::treatMessage(string message)
                         }
                         else
                         {
-                            games[i].addPlayer(jmessage[1]);
+                            games[i].addPlayer(jmessage["data"]["playerID"]);
                             response["type"] = CODE_JOIN_LOBBY;
                             response["data"]["error"] = false;
                             response["data"]["response"] = "Success";
                         }
                     }
+                }
+
+                if (!found)
+                {
+                    response["type"] = CODE_JOIN_LOBBY;
+                    response["data"]["error"] = true;
+                    response["data"]["response"] = "Lobby not found";
                 }
             }
             break;
