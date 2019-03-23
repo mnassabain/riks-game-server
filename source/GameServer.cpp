@@ -209,8 +209,6 @@ string GameServer::treatMessage(string message, Connection connection)
                 map<string, Connection>::iterator client =
                     clients.find(jmessage["data"]["userID"]);
 
-                cout << "FOUND: " << client->first << endl;
-                
                 try
                 {
                     endpoint.pause_reading(client->second);
@@ -396,6 +394,72 @@ string GameServer::treatMessage(string message, Connection connection)
             }
             break;
 
+        case CODE_LEAVE_GAME:
+
+            // id, id game
+            if (!jmessage.count("data"))
+            {
+                errorResponse(response, CODE_LEAVE_GAME, 
+                    "Invalid message; insufficient parameters");
+
+                break;
+            }
+
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_LEAVE_GAME,
+                    "Invalid message data types");
+                    
+                break;
+            }
+
+            if (!jmessage["data"].count("playerID") ||
+                !jmessage["data"].count("lobbyID"))
+            {
+                errorResponse(response, CODE_LEAVE_GAME,
+                    "Invalid message; insufficient parameters");
+
+                break;
+            }
+
+            if (!jmessage["data"]["playerID"].is_string() ||
+                !jmessage["data"]["lobbyID"].is_number())
+            {
+                errorResponse(response, CODE_LEAVE_GAME,
+                    "Invalid message data types");
+
+                break;
+            }
+
+            {
+                bool found = false;
+                for (unsigned int i = 0; i < games.size() && !found; i++)
+                {
+                    if (games[i].getId() == jmessage["data"]["lobbyID"])
+                    {
+                        games[i].removePlayer(jmessage["data"]["playerID"]);
+                        if (true/*games[i].nbPlayers() == 0*/)
+                        {
+                            games.erase(games.begin() + i);
+                        }
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                {
+                    errorResponse(response, CODE_LEAVE_GAME, "Lobby not found");
+
+                    break;
+                }
+            }
+
+            response["type"] = CODE_LEAVE_GAME;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
+
+            break;
+
         
         default:
             cout << "Unhandled message code" << endl;
@@ -558,6 +622,12 @@ void GameServer::onMessage(Connection connection, Message msg)
     if (msg->get_payload() == "nb-clients")
     {
         cout << "Number of clients: " << nbClients() << endl;
+        return;
+    }
+
+    if (msg->get_payload() == "nb-games")
+    {
+        cout << "Number of games: " << nbGames() << endl;
         return;
     }
 
