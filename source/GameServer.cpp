@@ -208,6 +208,8 @@ string GameServer::treatMessage(string message, Connection connection)
             {
                 map<string, Connection>::iterator client =
                     clients.find(jmessage["data"]["userID"]);
+
+                cout << "FOUND: " << client->first << endl;
                 
                 try
                 {
@@ -216,9 +218,9 @@ string GameServer::treatMessage(string message, Connection connection)
                         websocketpp::close::status::normal, 
                         "Successfully disconnected");
                 }
-                catch(websocketpp::exception e)
+                catch(exception e)
                 {
-                    cout << "Caught websocket exception" << e.what() << endl;
+                    cout << "Caught websocket exception: " << e.what() << endl;
                 }
 
                 clients.erase(client);
@@ -561,7 +563,14 @@ void GameServer::onMessage(Connection connection, Message msg)
 
     string response = treatMessage(msg->get_payload(), connection);
 
-    endpoint.send(connection, response, websocketpp::frame::opcode::text);
+    try
+    {
+        endpoint.send(connection, response, websocketpp::frame::opcode::text);
+    }
+    catch(websocketpp::exception e)
+    {
+        cout << "Caught exception when sending message: " << e.what() << endl;
+    }
 }
 
 
