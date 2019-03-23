@@ -204,6 +204,25 @@ string GameServer::treatMessage(string message, Connection connection)
             cout << "User disconnected (id = " << jmessage["data"]["userID"] 
                 << ")" << endl;
 
+            /* disconnect user */
+            {
+                map<string, Connection>::iterator client =
+                    clients.find(jmessage["data"]["userID"]);
+                
+                try
+                {
+                    endpoint.pause_reading(client->second);
+                    endpoint.close(client->second, 
+                        websocketpp::close::status::normal, 
+                        "Successfully disconnected");
+                }
+                catch(websocketpp::exception e)
+                {
+                    cout << "Caught websocket exception" << e.what() << endl;
+                }
+
+                clients.erase(client);
+            }
 
             response["type"] = CODE_DISCONNECT;
             response["data"]["error"] = false;
