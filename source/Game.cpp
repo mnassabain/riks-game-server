@@ -79,12 +79,20 @@ void Game::chooseFirstPlayer()
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
-	reinforcement = this -> players[this -> activePlayer].getTerritoriesCaptured()\
-					- this -> players[this -> activePlayer].GetTerritoriesLost();
 
-	// TODO: check if the player has continents conquered, if so, add him the reinforcements
+	// The reinforcements depend on how many sets of 3 terriitories the player has captures
+	reinforcement = (this -> players[this -> activePlayer].getTerritoriesCaptured()\
+					- this -> players[this -> activePlayer].GetTerritoriesLost()) / 3;
 
-	// if the player gets less than 3 reinforcements, the number is rounded up to three
+	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
+	for(size_t i = 0; i < 6; i++)
+	{
+		if (dominatedContinent(i, this -> activePlayer))
+			reinforcement += this -> map.getContinents()[i].bonus;
+	}
+	
+
+	// If the player gets less than 3 reinforcements, the number is rounded up to three
 	if (reinforcement < 3)
 		reinforcement = 3;
 	this->players[this->activePlayer].addReinforcement(reinforcement);
@@ -264,6 +272,27 @@ bool Game::areAdjacent(int a, int b) {
 	} 
 	else 
 		return false;
+}
+
+bool Game::dominatedContinent(int idContinent, int idPlayer) {
+	bool isDominating = true;
+	int firstTerritory = this -> map.getContinents()[idContinent].firstTerritory;
+	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
+	int nbTerritoriesInContinent = firstTerritory - lastTerritory;
+	int nbTerritories = (this -> players[this -> activePlayer].getTerritoriesCaptured() - \
+		this -> players[this -> activePlayer].GetTerritoriesLost());
+	
+	// Checks if the player has at least the number of territories on that continent
+	if (nbTerritories < nbTerritoriesInContinent)
+		return false;
+	
+	for(size_t i = firstTerritory; i <= lastTerritory; i++)
+	{
+		if (board[i].owner != idPlayer)
+			return false;
+	}
+	
+	return isDominating;
 }
 
 // Public methods
