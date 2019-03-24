@@ -325,6 +325,10 @@ int Game::getId()
 	return this->id;
 }
 
+int Game::getNbPlayers() {
+	return this -> nbPlayers;
+}
+
 int Game::intRand(int min, int max) {
     std::random_device rd;
     std::mt19937 mt(rd());

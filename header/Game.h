@@ -171,6 +171,13 @@ public:
 	int getId();
 
 	/**
+	 * @brief Get the nbPlayers attribute
+	 * 
+	 * @return int 
+	 */
+	int getNbPlayers();
+
+	/**
 	* @brief Send a message to the Game object and process it
 	*
 	* @return string
