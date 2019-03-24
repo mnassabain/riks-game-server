@@ -168,11 +168,24 @@ public:
 	 * @param name 
 	 */
 	void addPlayer(string name);
+
+	/**
+	 * @brief 
+	 * 
+	 * @param name 
+	 */
 	void removePlayer(string name);
+
+	/**
+	 * @brief Get the player's turn order
+	 * 
+	 * @param name 
+	 * @return int 
+	 */
 	int getPlayerOrder(string name);
 
 	/**
-	 * @brief Get the Id object
+	 * @brief Get the Id attribute
 	 * 
 	 * @return int 
 	 */
