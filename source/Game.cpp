@@ -301,9 +301,13 @@ bool Game::isRunning()
 	return this->running;
 }
 
+bool Game::isFull(){
+	return (this -> nbPlayers == this -> maxPlayers);
+}
+
 void Game::addPlayer(string name)
 {
-	if ((this->nbPlayers < this->maxPlayer) && (this->running == false))
+	if ((this->nbPlayers < this->maxPlayers) && (this->running == false))
 	{
 		this->nbPlayers++;
 		this->players.push_back(Player(name));
@@ -325,6 +329,14 @@ int Game::getId()
 	return this->id;
 }
 
+int Game::getNbPlayers() {
+	return this -> nbPlayers;
+}
+
+string Game::getPassword() {
+	return this -> password;
+}
+
 int Game::intRand(int min, int max) {
     std::random_device rd;
     std::mt19937 mt(rd());
@@ -341,7 +353,7 @@ string Game::message(string message)
 }
 
 // Public constructors
-Game::Game(string mapName, string creatorId, int maxPlayer)
+Game::Game(string mapName, string creatorId, int maxPlayers)
 {
 	// Setting up game ID
 	this->id = nextId;
@@ -354,7 +366,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->running = false;
 
 	// Initialization of players
-	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
+	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
 
@@ -365,7 +377,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->password.assign("");
 }
 
-Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
+Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName)
 {
 	// Setting up game ID
 	this->id = nextId;
@@ -378,7 +390,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
 	this->running = false;
 
 	// Initialization of players
-	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
+	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
 
