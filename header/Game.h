@@ -63,6 +63,11 @@ private:
 	 */
 	void chooseFirstPlayer();
 
+	/**
+	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to 
+	 * 	at the beginning of the turn
+	 * 
+	 */
 	void turnReinforcement();
 
 	/**
