@@ -79,7 +79,14 @@ void Game::chooseFirstPlayer()
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
+	reinforcement = this -> players[this -> activePlayer].getTerritoriesCaptured()\
+					- this -> players[this -> activePlayer].GetTerritoriesLost();
 
+	// TODO: check if the player has continents conquered, if so, add him the reinforcements
+
+	// if the player gets less than 3 reinforcements, the number is rounded up to three
+	if (reinforcement < 3)
+		reinforcement = 3;
 	this->players[this->activePlayer].addReinforcement(reinforcement);
 }
 
@@ -165,7 +172,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	result.defenderLoss = 0;
 	
 	int limit = pow(6, attackers + defenders);
-	int roll = 0; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+	int roll = intRand(0, limit - 1); // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
 
 	// Calculating unit loss for all 6 possible combat setups
 	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
