@@ -275,7 +275,24 @@ bool Game::areAdjacent(int a, int b) {
 }
 
 bool Game::dominatedContinent(int idContinent, int idPlayer) {
-	return false;
+	bool isDominating = true;
+	int firstTerritory = this -> map.getContinents()[idContinent].firstTerritory;
+	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
+	int nbTerritoriesInContinent = firstTerritory - lastTerritory;
+	int nbTerritories = (this -> players[this -> activePlayer].getTerritoriesCaptured() - \
+		this -> players[this -> activePlayer].GetTerritoriesLost());
+	
+	// Checks if the player has at least the number of territories on that continent
+	if (nbTerritories < nbTerritoriesInContinent)
+		return false;
+	
+	for(size_t i = firstTerritory; i <= lastTerritory; i++)
+	{
+		if (board[i].owner != idPlayer)
+			return false;
+	}
+	
+	return isDominating;
 }
 
 // Public methods
