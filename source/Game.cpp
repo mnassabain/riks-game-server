@@ -79,24 +79,20 @@ void Game::chooseFirstPlayer()
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
-	/* You receive 3 armies for Africa, 7 armies for Asia, 2 armies for Australia, 
-	5 armies for Europe, 5 armies for North America and 2 armies for South America.
-	Alphabetical order is used, might have to change depending on Map.*/
-	vector<int> continentReinforcement = {3, 7, 2, 5, 5, 2};
 
-	// the reinforcements depend on how many sets of 3 terriitories the player has captures
+	// The reinforcements depend on how many sets of 3 terriitories the player has captures
 	reinforcement = (this -> players[this -> activePlayer].getTerritoriesCaptured()\
 					- this -> players[this -> activePlayer].GetTerritoriesLost()) / 3;
 
-	// checks if the player has continents conquered, if so, add him the reinforcements
+	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
 	for(size_t i = 0; i < 6; i++)
 	{
 		if (dominatedContinent(i, this -> activePlayer))
-			reinforcement += continentReinforcement[i];
+			reinforcement += this -> map.getContinents()[i].bonus;
 	}
 	
 
-	// if the player gets less than 3 reinforcements, the number is rounded up to three
+	// If the player gets less than 3 reinforcements, the number is rounded up to three
 	if (reinforcement < 3)
 		reinforcement = 3;
 	this->players[this->activePlayer].addReinforcement(reinforcement);
