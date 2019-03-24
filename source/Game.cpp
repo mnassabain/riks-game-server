@@ -165,7 +165,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	result.defenderLoss = 0;
 	
 	int limit = pow(6, attackers + defenders);
-	int roll = 0; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+	int roll = intRand(0, limit - 1); // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
 
 	// Calculating unit loss for all 6 possible combat setups
 	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
