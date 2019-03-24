@@ -178,6 +178,13 @@ public:
 	int getNbPlayers();
 
 	/**
+	 * @brief Get the Password attribute
+	 * 
+	 * @return string 
+	 */
+	string getPassword();
+
+	/**
 	* @brief Send a message to the Game object and process it
 	*
 	* @return string

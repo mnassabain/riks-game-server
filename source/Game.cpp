@@ -329,6 +329,10 @@ int Game::getNbPlayers() {
 	return this -> nbPlayers;
 }
 
+string Game::getPassword() {
+	return this -> password;
+}
+
 int Game::intRand(int min, int max) {
     std::random_device rd;
     std::mt19937 mt(rd());
