@@ -263,7 +263,8 @@ int Game::updatePlayersStatsInDB()
 	return 0;
 }
 
-bool Game::areAdjacent(int a, int b) {
+bool Game::areAdjacent(int a, int b)
+{
 	vector<int> aNeighbors = this -> map.getTerritories()[a].neighbors;
 
 	// checking if `b` is in the `neighbors` vector of the `a` territory
@@ -274,7 +275,8 @@ bool Game::areAdjacent(int a, int b) {
 		return false;
 }
 
-bool Game::dominatedContinent(int idContinent, int idPlayer) {
+bool Game::dominatedContinent(int idContinent, int idPlayer)
+{
 	bool isDominating = true;
 	int firstTerritory = this -> map.getContinents()[idContinent].firstTerritory;
 	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
@@ -291,7 +293,6 @@ bool Game::dominatedContinent(int idContinent, int idPlayer) {
 		if (board[i].owner != idPlayer)
 			return false;
 	}
-	
 	return isDominating;
 }
 
