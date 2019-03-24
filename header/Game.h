@@ -19,7 +19,7 @@ private:
 	int id;
 	string name;
 	string password;
-	int maxPlayer;
+	int maxPlayers;
 	int nbPlayers;
 	vector <Player> players;
 	bool running;
@@ -155,6 +155,14 @@ public:
 	bool isRunning();
 
 	/**
+	 * @brief isFull : tells if the Gameroom is full or not
+	 * 
+	 * @return true 
+	 * @return false 
+	 */
+	bool isFull();
+
+	/**
 	 * @brief 
 	 * 
 	 * @param name 
@@ -207,10 +215,10 @@ public:
 	 * 
 	 * @param mapName 
 	 * @param creatorId 
-	 * @param maxPlayer 
+	 * @param maxPlayers 
 	 */
-	Game(string mapName, string creatorId, int maxPlayer);
-	Game(string mapName, string creatorId, int maxPlayer, string lobbyName); // Constructor used on lobby creation
+	Game(string mapName, string creatorId, int maxPlayers);
+	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation
 };
 
 #endif //GAME_H
