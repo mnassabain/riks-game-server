@@ -80,7 +80,8 @@ void Game::turnReinforcement()
 {
 	int reinforcement = 0;
 	/* You receive 3 armies for Africa, 7 armies for Asia, 2 armies for Australia, 
-	5 armies for Europe, 5 armies for North America and 2 armies for South America.*/
+	5 armies for Europe, 5 armies for North America and 2 armies for South America.
+	Alphabetical order is used, might have to change depending on Map.*/
 	vector<int> continentReinforcement = {3, 7, 2, 5, 5, 2};
 
 	// the reinforcements depend on how many sets of 3 terriitories the player has captures
