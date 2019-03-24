@@ -129,6 +129,16 @@ private:
 	 */
 	bool areAdjacent(int a, int b);
 
+	/**
+	 * @brief dominatedContinent : Checks if the continent is dominated by the player
+	 * 
+	 * @param id
+	 * @param idPlayer 
+	 * @return true 
+	 * @return false 
+	 */
+	bool dominatedContinent(int idContinent, int idPlayer);
+
 	// Constructors
 
 public:

@@ -79,10 +79,21 @@ void Game::chooseFirstPlayer()
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
-	reinforcement = this -> players[this -> activePlayer].getTerritoriesCaptured()\
-					- this -> players[this -> activePlayer].GetTerritoriesLost();
+	/* You receive 3 armies for Africa, 7 armies for Asia, 2 armies for Australia, 
+	5 armies for Europe, 5 armies for North America and 2 armies for South America.*/
+	vector<int> continentReinforcement = {3, 7, 2, 5, 5, 2};
 
-	// TODO: check if the player has continents conquered, if so, add him the reinforcements
+	// the reinforcements depend on how many sets of 3 terriitories the player has captures
+	reinforcement = (this -> players[this -> activePlayer].getTerritoriesCaptured()\
+					- this -> players[this -> activePlayer].GetTerritoriesLost()) / 3;
+
+	// checks if the player has continents conquered, if so, add him the reinforcements
+	for(size_t i = 0; i < 6; i++)
+	{
+		if (dominatedContinent(i, this -> activePlayer))
+			reinforcement += continentReinforcement[i];
+	}
+	
 
 	// if the player gets less than 3 reinforcements, the number is rounded up to three
 	if (reinforcement < 3)
@@ -264,6 +275,10 @@ bool Game::areAdjacent(int a, int b) {
 	} 
 	else 
 		return false;
+}
+
+bool Game::dominatedContinent(int idContinent, int idPlayer) {
+	return false;
 }
 
 // Public methods
