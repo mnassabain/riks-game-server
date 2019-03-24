@@ -370,18 +370,29 @@ string GameServer::treatMessage(string message, Connection connection)
                     if (games[i].getId() == jmessage["data"]["lobbyID"])
                     {
                         found = true;
-                        if (false/*games[i].isFull()*/)
+                        if (games[i].isFull())
                         {
                             errorResponse(response, CODE_JOIN_LOBBY,
                                 "Lobby is full");
                         }
                         else
                         {
-                            games[i].addPlayer(jmessage["data"]["playerID"]);
+                            if (games[i].getPassword() != 
+                                jmessage["data"]["lobbyPassword"])
+                            {
+                                errorResponse(response, CODE_JOIN_LOBBY,
+                                    "Incorrect password");
+                            }
+                            else
+                            {
 
-                            response["type"] = CODE_JOIN_LOBBY;
-                            response["data"]["error"] = false;
-                            response["data"]["response"] = "Success";
+                                games[i].addPlayer(
+                                    jmessage["data"]["playerID"]);
+
+                                response["type"] = CODE_JOIN_LOBBY;
+                                response["data"]["error"] = false;
+                                response["data"]["response"] = "Success";
+                            }
                         }
                     }
                 }
@@ -438,7 +449,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     if (games[i].getId() == jmessage["data"]["lobbyID"])
                     {
                         games[i].removePlayer(jmessage["data"]["playerID"]);
-                        if (true/*games[i].nbPlayers() == 0*/)
+                        if (games[i].getNbPlayers() == 0)
                         {
                             games.erase(games.begin() + i);
                         }
@@ -464,7 +475,7 @@ string GameServer::treatMessage(string message, Connection connection)
         default:
             cout << "Unhandled message code" << endl;
 
-            errorResponse(response, CODE_JOIN_LOBBY, "Unrecognized message");
+            errorResponse(response, CODE_UNHANDLED, "Unrecognized message");
     }
 
     return response.dump();
