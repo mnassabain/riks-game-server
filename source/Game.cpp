@@ -41,12 +41,12 @@ void Game::start()
 
 void Game::nextPlayer()
 {
-	// considering that `activePlayer` can go from 0 to `nbPlayer - 1`
-	int idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+	// considering that `activePlayer` can go from 0 to `nbPlayers - 1`
+	int idPlayer = (this -> activePlayer + 1) % this -> nbPlayers;
 
 	// don't pass the turn to an eliminated player
 	while (!this -> players[idPlayer].isAlive) {
-		idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+		idPlayer = (this -> activePlayer + 1) % this -> nbPlayers;
 	}
 
 	if(idPlayer == this -> activePlayer) {
@@ -73,7 +73,7 @@ void Game::nextPhase()
 
 void Game::chooseFirstPlayer()
 {
-	this -> activePlayer = intRand(0, this -> nbPlayer - 1);
+	this -> activePlayer = intRand(0, this -> nbPlayers - 1);
 }
 
 void Game::turnReinforcement()
@@ -249,8 +249,8 @@ void Game::moveUnits(int source, int destination, int units) // The phase checks
 
 void Game::setInitialReinforcement()
 {
-	for (int i = 0; i < this->nbPlayer; i++) {
-		players[i].addReinforcement(20 + 5 * (this->map.getMaxPlayers() - this->nbPlayer)); // 20 units + 5 for each missing player
+	for (int i = 0; i < this->nbPlayers; i++) {
+		players[i].addReinforcement(20 + 5 * (this->map.getMaxPlayers() - this->nbPlayers)); // 20 units + 5 for each missing player
 	}
 }
 
@@ -286,7 +286,7 @@ bool Game::dominatedContinent(int idContinent, int idPlayer) {
 	if (nbTerritories < nbTerritoriesInContinent)
 		return false;
 	
-	for(size_t i = firstTerritory; i <= lastTerritory; i++)
+	for(int i = firstTerritory; i <= lastTerritory; i++)
 	{
 		if (board[i].owner != idPlayer)
 			return false;
@@ -303,9 +303,9 @@ bool Game::isRunning()
 
 void Game::addPlayer(string name)
 {
-	if ((this->nbPlayer < this->maxPlayer) && (this->running == false))
+	if ((this->nbPlayers < this->maxPlayer) && (this->running == false))
 	{
-		this->nbPlayer++;
+		this->nbPlayers++;
 		this->players.push_back(Player(name));
 	}
 }
@@ -355,7 +355,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 
 	// Initialization of players
 	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
-	this->nbPlayer = 0;
+	this->nbPlayers = 0;
 	addPlayer(creatorId);
 
 	// Setting up default lobby name
@@ -379,7 +379,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
 
 	// Initialization of players
 	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
-	this->nbPlayer = 0;
+	this->nbPlayers = 0;
 	addPlayer(creatorId);
 
 	// Setting up lobby name

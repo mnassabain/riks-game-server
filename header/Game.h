@@ -20,7 +20,7 @@ private:
 	string name;
 	string password;
 	int maxPlayer;
-	int nbPlayer;
+	int nbPlayers;
 	vector <Player> players;
 	bool running;
 	Map map;
