@@ -79,7 +79,14 @@ void Game::chooseFirstPlayer()
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
+	reinforcement = this -> players[this -> activePlayer].getTerritoriesCaptured()\
+					- this -> players[this -> activePlayer].GetTerritoriesLost();
 
+	// TODO: check if the player has continents conquered, if so, add him the reinforcements
+
+	// if the player gets less than 3 reinforcements, the number is rounded up to three
+	if (reinforcement < 3)
+		reinforcement = 3;
 	this->players[this->activePlayer].addReinforcement(reinforcement);
 }
 
