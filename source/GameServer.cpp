@@ -385,13 +385,34 @@ string GameServer::treatMessage(string message, Connection connection)
                             }
                             else
                             {
-
+                                /* join game */
                                 games[i].addPlayer(
                                     jmessage["data"]["playerID"]);
 
+                                /* construct response */
                                 response["type"] = CODE_JOIN_LOBBY;
                                 response["data"]["error"] = false;
                                 response["data"]["response"] = "Success";
+
+                                /* give all existing players new lobby state */
+                                json update;
+                                update["type"] = CODE_LOBBY_STATE;
+                                update["data"]["error"] = false;
+                                update["data"]["response"] = "Success";
+                                update["data"]["gameData"] = games[i].toJSON();
+                                
+                                vector<Player> players = games[i].getPlayers();
+                                for (unsigned int i = 0; 
+                                    i < players.size(); i++)
+                                {
+                                    map<string, Connection>::iterator it;
+
+                                    it = clients.find(players[i].getName());
+                                    Connection c = it->second;
+
+                                    endpoint.send(c, update.dump(), 
+                                        websocketpp::frame::opcode::text);
+                                }
                             }
                         }
                     }
