@@ -201,6 +201,28 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* check if user is connected & owns connection */
+            {
+                map<string, Connection>::iterator it;
+                it = clients.find(jmessage["data"]["userID"]);
+
+                /* if we can't find the user we send an error */
+                if (it == clients.end())
+                {
+                    errorResponse(response, CODE_DISCONNECT,
+                        "User not connected");
+                    break;
+                }
+
+                /* check if user owns the connection */
+                if (it->second.lock().get() != connection.lock().get())
+                {
+                    errorResponse(response, CODE_DISCONNECT,
+                        "Action not permitted");
+                    break;
+                }
+            }
+
             cout << "User disconnected (id = " << jmessage["data"]["userID"] 
                 << ")" << endl;
 
