@@ -354,6 +354,11 @@ string Game::getPassword() {
 	return this -> password;
 }
 
+vector<Player> Game::getPlayers()
+{
+	return this -> players;
+}
+
 int Game::intRand(int min, int max) {
     std::random_device rd;
     std::mt19937 mt(rd());

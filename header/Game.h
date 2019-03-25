@@ -217,6 +217,13 @@ public:
 	string getPassword();
 
 	/**
+	 * @brief Get the players attribute
+	 * 
+	 * @return vector<Player> 
+	 */
+	vector<Player> getPlayers();
+
+	/**
 	* @brief Send a message to the Game object and process it
 	*
 	* @return string
