@@ -155,7 +155,7 @@ public:
 	 * 
 	 * @return json 
 	 */
-	json Game::toJSON();
+	json toJSON();
 
 	/**
 	 * @brief 

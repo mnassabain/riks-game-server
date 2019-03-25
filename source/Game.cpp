@@ -298,17 +298,14 @@ bool Game::dominatedContinent(int idContinent, int idPlayer)
 
 // Public methods
 
-/**
- * lobby name
-lobby password
-number of players in lobby
-max players in lobby
-map name
- */
-
 json Game::toJSON()
 {
 	json j;
+	j["name"] = this -> name;
+	j["password"] = this -> getPassword();
+	j["nbPlayers"] = this -> getNbPlayers();
+	j["maxPlayers"] = this -> maxPlayers;
+	j["mapName"] = this -> map.getName();
 	return j;
 }
 
