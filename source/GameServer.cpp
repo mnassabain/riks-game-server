@@ -285,14 +285,15 @@ string GameServer::treatMessage(string message, Connection connection)
                 << "of max players " << jmessage["data"]["maxPlayers"]
                 << "and on map " << jmessage["data"]["mapName"] << endl;
 
-            createGame(jmessage["data"]["mapName"], jmessage["data"]["userID"],
-                jmessage["data"]["maxPlayers"]);
+            int newGameId = createGame(jmessage["data"]["mapName"], 
+                jmessage["data"]["userID"], jmessage["data"]["maxPlayers"]);
 
             cout << "Lobby created" << endl;
             
             response["type"] = CODE_CREATE_LOBBY;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
+            response["data"]["gameID"] = newGameId;
             break;
 
         case CODE_LOBBY_LIST:
@@ -570,6 +571,8 @@ void GameServer::createGame(string mapName, string host, int nbPlayers)
 
     /* copy the new object into the games list */
     games.push_back(newGame);
+
+    return newGame.getId();
 }
 
 
