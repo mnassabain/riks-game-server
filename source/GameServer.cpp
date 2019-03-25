@@ -311,7 +311,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     if (!games[i].isRunning())
                     {
                         response["data"]["gameList"].push_back(
-                            "game"/*games[i].toJSON()*/);
+                            games[i].toJSON());
                         nb++;
                     }
                 }
