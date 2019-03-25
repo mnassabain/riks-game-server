@@ -282,6 +282,28 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* check if user is connected & owns connection */
+            {
+                map<string, Connection>::iterator it;
+                it = clients.find(jmessage["data"]["userID"]);
+
+                /* if we can't find the user we send an error */
+                if (it == clients.end())
+                {
+                    errorResponse(response, CODE_CREATE_LOBBY,
+                        "User not connected");
+                    break;
+                }
+
+                /* check if user owns the connection */
+                if (it->second.lock().get() != connection.lock().get())
+                {
+                    errorResponse(response, CODE_CREATE_LOBBY,
+                        "Action not permitted");
+                    break;
+                }
+            }
+
             cout << "User " << jmessage["data"]["userID"] 
                 << ": attempt to create lobby "
                 << jmessage["data"]["lobbyName"]
