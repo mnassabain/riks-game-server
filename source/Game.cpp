@@ -346,15 +346,23 @@ int Game::getId()
 	return this->id;
 }
 
-int Game::getNbPlayers() {
+int Game::getNbPlayers() 
+{
 	return this -> nbPlayers;
 }
 
-string Game::getPassword() {
+string Game::getPassword() 
+{
 	return this -> password;
 }
 
-int Game::intRand(int min, int max) {
+vector<Player> Game::getPlayers()
+{
+	return this -> players;
+}
+
+int Game::intRand(int min, int max) 
+{
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_real_distribution<float> dist(min, max);
