@@ -306,6 +306,56 @@ string GameServer::treatMessage(string message, Connection connection)
 
             cout << "Received lobby list demand" << endl;
 
+            if (!jmessage.count("data"))
+            {
+                errorResponse(response, CODE_LOBBY_LIST,
+                    "Invalid message; insufficient parameters");
+                break;
+            }
+
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_LOBBY_LIST,
+                    "Invalid message data types");
+                break;
+            }
+
+            if (!jmessage["data"].count("playerID"))
+            {
+                errorResponse(response, CODE_LOBBY_LIST,
+                    "Invalid message; insufficient parameters");
+                break;
+            }
+
+            if (!jmessage["data"]["playerID"].is_string())
+            {
+                errorResponse(response, CODE_LOBBY_LIST,
+                    "Invalid message data types");
+                break;
+            }
+
+            /* check if user is connected & owns connection */
+            {
+                map<string, Connection>::iterator it;
+                it = clients.find(jmessage["data"]["playerID"]);
+
+                /* if we can't find the user we send an error */
+                if (it == clients.end())
+                {
+                    errorResponse(response, CODE_LOBBY_LIST,
+                        "User not connected");
+                    break;
+                }
+
+                /* check if user owns the connection */
+                if (it->second.lock().get() != connection.lock().get())
+                {
+                    errorResponse(response, CODE_LOBBY_LIST,
+                        "Action not permitted");
+                    break;
+                }
+            }
+
             response["type"] = CODE_LOBBY_LIST;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
