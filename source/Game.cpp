@@ -301,11 +301,15 @@ bool Game::dominatedContinent(int idContinent, int idPlayer)
 json Game::toJSON()
 {
 	json j;
-	j["name"] = this -> name;
+
+	j["lobbyName"] = this -> name;
 	j["password"] = this -> getPassword();
 	j["nbPlayers"] = this -> getNbPlayers();
 	j["maxPlayers"] = this -> maxPlayers;
 	j["mapName"] = this -> map.getName();
+	for (int i = 0; i < this -> nbPlayers; i++) {
+		j["playerNames"].push_back(players[i].getName());
+	}
 	return j;
 }
 
