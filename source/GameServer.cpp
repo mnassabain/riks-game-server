@@ -561,7 +561,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-            if (!jmessage["data"].count("gameID"))
+            if (!jmessage["data"].count("gameID") ||
+                !jmessage["data"].count("playerID"))
             {
                 errorResponse(response, CODE_LOBBY_STATE, 
                     "Invalid message; insufficient parameters");
@@ -569,12 +570,34 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-            if (!jmessage["data"]["gameID"].is_number())
+            if (!jmessage["data"]["gameID"].is_number() ||
+                !jmessage["data"]["playerID"].is_string())
             {
                 errorResponse(response, CODE_LOBBY_STATE,
                     "Invalid game ID");
             
                 break;
+            }
+
+            /* check if user is connected */
+            {
+                map<string, Connection>::iterator it;
+                it = clients.find(jmessage["data"]["playerID"]);
+
+                if (it == clients.end())
+                {
+                    errorResponse(response, CODE_LOBBY_STATE,
+                        "User not connected");
+                    break;
+                }
+
+                /* check if user owns the connection */
+                if (it->second.lock().get() != connection.lock().get())
+                {
+                    errorResponse(response, CODE_LOBBY_STATE,
+                        "Action not permitted");
+                    break;
+                }
             }
 
             {
