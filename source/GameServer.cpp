@@ -471,6 +471,66 @@ string GameServer::treatMessage(string message, Connection connection)
 
             break;
 
+        case CODE_LOBBY_STATE:
+
+            if (!jmessage.count("data"))
+            {
+                errorResponse(response, CODE_LOBBY_STATE, 
+                    "Invalid message; insufficient parameters");
+            
+                break;
+            }
+
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_LOBBY_STATE,
+                    "Invalid message data types");
+            
+                break;
+            }
+
+            if (!jmessage["data"].count("gameID"))
+            {
+                errorResponse(response, CODE_LOBBY_STATE, 
+                    "Invalid message; insufficient parameters");
+            
+                break;
+            }
+
+            if (!jmessage["data"]["gameID"].is_number())
+            {
+                errorResponse(response, CODE_LOBBY_STATE,
+                    "Invalid game ID");
+            
+                break;
+            }
+
+            {
+                bool found = false;
+                for (unsigned int i = 0; i < games.size() && !found; i++)
+                {
+                    if (games[i].getId() == jmessage["data"]["gameID"])
+                    {
+                        found = true;
+                        response["data"]["gameData"] = games[i].toJSON();
+                    }
+                }
+
+                if (!found)
+                {
+                    errorResponse(response, CODE_LOBBY_STATE, 
+                        "Lobby not found");
+
+                    break;
+                }
+            }
+
+            response["type"] = CODE_LOBBY_STATE;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
+
+            break;
+
         
         default:
             cout << "Unhandled message code" << endl;
