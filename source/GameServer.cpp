@@ -285,14 +285,17 @@ string GameServer::treatMessage(string message, Connection connection)
                 << "of max players " << jmessage["data"]["maxPlayers"]
                 << "and on map " << jmessage["data"]["mapName"] << endl;
 
-            createGame(jmessage["data"]["mapName"], jmessage["data"]["userID"],
-                jmessage["data"]["maxPlayers"]);
+            {
+                int newGameId = createGame(jmessage["data"]["mapName"], 
+                    jmessage["data"]["userID"], jmessage["data"]["maxPlayers"]);
 
-            cout << "Lobby created" << endl;
-            
-            response["type"] = CODE_CREATE_LOBBY;
-            response["data"]["error"] = false;
-            response["data"]["response"] = "Success";
+                cout << "Lobby created" << endl;
+
+                response["type"] = CODE_CREATE_LOBBY;
+                response["data"]["error"] = false;
+                response["data"]["response"] = "Success";
+                response["data"]["lobbyID"] = newGameId;
+            }
             break;
 
         case CODE_LOBBY_LIST:
@@ -311,7 +314,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     if (!games[i].isRunning())
                     {
                         response["data"]["gameList"].push_back(
-                            "game"/*games[i].toJSON()*/);
+                            games[i].toJSON());
                         nb++;
                     }
                 }
@@ -385,13 +388,34 @@ string GameServer::treatMessage(string message, Connection connection)
                             }
                             else
                             {
-
+                                /* join game */
                                 games[i].addPlayer(
                                     jmessage["data"]["playerID"]);
 
+                                /* construct response */
                                 response["type"] = CODE_JOIN_LOBBY;
                                 response["data"]["error"] = false;
                                 response["data"]["response"] = "Success";
+
+                                /* give all existing players new lobby state */
+                                json update;
+                                update["type"] = CODE_LOBBY_STATE;
+                                update["data"]["error"] = false;
+                                update["data"]["response"] = "Success";
+                                update["data"]["gameData"] = games[i].toJSON();
+                                
+                                vector<Player> players = games[i].getPlayers();
+                                for (unsigned int i = 0; 
+                                    i < players.size(); i++)
+                                {
+                                    map<string, Connection>::iterator it;
+
+                                    it = clients.find(players[i].getName());
+                                    Connection c = it->second;
+
+                                    endpoint.send(c, update.dump(), 
+                                        websocketpp::frame::opcode::text);
+                                }
                             }
                         }
                     }
@@ -471,6 +495,66 @@ string GameServer::treatMessage(string message, Connection connection)
 
             break;
 
+        case CODE_LOBBY_STATE:
+
+            if (!jmessage.count("data"))
+            {
+                errorResponse(response, CODE_LOBBY_STATE, 
+                    "Invalid message; insufficient parameters");
+            
+                break;
+            }
+
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_LOBBY_STATE,
+                    "Invalid message data types");
+            
+                break;
+            }
+
+            if (!jmessage["data"].count("gameID"))
+            {
+                errorResponse(response, CODE_LOBBY_STATE, 
+                    "Invalid message; insufficient parameters");
+            
+                break;
+            }
+
+            if (!jmessage["data"]["gameID"].is_number())
+            {
+                errorResponse(response, CODE_LOBBY_STATE,
+                    "Invalid game ID");
+            
+                break;
+            }
+
+            {
+                bool found = false;
+                for (unsigned int i = 0; i < games.size() && !found; i++)
+                {
+                    if (games[i].getId() == jmessage["data"]["gameID"])
+                    {
+                        found = true;
+                        response["data"]["gameData"] = games[i].toJSON();
+                    }
+                }
+
+                if (!found)
+                {
+                    errorResponse(response, CODE_LOBBY_STATE, 
+                        "Lobby not found");
+
+                    break;
+                }
+            }
+
+            response["type"] = CODE_LOBBY_STATE;
+            response["data"]["error"] = false;
+            response["data"]["response"] = "Success";
+
+            break;
+
         
         default:
             cout << "Unhandled message code" << endl;
@@ -482,13 +566,15 @@ string GameServer::treatMessage(string message, Connection connection)
 }
 
 
-void GameServer::createGame(string mapName, string host, int nbPlayers)
+int GameServer::createGame(string mapName, string host, int nbPlayers)
 {
     /* create a new game */
     Game newGame(mapName, host, MAX_PLAYERS);
 
     /* copy the new object into the games list */
     games.push_back(newGame);
+
+    return newGame.getId();
 }
 
 
