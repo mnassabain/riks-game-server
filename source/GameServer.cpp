@@ -209,16 +209,20 @@ string GameServer::treatMessage(string message, Connection connection)
                 map<string, Connection>::iterator client =
                     clients.find(jmessage["data"]["userID"]);
 
-                try
+                if (client != clients.end())
                 {
-                    endpoint.pause_reading(client->second);
-                    endpoint.close(client->second, 
-                        websocketpp::close::status::normal, 
-                        "Successfully disconnected");
-                }
-                catch(exception e)
-                {
-                    cout << "Caught websocket exception: " << e.what() << endl;
+                    try
+                    {
+                        endpoint.pause_reading(client->second);
+                        endpoint.close(client->second, 
+                            websocketpp::close::status::normal, 
+                            "Successfully disconnected");
+                    }
+                    catch(exception e)
+                    {
+                        cout << "Caught websocket exception: " 
+                            << e.what() << endl;
+                    }
                 }
 
                 clients.erase(client);
@@ -365,6 +369,30 @@ string GameServer::treatMessage(string message, Connection connection)
                 << jmessage["data"]["lobbyID"] 
                 << "and password: \"" << jmessage["data"]["lobbyPassword"]
                 << "\"" << endl;
+
+
+            /* check if user is connected & owns connection */
+            {
+                map<string, Connection>::iterator it;
+                it = clients.find(jmessage["data"]["playerID"]);
+
+                /* if we can't find the user we send an error */
+                if (it == clients.end())
+                {
+                    errorResponse(response, CODE_JOIN_LOBBY,
+                        "User not connected");
+                    break;
+                }
+
+                /* check if user owns the connection */
+                if (it->second.lock().get() != connection.lock().get())
+                {
+                    errorResponse(response, CODE_JOIN_LOBBY,
+                        "Action not permitted");
+                    break;
+                }
+            }
+
 
             {
                 bool found = false;
