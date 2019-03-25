@@ -293,7 +293,7 @@ string GameServer::treatMessage(string message, Connection connection)
             response["type"] = CODE_CREATE_LOBBY;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
-            response["data"]["gameID"] = newGameId;
+            response["data"]["lobbyID"] = newGameId;
             break;
 
         case CODE_LOBBY_LIST:
