@@ -8,7 +8,7 @@ send 0 {"type": 2, "userID": "monid", "userPassword": "mdp"}}
 
 
 send 0 {"type": 3, "data": {"userID": "monid", "userPassword": "mdp"}}
-send 0 {"type": 3, "data": {"userID": "user2", "userPassword": "motdepasse"}}
+send 0 {"type": 3, "data": {"userID": "monid2", "userPassword": "motdepasse"}}
 
 send 0 {"type": 3, "data": {"id": "monid", "userPassword": "mdp"}}
 send 0 {"type": 3, "data": {"userID": "monid", "password": "mdp"}}
@@ -29,8 +29,10 @@ send 0 {"type": 6, "userID": "monid", "lobbyName": "monlobby", "lobbyPassword": 
 
 send 0 {"type": 5}
 
+send 0 {"type": 9, "data": {"gameID": 0}}
 
-send 0 {"type": 7, "data": {"playerID": "monid", "lobbyID": 0, "lobbyPassword": ""}}
+
+send 0 {"type": 7, "data": {"playerID": "monid2", "lobbyID": 0, "lobbyPassword": ""}}
 
 
 send 0 {"type": 14, "data": {"playerID": "monid", "lobbyID": 0}}
