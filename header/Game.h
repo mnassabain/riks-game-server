@@ -9,7 +9,11 @@
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
+
+#include "../libs/json/json.hpp"
+
 using namespace std;
+using json = nlohmann::json;
 
 class Game {
 private:
@@ -145,6 +149,13 @@ public:
 	// Attributes
 
 	// Methods
+
+	/**
+	 * @brief toJSON: Gives information about the game instance in json 
+	 * 
+	 * @return json 
+	 */
+	json toJSON();
 
 	/**
 	 * @brief 
