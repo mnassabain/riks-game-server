@@ -494,6 +494,26 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* check if user is connected */
+            {
+                map<string, Connection>::iterator it;
+                it = clients.find(jmessage["data"]["playerID"]);
+
+                if (it == clients.end())
+                {
+                    errorResponse(response, CODE_LEAVE_GAME, 
+                        "User not connected");
+                    break;
+                }
+
+                /* check if the user owns the connections */
+                if (it->second.lock().get() != connection.lock().get())
+                {
+                    errorResponse(response, CODE_LEAVE_GAME,
+                        "Action not permitted");
+                }
+            }
+
             {
                 bool found = false;
                 for (unsigned int i = 0; i < games.size() && !found; i++)
