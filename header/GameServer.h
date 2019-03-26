@@ -32,7 +32,8 @@ private:
 
     /* server & socket data */
     static ServerEndpoint endpoint;
-    static vector<Connection> connections;
+    static map<string, Connection> clients;
+    static vector<Connection> unregisteredConnections;
 
     /* server control methods */
     static void init();
@@ -44,19 +45,24 @@ private:
     static void onOpenConnection(Connection connection);
     static void onCloseConnection(Connection connection);
 
+    /* other communication methods */
+    static void errorResponse(json& response, MessageCode code, string message);
 
 
 public:
     /* server control methods */
     static void listen();
-    static string treatMessage(string message);
+    static string treatMessage(string message, Connection connection);
 
     /* game control methods */
-    static void createGame(string mapName, string host, int nbPlayers);
+    static int createGame(string mapName, string host, int nbPlayers);
     static int destroyGame(int id);
 
     /* debugging */
     static int nbGames();
+    static int nbConnections();
+    static int nbClients();
+    static int nbUnregisteredConnections();
 
 };
 

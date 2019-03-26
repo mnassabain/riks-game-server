@@ -1,19 +1,68 @@
-
+Server response:
 {
-    type: "CONNECT",
+    type: MESSAGE_TYPE,
     data: {
-        id: "...",
-        pwd: "..."
+        error: bool
+        response: "..."
     }
 }
 
 
-response:
+Player to server message format:
 
+SIGN UP:
 {
-    type: "CONNECT",
+    type: SIGN_UP,
+    data:
+    {
+        userID: "...",
+        userPassword: "..."
+    }
+}
+
+CONNECT:
+{
+    type: CONNECT,
     data: {
-        error: bool
-        response: "..."
+        userID: "...",
+        userPassword: "..."
+    }
+}
+
+DISCONNECT:
+{
+    type: DISCONNECT,
+    data:
+    {
+        userID: "..."
+    }
+}
+
+CREATE_LOBBY:
+{
+    type: CREATE_LOBBY,
+    data:
+    {
+        userID: "...",
+        lobbyName: "...",
+        lobbyPassword: "...",
+        maxPlayers: "...",
+        mapName: "..."
+    }
+}
+
+LOBBY_LIST:
+{
+    type: LOBBY_LIST
+}
+
+JOIN_LOBBY:
+{
+    type: JOIN_LOBBY,
+    data:
+    {
+        playerID: "...",
+        lobbyID: "...",
+        lobbyPassword: "..."
     }
 }

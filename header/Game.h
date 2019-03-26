@@ -9,7 +9,11 @@
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
+
+#include "../libs/json/json.hpp"
+
 using namespace std;
+using json = nlohmann::json;
 
 class Game {
 private:
@@ -19,8 +23,8 @@ private:
 	int id;
 	string name;
 	string password;
-	int maxPlayer;
-	int nbPlayer;
+	int maxPlayers;
+	int nbPlayers;
 	vector <Player> players;
 	bool running;
 	Map map;
@@ -63,6 +67,11 @@ private:
 	 */
 	void chooseFirstPlayer();
 
+	/**
+	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to 
+	 * 	at the beginning of the turn
+	 * 
+	 */
 	void turnReinforcement();
 
 	/**
@@ -124,12 +133,29 @@ private:
 	 */
 	bool areAdjacent(int a, int b);
 
+	/**
+	 * @brief dominatedContinent : Checks if the continent is dominated by the player
+	 * 
+	 * @param id
+	 * @param idPlayer 
+	 * @return true 
+	 * @return false 
+	 */
+	bool dominatedContinent(int idContinent, int idPlayer);
+
 	// Constructors
 
 public:
 	// Attributes
 
 	// Methods
+
+	/**
+	 * @brief toJSON: Gives information about the game instance in json 
+	 * 
+	 * @return json 
+	 */
+	json toJSON();
 
 	/**
 	 * @brief 
@@ -140,20 +166,62 @@ public:
 	bool isRunning();
 
 	/**
+	 * @brief isFull : tells if the Gameroom is full or not
+	 * 
+	 * @return true 
+	 * @return false 
+	 */
+	bool isFull();
+
+	/**
 	 * @brief 
 	 * 
 	 * @param name 
 	 */
 	void addPlayer(string name);
+
+	/**
+	 * @brief 
+	 * 
+	 * @param name 
+	 */
 	void removePlayer(string name);
+
+	/**
+	 * @brief Get the player's turn order
+	 * 
+	 * @param name 
+	 * @return int 
+	 */
 	int getPlayerOrder(string name);
 
 	/**
-	 * @brief Get the Id object
+	 * @brief Get the Id attribute
 	 * 
 	 * @return int 
 	 */
 	int getId();
+
+	/**
+	 * @brief Get the nbPlayers attribute
+	 * 
+	 * @return int 
+	 */
+	int getNbPlayers();
+
+	/**
+	 * @brief Get the Password attribute
+	 * 
+	 * @return string 
+	 */
+	string getPassword();
+
+	/**
+	 * @brief Get the players attribute
+	 * 
+	 * @return vector<Player> 
+	 */
+	vector<Player> getPlayers();
 
 	/**
 	* @brief Send a message to the Game object and process it
@@ -178,10 +246,10 @@ public:
 	 * 
 	 * @param mapName 
 	 * @param creatorId 
-	 * @param maxPlayer 
+	 * @param maxPlayers 
 	 */
-	Game(string mapName, string creatorId, int maxPlayer);
-	Game(string mapName, string creatorId, int maxPlayer, string lobbyName); // Constructor used on lobby creation
+	Game(string mapName, string creatorId, int maxPlayers);
+	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation
 };
 
 #endif //GAME_H

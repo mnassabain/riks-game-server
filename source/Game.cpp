@@ -41,12 +41,12 @@ void Game::start()
 
 void Game::nextPlayer()
 {
-	// considering that `activePlayer` can go from 0 to `nbPlayer - 1`
-	int idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+	// considering that `activePlayer` can go from 0 to `nbPlayers - 1`
+	int idPlayer = (this -> activePlayer + 1) % this -> nbPlayers;
 
 	// don't pass the turn to an eliminated player
 	while (!this -> players[idPlayer].isAlive) {
-		idPlayer = (this -> activePlayer + 1) % this -> nbPlayer;
+		idPlayer = (this -> activePlayer + 1) % this -> nbPlayers;
 	}
 
 	if(idPlayer == this -> activePlayer) {
@@ -73,13 +73,28 @@ void Game::nextPhase()
 
 void Game::chooseFirstPlayer()
 {
-	this -> activePlayer = intRand(0, this -> nbPlayer - 1);
+	this -> activePlayer = intRand(0, this -> nbPlayers - 1);
 }
 
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
 
+	// The reinforcements depend on how many sets of 3 terriitories the player has captures
+	reinforcement = (this -> players[this -> activePlayer].getTerritoriesCaptured()\
+					- this -> players[this -> activePlayer].GetTerritoriesLost()) / 3;
+
+	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
+	for(size_t i = 0; i < 6; i++)
+	{
+		if (dominatedContinent(i, this -> activePlayer))
+			reinforcement += this -> map.getContinents()[i].bonus;
+	}
+	
+
+	// If the player gets less than 3 reinforcements, the number is rounded up to three
+	if (reinforcement < 3)
+		reinforcement = 3;
 	this->players[this->activePlayer].addReinforcement(reinforcement);
 }
 
@@ -165,7 +180,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	result.defenderLoss = 0;
 	
 	int limit = pow(6, attackers + defenders);
-	int roll = 0; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+	int roll = intRand(0, limit - 1); // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
 
 	// Calculating unit loss for all 6 possible combat setups
 	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
@@ -234,8 +249,8 @@ void Game::moveUnits(int source, int destination, int units) // The phase checks
 
 void Game::setInitialReinforcement()
 {
-	for (int i = 0; i < this->nbPlayer; i++) {
-		players[i].addReinforcement(20 + 5 * (this->map.getMaxPlayers() - this->nbPlayer)); // 20 units + 5 for each missing player
+	for (int i = 0; i < this->nbPlayers; i++) {
+		players[i].addReinforcement(20 + 5 * (this->map.getMaxPlayers() - this->nbPlayers)); // 20 units + 5 for each missing player
 	}
 }
 
@@ -248,7 +263,8 @@ int Game::updatePlayersStatsInDB()
 	return 0;
 }
 
-bool Game::areAdjacent(int a, int b) {
+bool Game::areAdjacent(int a, int b)
+{
 	vector<int> aNeighbors = this -> map.getTerritories()[a].neighbors;
 
 	// checking if `b` is in the `neighbors` vector of the `a` territory
@@ -259,17 +275,58 @@ bool Game::areAdjacent(int a, int b) {
 		return false;
 }
 
+bool Game::dominatedContinent(int idContinent, int idPlayer)
+{
+	bool isDominating = true;
+	int firstTerritory = this -> map.getContinents()[idContinent].firstTerritory;
+	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
+	int nbTerritoriesInContinent = firstTerritory - lastTerritory;
+	int nbTerritories = (this -> players[this -> activePlayer].getTerritoriesCaptured() - \
+		this -> players[this -> activePlayer].GetTerritoriesLost());
+	
+	// Checks if the player has at least the number of territories on that continent
+	if (nbTerritories < nbTerritoriesInContinent)
+		return false;
+	
+	for(int i = firstTerritory; i <= lastTerritory; i++)
+	{
+		if (board[i].owner != idPlayer)
+			return false;
+	}
+	return isDominating;
+}
+
 // Public methods
+
+json Game::toJSON()
+{
+	json j;
+
+	j["lobbyName"] = this -> name;
+	j["password"] = this -> getPassword();
+	j["nbPlayers"] = this -> getNbPlayers();
+	j["maxPlayers"] = this -> maxPlayers;
+	j["mapName"] = this -> map.getName();
+	for (int i = 0; i < this -> nbPlayers; i++) {
+		j["playerNames"].push_back(players[i].getName());
+	}
+	return j;
+}
+
 bool Game::isRunning()
 {
 	return this->running;
 }
 
+bool Game::isFull(){
+	return (this -> nbPlayers == this -> maxPlayers);
+}
+
 void Game::addPlayer(string name)
 {
-	if ((this->nbPlayer < this->maxPlayer) && (this->running == false))
+	if ((this->nbPlayers < this->maxPlayers) && (this->running == false))
 	{
-		this->nbPlayer++;
+		this->nbPlayers++;
 		this->players.push_back(Player(name));
 	}
 }
@@ -289,7 +346,23 @@ int Game::getId()
 	return this->id;
 }
 
-int Game::intRand(int min, int max) {
+int Game::getNbPlayers() 
+{
+	return this -> nbPlayers;
+}
+
+string Game::getPassword() 
+{
+	return this -> password;
+}
+
+vector<Player> Game::getPlayers()
+{
+	return this -> players;
+}
+
+int Game::intRand(int min, int max) 
+{
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_real_distribution<float> dist(min, max);
@@ -305,7 +378,7 @@ string Game::message(string message)
 }
 
 // Public constructors
-Game::Game(string mapName, string creatorId, int maxPlayer)
+Game::Game(string mapName, string creatorId, int maxPlayers)
 {
 	// Setting up game ID
 	this->id = nextId;
@@ -318,8 +391,8 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->running = false;
 
 	// Initialization of players
-	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
-	this->nbPlayer = 0;
+	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
+	this->nbPlayers = 0;
 	addPlayer(creatorId);
 
 	// Setting up default lobby name
@@ -329,7 +402,7 @@ Game::Game(string mapName, string creatorId, int maxPlayer)
 	this->password.assign("");
 }
 
-Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
+Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName)
 {
 	// Setting up game ID
 	this->id = nextId;
@@ -342,8 +415,8 @@ Game::Game(string mapName, string creatorId, int maxPlayer, string lobbyName)
 	this->running = false;
 
 	// Initialization of players
-	this->maxPlayer = min(maxPlayer, this->map.getMaxPlayers());
-	this->nbPlayer = 0;
+	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
+	this->nbPlayers = 0;
 	addPlayer(creatorId);
 
 	// Setting up lobby name
