@@ -179,14 +179,14 @@ public:
 	 * 
 	 * @param name 
 	 */
-	void addPlayer(string name);
+	int addPlayer(string name);
 
 	/**
 	 * @brief 
 	 * 
 	 * @param name 
 	 */
-	void removePlayer(string name);
+	int removePlayer(string name);
 
 	/**
 	 * @brief Get the player's turn order
