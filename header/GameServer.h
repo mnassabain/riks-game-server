@@ -6,6 +6,7 @@
 #include <string>
 #include "../header/Game.h"
 #include "../header/MessageCode.h"
+#include "../header/Client.h"
 
 #include "../libs/websocketpp/config/asio_no_tls.hpp"
 #include "../libs/websocketpp/server.hpp"
@@ -32,7 +33,7 @@ private:
 
     /* server & socket data */
     static ServerEndpoint endpoint;
-    static map<string, Connection> clients;
+    static map<string, Client> clients;
     static vector<Connection> unregisteredConnections;
 
     /* server control methods */

@@ -9,7 +9,7 @@
 
 vector<Game> GameServer::games;
 ServerEndpoint GameServer::endpoint;
-map<string, Connection> GameServer::clients;
+map<string, Client> GameServer::clients;
 vector<Connection> GameServer::unregisteredConnections;
 
 
@@ -206,7 +206,7 @@ string GameServer::treatMessage(string message, Connection connection)
             /* ... */
 
             /* move from unregistered connections into registered clients */
-            clients.emplace(jmessage["data"]["userID"], connection);
+            clients.emplace(jmessage["data"]["userID"], Client(connection));
 
             /* remove from unregistered connections */
             {
@@ -265,7 +265,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected & owns connection */
             {
-                map<string, Connection>::iterator it;
+                map<string, Client>::iterator it;
                 it = clients.find(jmessage["data"]["userID"]);
 
                 /* if we can't find the user we send an error */
@@ -277,40 +277,34 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if user owns the connection */
-                if (it->second.lock().get() != connection.lock().get())
+                if (it->second.getConnection().lock().get() 
+                    != connection.lock().get())
                 {
                     errorResponse(response, CODE_DISCONNECT,
                         "Action not permitted");
                     break;
                 }
+
+                /* disconnect user */
+                try
+                {
+                    endpoint.pause_reading(it->second.getConnection());
+                    endpoint.close(it->second.getConnection(), 
+                        websocketpp::close::status::normal, 
+                        "Successfully disconnected");
+                }
+                catch(exception e)
+                {
+                    cout << "Caught websocket exception: " 
+                        << e.what() << endl;
+                }
+
+                /* remove disconnected user from clients map */
+                clients.erase(it);
             }
 
             cout << "User disconnected (id = " << jmessage["data"]["userID"] 
                 << ")" << endl;
-
-            /* disconnect user */
-            {
-                map<string, Connection>::iterator client =
-                    clients.find(jmessage["data"]["userID"]);
-
-                if (client != clients.end())
-                {
-                    try
-                    {
-                        endpoint.pause_reading(client->second);
-                        endpoint.close(client->second, 
-                            websocketpp::close::status::normal, 
-                            "Successfully disconnected");
-                    }
-                    catch(exception e)
-                    {
-                        cout << "Caught websocket exception: " 
-                            << e.what() << endl;
-                    }
-                }
-
-                clients.erase(client);
-            }
 
             response["type"] = CODE_DISCONNECT;
             response["data"]["error"] = false;
@@ -368,7 +362,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected & owns connection */
             {
-                map<string, Connection>::iterator it;
+                map<string, Client>::iterator it;
                 it = clients.find(jmessage["data"]["userID"]);
 
                 /* if we can't find the user we send an error */
@@ -380,7 +374,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if user owns the connection */
-                if (it->second.lock().get() != connection.lock().get())
+                if (it->second.getConnection().lock().get() 
+                    != connection.lock().get())
                 {
                     errorResponse(response, CODE_CREATE_LOBBY,
                         "Action not permitted");
@@ -442,7 +437,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected & owns connection */
             {
-                map<string, Connection>::iterator it;
+                map<string, Client>::iterator it;
                 it = clients.find(jmessage["data"]["playerID"]);
 
                 /* if we can't find the user we send an error */
@@ -454,7 +449,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if user owns the connection */
-                if (it->second.lock().get() != connection.lock().get())
+                if (it->second.getConnection().lock().get() 
+                    != connection.lock().get())
                 {
                     errorResponse(response, CODE_LOBBY_LIST,
                         "Action not permitted");
@@ -529,7 +525,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected & owns connection */
             {
-                map<string, Connection>::iterator it;
+                map<string, Client>::iterator it;
                 it = clients.find(jmessage["data"]["playerID"]);
 
                 /* if we can't find the user we send an error */
@@ -541,7 +537,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if user owns the connection */
-                if (it->second.lock().get() != connection.lock().get())
+                if (it->second.getConnection().lock().get() 
+                    != connection.lock().get())
                 {
                     errorResponse(response, CODE_JOIN_LOBBY,
                         "Action not permitted");
@@ -592,10 +589,10 @@ string GameServer::treatMessage(string message, Connection connection)
                                 for (unsigned int i = 0;
                                     i < players.size(); i++)
                                 {
-                                    map<string, Connection>::iterator it;
+                                    map<string, Client>::iterator it;
 
                                     it = clients.find(players[i].getName());
-                                    Connection c = it->second;
+                                    Connection c = it->second.getConnection();
 
                                     endpoint.send(c, update.dump(),
                                         websocketpp::frame::opcode::text);
@@ -652,7 +649,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<string, Connection>::iterator it;
+                map<string, Client>::iterator it;
                 it = clients.find(jmessage["data"]["playerID"]);
 
                 if (it == clients.end())
@@ -663,7 +660,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if the user owns the connections */
-                if (it->second.lock().get() != connection.lock().get())
+                if (it->second.getConnection().lock().get() 
+                    != connection.lock().get())
                 {
                     errorResponse(response, CODE_LEAVE_GAME,
                         "Action not permitted");
@@ -737,7 +735,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<string, Connection>::iterator it;
+                map<string, Client>::iterator it;
                 it = clients.find(jmessage["data"]["playerID"]);
 
                 if (it == clients.end())
@@ -748,7 +746,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if user owns the connection */
-                if (it->second.lock().get() != connection.lock().get())
+                if (it->second.getConnection().lock().get() 
+                    != connection.lock().get())
                 {
                     errorResponse(response, CODE_LOBBY_STATE,
                         "Action not permitted");
@@ -889,13 +888,13 @@ void GameServer::stop()
     }
 
     /* close all existing connections */
-    map<string, Connection>::iterator i;
+    map<string, Client>::iterator i;
     for(i = clients.begin(); i != clients.end(); i++)
     {
         try
         {
-            endpoint.pause_reading(i->second);
-            endpoint.close(i->second,
+            endpoint.pause_reading(i->second.getConnection());
+            endpoint.close(i->second.getConnection(),
                 websocketpp::close::status::going_away, "Server shutdown");
         }
         catch(websocketpp::exception e)
@@ -980,16 +979,15 @@ void GameServer::onCloseConnection(Connection connection)
     bool found = false;
 
     /* check clients list */
-    map<string, Connection>::iterator i;
+    map<string, Client>::iterator i;
     for (i = clients.begin(); i != clients.end(); i++)
     {
-        if (i->second.lock().get() == connection.lock().get())
+        if (i->second.getConnection().lock().get() == connection.lock().get())
         {
             found = true;
             clients.erase(i);
         }
     }
-
 
     if (found)
         return;
