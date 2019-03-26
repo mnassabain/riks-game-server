@@ -338,6 +338,11 @@ void Game::removePlayer(string name)
 // Will return -1 if the player isn't in this game/lobby
 int Game::getPlayerOrder(string name)
 {
+	size_t i;
+	size_t max = players.size();
+	for (i = 0; i < max; i++) {
+		if (players[i].compare(name) == 0) return i;
+	}
 	return -1;
 }
 
