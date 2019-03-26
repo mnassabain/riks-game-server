@@ -109,7 +109,7 @@ string GameServer::treatMessage(string message, Connection connection)
 		sqlite3_close(db);
 		response["type"]= CODE_SIGN_UP;
 		response["data"]["error"]=true;
-		response["data"]["response"]="Data Base connection error";
+		response["data"]["response"]="SIGN_UP Data Base connection error";
 	    }
 	    else//DB is connected
 	    {
@@ -120,7 +120,7 @@ string GameServer::treatMessage(string message, Connection connection)
 			sqlite3_close(db);
 			response["type"]= CODE_SIGN_UP;
 			response["data"]["error"]=true;
-			response["data"]["response"]="Error during Insertion preparing";
+			response["data"]["response"]="SIGN_UP Error during Insertion preparing";
 
 		}
 		else//No preparing error
@@ -133,7 +133,7 @@ string GameServer::treatMessage(string message, Connection connection)
 			  sqlite3_close(db);
 			  response["type"]= CODE_SIGN_UP;
 			  response["data"]["error"]=true;
-			  response["data"]["response"]="Error during binding";
+			  response["data"]["response"]="SIGN_UP Error during binding";
 			}
 			else//No binding error
 			{
@@ -143,7 +143,7 @@ string GameServer::treatMessage(string message, Connection connection)
 			    sqlite3_close(db);
 		 	    response["type"]= CODE_SIGN_UP;
 			    response["data"]["error"]=true;
-			    response["data"]["response"]="Error during Insertion execution";
+			    response["data"]["response"]="SIGN_UP Error during Insertion execution";
 			  }
 			  else// SIGN_UP Success
 			  {
@@ -203,7 +203,83 @@ string GameServer::treatMessage(string message, Connection connection)
                 << jmessage["data"]["userID"] << ", password = "
                 << jmessage["data"]["userPassword"] << ")" << endl;
 
-            /* ... */
+	    {//====select user in db====
+	      sqlite3* db;
+	      int returnCode = 0;
+	      sqlite3_stmt* stmt = NULL;
+
+	      //Connection
+	      returnCode = sqlite3_open_v2(DB_NAME,&db,SQLITE_OPEN_READWRITE,NULL);
+
+	      if(returnCode)//Connection error
+	      {
+		cout<<"CONNECT : DB connection error : "<<sqlite3_errmsg(db)<<endl;
+		sqlite3_close(db);
+		response["type"]= CODE_CONNECT;
+		response["data"]["error"]=true;
+		response["data"]["response"]="CONNECT Data Base connection error";
+	      }
+	      else //No connection error
+	      {
+		if(sqlite3_prepare_v2(db,"Select * from users where login=?",-1,&stmt,NULL)) //Error when creating request
+		{
+		  cout<<"CONNECT : Select preparing error"<<endl;
+		  sqlite3_close(db);
+		  response["type"]= CODE_CONNECT;
+		  response["data"]["error"]=true;
+		  response["data"]["response"]="CONNECT Data Base Select preparing error";
+
+		}
+		else //No preparing error
+		{
+		  string uid = jmessage["data"]["userID"].get<string>();
+	   	  const char * pwd = jmessage["data"]["userPassword"].get<string>().c_str();
+		  if(sqlite3_bind_text(stmt,1,uid.c_str(),uid.length(),SQLITE_STATIC)) //Error while binding parameters
+		  {
+		    cout<<"CONNECT : Binding parmeters error"<<endl;
+		    sqlite3_close(db);
+	  	    response["type"]= CODE_CONNECT;
+		    response["data"]["error"]=true;
+		    response["data"]["response"]="CONNECT Error during binding";
+		  }
+		  else//No binding error
+		  {
+		    returnCode = sqlite3_step(stmt);
+		    if(returnCode == SQLITE_OK || returnCode == SQLITE_ROW)//Found
+		    {
+		      unsigned char * realPwd = (unsigned char*)sqlite3_column_text(stmt,2);//Getting password
+		      if(strcmp(pwd,(char *)realPwd))//True if passwords are different
+		      {
+			cout<<"CONNECT : Bad password"<<endl;
+		    	sqlite3_close(db);
+	  	    	response["type"]= CODE_CONNECT;
+		    	response["data"]["error"]=true;
+		    	response["data"]["response"]="CONNECT Bad password";
+		      }
+		      else //CONNECT Success
+		      {
+            		cout<<"CONNECT : User successfully connected"<<endl;
+			sqlite3_close(db);
+			response["type"] = CODE_CONNECT;
+            		response["data"]["error"] = false;
+            		response["data"]["response"] = "Success";
+		      }
+		    }
+		    else //User not found
+		    {
+		      cout<<"CONNECT : Bad Login (user not found)"<<endl;
+		      sqlite3_close(db);
+	  	      response["type"]= CODE_CONNECT;
+		      response["data"]["error"]=true;
+		      response["data"]["response"]="CONNECT Bad Login (user not found)";
+		    }
+		  }
+
+		}
+		
+	      }
+	     sqlite3_finalize(stmt);
+	    }
 
             /* move from unregistered connections into registered clients */
             clients.emplace(jmessage["data"]["userID"], Client(connection));
@@ -225,9 +301,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
             }
 
-            response["type"] = CODE_CONNECT;
-            response["data"]["error"] = false;
-            response["data"]["response"] = "Success";
+
             break;
 
         case CODE_DISCONNECT:
