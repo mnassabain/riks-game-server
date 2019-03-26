@@ -231,15 +231,6 @@ public:
 	*/
 	string message(string message);
 
-	/**
-	 * @brief Returns a random value between min and max (both included)
-	 * 
-	 * @param min 
-	 * @param max 
-	 * @return int 
-	 */
-	int intRand(int min, int max);
-
 	// Constructors
 
 	/**

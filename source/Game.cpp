@@ -24,6 +24,7 @@ void Game::start()
 	this->combat.destination = -1;
 	this->combat.attackerUnits = -1;
 	this->combat.defenderUnits = -1;
+	srand(time(NULL));
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
 	TerritoryState blank;
@@ -73,7 +74,7 @@ void Game::nextPhase()
 
 void Game::chooseFirstPlayer()
 {
-	this -> activePlayer = intRand(0, this -> nbPlayers - 1);
+	this -> activePlayer = rand()%(this -> nbPlayers);
 }
 
 void Game::turnReinforcement()
@@ -160,7 +161,7 @@ bool Game::isValidSet(int tok1, int tok2, int tok3)
 void Game::grantToken()
 {
 	// Granting a random token to the player
-	int r = intRand(0, 3);
+	int r = rand()%4;
 	tokens[r]--;
 	players[activePlayer].receiveToken(r);
 }
@@ -180,7 +181,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	result.defenderLoss = 0;
 	
 	int limit = pow(6, attackers + defenders);
-	int roll = intRand(0, limit - 1); // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+	int roll = rand()%limit; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
 
 	// Calculating unit loss for all 6 possible combat setups
 	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
@@ -376,14 +377,6 @@ string Game::getPassword()
 vector<Player> Game::getPlayers()
 {
 	return this -> players;
-}
-
-int Game::intRand(int min, int max) 
-{
-    std::random_device rd;
-    std::mt19937 mt(rd());
-    std::uniform_real_distribution<float> dist(min, max);
-	return (int) dist(mt);
 }
 
 // This is where most of the game logic will happen
