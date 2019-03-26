@@ -125,7 +125,9 @@ string GameServer::treatMessage(string message, Connection connection)
 		}
 		else//No preparing error
 		{
-			if(sqlite3_bind_text(stmt,1,(char*)jmessage["data"]["id"], jmessage["data"]["id"].length,SQLITE_STATIC) || sqlite3_bind_text(stmt,2,(char*)jmessage["data"]["password"], jmessage["data"]["password"].length,SQLITE_STATIC) ) //Error while binding parameters
+			string uid = jmessage["data"]["userID"].get<string>();
+			string pwd = jmessage["data"]["userPassword"].get<string>();
+			if(sqlite3_bind_text(stmt,1,uid.c_str(),uid.length(),SQLITE_STATIC) || sqlite3_bind_text(stmt,2,pwd.c_str(),pwd.length(),SQLITE_STATIC) ) //Error while binding parameters
 			{
 			  cout<<"SIGN_UP : Binding parmeters error"<<endl;
 			  sqlite3_close(db);
