@@ -11,6 +11,8 @@
 #include "../libs/websocketpp/server.hpp"
 
 #include "../libs/json/json.hpp"
+#include "../libs/sqlite/sqlite3.h"
+#include <string.h>
 
 using namespace std;
 using json = nlohmann::json;
@@ -53,7 +55,7 @@ public:
     static string treatMessage(string message, Connection connection);
 
     /* game control methods */
-    static void createGame(string mapName, string host, int nbPlayers);
+    static int createGame(string mapName, string host, int nbPlayers);
     static int destroyGame(int id);
 
     /* debugging */

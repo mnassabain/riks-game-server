@@ -301,11 +301,15 @@ bool Game::dominatedContinent(int idContinent, int idPlayer)
 json Game::toJSON()
 {
 	json j;
-	j["name"] = this -> name;
+
+	j["lobbyName"] = this -> name;
 	j["password"] = this -> getPassword();
 	j["nbPlayers"] = this -> getNbPlayers();
 	j["maxPlayers"] = this -> maxPlayers;
 	j["mapName"] = this -> map.getName();
+	for (int i = 0; i < this -> nbPlayers; i++) {
+		j["playerNames"].push_back(players[i].getName());
+	}
 	return j;
 }
 
@@ -342,15 +346,23 @@ int Game::getId()
 	return this->id;
 }
 
-int Game::getNbPlayers() {
+int Game::getNbPlayers() 
+{
 	return this -> nbPlayers;
 }
 
-string Game::getPassword() {
+string Game::getPassword() 
+{
 	return this -> password;
 }
 
-int Game::intRand(int min, int max) {
+vector<Player> Game::getPlayers()
+{
+	return this -> players;
+}
+
+int Game::intRand(int min, int max) 
+{
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_real_distribution<float> dist(min, max);
