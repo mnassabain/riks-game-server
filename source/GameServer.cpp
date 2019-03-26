@@ -7,7 +7,7 @@
 
 
 
-vector<Game> GameServer::games;
+map<int, Game> GameServer::games;
 ServerEndpoint GameServer::endpoint;
 map<string, Client> GameServer::clients;
 vector<Connection> GameServer::unregisteredConnections;
@@ -464,13 +464,14 @@ string GameServer::treatMessage(string message, Connection connection)
 
             {
                 int nb = 0;
-                for (unsigned int i = 0; nb < MAX_GAMES && i < games.size();
-                    i++)
+                map<int, Game>::iterator it;
+                for (it = games.begin(); nb < MAX_GAMES && it != games.end();
+                    it++)
                 {
-                    if (!games[i].isRunning())
+                    if (!it->second.isRunning())
                     {
                         response["data"]["gameList"].push_back(
-                            games[i].toJSON());
+                            it->second.toJSON());
                         nb++;
                     }
                 }
@@ -548,64 +549,57 @@ string GameServer::treatMessage(string message, Connection connection)
 
 
             {
-                bool found = false;
-                for (unsigned int i = 0; i < games.size() && !found; i++)
+                map<int, Game>::iterator it;
+                it = games.find(jmessage["data"]["lobbyID"]);
+
+                /* if the lobby is not found send error response */
+                if (it == games.end())
                 {
-                    if (games[i].getId() == jmessage["data"]["lobbyID"])
-                    {
-                        found = true;
-                        if (games[i].isFull())
-                        {
-                            errorResponse(response, CODE_JOIN_LOBBY,
-                                "Lobby is full");
-                        }
-                        else
-                        {
-                            if (games[i].getPassword() !=
-                                jmessage["data"]["lobbyPassword"])
-                            {
-                                errorResponse(response, CODE_JOIN_LOBBY,
-                                    "Incorrect password");
-                            }
-                            else
-                            {
-                                /* join game */
-                                games[i].addPlayer(
-                                    jmessage["data"]["playerID"]);
-
-                                /* construct response */
-                                response["type"] = CODE_JOIN_LOBBY;
-                                response["data"]["error"] = false;
-                                response["data"]["response"] = "Success";
-
-                                /* give all existing players new lobby state */
-                                json update;
-                                update["type"] = CODE_LOBBY_STATE;
-                                update["data"]["error"] = false;
-                                update["data"]["response"] = "Success";
-                                update["data"]["gameData"] = games[i].toJSON();
-
-                                vector<Player> players = games[i].getPlayers();
-                                for (unsigned int i = 0;
-                                    i < players.size(); i++)
-                                {
-                                    map<string, Client>::iterator it;
-
-                                    it = clients.find(players[i].getName());
-                                    Connection c = it->second.getConnection();
-
-                                    endpoint.send(c, update.dump(),
-                                        websocketpp::frame::opcode::text);
-                                }
-                            }
-                        }
-                    }
+                    errorResponse(response, CODE_JOIN_LOBBY, "Lobby not found");
+                    break;
                 }
 
-                if (!found)
+                /* check if the lobby is full */
+                if (it->second.isFull())
                 {
-                    errorResponse(response, CODE_JOIN_LOBBY,
-                    "Lobby not found");
+                    errorResponse(response, CODE_JOIN_LOBBY, "Lobby is full");
+                    break;
+                }
+
+                /* check if the password is correct */
+                if (it->second.getPassword() 
+                    != jmessage["data"]["lobbyPassword"])
+                {
+                    errorResponse(response, CODE_JOIN_LOBBY, 
+                        "Incorrect password");
+                    break;
+                }
+
+                /* if all tests pass, we can join the game */
+                it->second.addPlayer(jmessage["data"]["playerID"]);
+
+                /* construct response */
+                response["type"] = CODE_JOIN_LOBBY;
+                response["data"]["error"] = false;
+                response["data"]["response"] = "Success";
+
+                /* give all existing players new lobby state */
+                json update;
+                update["type"] = CODE_LOBBY_STATE;
+                update["data"]["error"] = false;
+                update["data"]["response"] = "Success";
+                update["data"]["gameData"] = it->second.toJSON();
+
+                vector<Player> players = it->second.getPlayers();
+                for (unsigned int i = 0; i < players.size(); i++)
+                {
+                    map<string, Client>::iterator player;
+
+                    player = clients.find(players[i].getName());
+                    Connection c = player->second.getConnection();
+
+                    endpoint.send(c, update.dump(), 
+                        websocketpp::frame::opcode::text);
                 }
             }
             break;
@@ -668,26 +662,27 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
             }
 
+            /* check if client is in the lobby/game */
+
             {
-                bool found = false;
-                for (unsigned int i = 0; i < games.size() && !found; i++)
-                {
-                    if (games[i].getId() == jmessage["data"]["lobbyID"])
-                    {
-                        games[i].removePlayer(jmessage["data"]["playerID"]);
-                        if (games[i].getNbPlayers() == 0)
-                        {
-                            games.erase(games.begin() + i);
-                        }
-                        found = true;
-                    }
-                }
+                map<int, Game>::iterator it;
+                it = games.find(jmessage["data"]["lobbyID"]);
 
-                if (!found)
+                /* if we can't find the game we send an error */
+                if (it == games.end())
                 {
-                    errorResponse(response, CODE_LEAVE_GAME, "Lobby not found");
-
+                    errorResponse(response, CODE_LEAVE_GAME, 
+                        "Lobby doesn't exist");
                     break;
+                }
+                
+                /* if we find the game we remove the player from the game */
+                it->second.removePlayer(jmessage["data"]["playerID"]);
+
+                /* and if the room is empty we delete it */
+                if (it->second.getNbPlayers() == 0)
+                {
+                    games.erase(it);
                 }
             }
 
@@ -756,23 +751,18 @@ string GameServer::treatMessage(string message, Connection connection)
             }
 
             {
-                bool found = false;
-                for (unsigned int i = 0; i < games.size() && !found; i++)
+                map<int, Game>::iterator it;
+                it = games.find(jmessage["data"]["lobbyID"]);
+                
+                /* if we don't find the lobby we send an error */
+                if (it == games.end())
                 {
-                    if (games[i].getId() == jmessage["data"]["gameID"])
-                    {
-                        found = true;
-                        response["data"]["gameData"] = games[i].toJSON();
-                    }
-                }
-
-                if (!found)
-                {
-                    errorResponse(response, CODE_LOBBY_STATE,
+                    errorResponse(response, CODE_LOBBY_STATE, 
                         "Lobby not found");
-
                     break;
                 }
+
+                response["data"]["gameData"] = it->second.toJSON();
             }
 
             response["type"] = CODE_LOBBY_STATE;
@@ -798,29 +788,26 @@ int GameServer::createGame(string mapName, string host, int nbPlayers)
     Game newGame(mapName, host, MAX_PLAYERS);
 
     /* copy the new object into the games list */
-    games.push_back(newGame);
+    int newGameID = newGame.getId();
+    games.emplace(newGameID, newGame);
 
-    return newGame.getId();
+    return newGameID;
 }
 
 
 int GameServer::destroyGame(int id)
 {
-    bool found = false;
+    map<int, Game>::iterator it;
+    it = games.find(id);
 
-    /* for each game in the games list .. */
-    for (unsigned int i = 0; i < games.size() && !found; i++)
+    if (it == games.end())
     {
-        /* .. we test the id .. */
-        if (games[i].getId() == id)
-        {
-            /* .. and we erase it if we find it */
-            games.erase(games.begin() + i);
-            found = true;
-        }
+        cout << "Game " << id << " not found" << endl;
+        return -1;
     }
 
-    return found?0:-1;
+    games.erase(it);
+    return 0;
 }
 
 

@@ -29,7 +29,7 @@ typedef websocketpp::connection_hdl Connection;
 class GameServer {
 private:
     /* game data */
-    static vector<Game> games;
+    static map<int, Game> games;
 
     /* server & socket data */
     static ServerEndpoint endpoint;
