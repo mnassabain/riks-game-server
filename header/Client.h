@@ -19,8 +19,7 @@ class Client
     public:
         Client(Connection connection);
 
-        bool isInGame();
-        bool isInLobby();
+        bool inLobby();
 
         Connection getConnection();
 };

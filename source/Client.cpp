@@ -15,3 +15,10 @@ Connection Client::getConnection()
 {
     return this->connection;
 }
+
+
+bool Client::inLobby()
+{
+    return gameID != -1;
+}
+
