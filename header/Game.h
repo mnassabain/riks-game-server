@@ -251,6 +251,7 @@ public:
 	 */
 	Game(string mapName, string creatorId, int maxPlayers);
 	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation
+	Game(string mapName, string creatorId, int maxPlayers, string lobbyName, string password);
 };
 
 #endif //GAME_H

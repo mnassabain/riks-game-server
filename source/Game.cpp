@@ -303,8 +303,8 @@ json Game::toJSON()
 	json j;
 
 	j["lobbyName"] = this -> name;
-	j["password"] = this -> getPassword();
-	j["nbPlayers"] = this -> getNbPlayers();
+	j["password"] = this -> password;
+	j["nbPlayers"] = this -> nbPlayers;
 	j["maxPlayers"] = this -> maxPlayers;
 	j["mapName"] = this -> map.getName();
 	for (int i = 0; i < this -> nbPlayers; i++) {
@@ -424,4 +424,28 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName)
 
 	// Setting up default password
 	this->password.assign("");
+}
+
+Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, string password)
+{
+	// Setting up game ID
+	this->id = nextId;
+	nextId++;
+
+	// Loading up map
+	this->map = Map::loadMap(mapName);
+
+	// Initialization of lobby variables
+	this->running = false;
+
+	// Initialization of players
+	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
+	this->nbPlayers = 0;
+	addPlayer(creatorId);
+
+	// Setting up lobby name
+	this->name.assign(lobbyName);
+
+	// Setting up password
+	this->password.assign(password);
 }
