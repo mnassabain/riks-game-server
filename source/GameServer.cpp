@@ -3,6 +3,7 @@
 /* debug */
 #define MAX_PLAYERS 6
 #define MAX_GAMES   10
+#define DB_NAME "DB/riksserverdb.db"
 
 
 
@@ -56,7 +57,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             if (!jmessage.count("data"))
             {
-                errorResponse(response, CODE_SIGN_UP, 
+                errorResponse(response, CODE_SIGN_UP,
                     "Invalid message format; insufficient parameters");
 
                 break;
@@ -64,16 +65,16 @@ string GameServer::treatMessage(string message, Connection connection)
 
             if (!jmessage["data"].is_object())
             {
-                errorResponse(response, CODE_SIGN_UP, 
+                errorResponse(response, CODE_SIGN_UP,
                     "Invalid message data types");
 
                 break;
             }
 
-            if (!jmessage["data"].count("userID") 
+            if (!jmessage["data"].count("userID")
                 || !jmessage["data"].count("userPassword"))
             {
-                errorResponse(response, CODE_SIGN_UP, 
+                errorResponse(response, CODE_SIGN_UP,
                     "Invalid message format; insufficient parameters");
 
                 break;
@@ -82,30 +83,89 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage["data"]["userID"].is_string() ||
                 !jmessage["data"]["userPassword"].is_string())
             {
-                errorResponse(response, CODE_SIGN_UP, 
+                errorResponse(response, CODE_SIGN_UP,
                     "Invalid message data types");
 
                 break;
             }
-            
+
 
             cout << "Creating new user (id = " << jmessage["data"]["userID"]
-                << ", password = " << jmessage["data"]["userPassword"] << ")" 
+                << ", password = " << jmessage["data"]["userPassword"] << ")"
                 << endl;
 
-            /* insert into db */
+	    {//====insertion into db====
 
-            response["type"] = CODE_SIGN_UP;
-            response["data"]["error"] = false;
-            response["data"]["response"] = "Success";
-            
+	    sqlite3* db;
+	    int returnCode = 0;
+	    sqlite3_stmt* stmt = NULL;
+
+	    //Connection
+	    returnCode = sqlite3_open_v2(DB_NAME,&db,SQLITE_OPEN_READWRITE,NULL);
+
+	    if(returnCode)//Connection error
+	    {
+		cout<<"SIGN_UP : DB connection error : "<<sqlite3_errmsg(db)<<endl;
+		sqlite3_close(db);
+		response["type"]= CODE_SIGN_UP;
+		response["data"]["error"]=true;
+		response["data"]["response"]="Data Base connection error";
+	    }
+	    else//DB is connected
+	    {
+		returnCode = sqlite3_prepare(db,"Insert into users values(null,?,?)",-1,&stmt,0);
+		if(returnCode)//Error when creating request
+		{
+			cout<<"SIGN_UP : Insert preparing error"<<endl;
+			sqlite3_close(db);
+			response["type"]= CODE_SIGN_UP;
+			response["data"]["error"]=true;
+			response["data"]["response"]="Error during Insertion preparing";
+
+		}
+		else//No preparing error
+		{
+			if(sqlite3_bind_text(stmt,1,(char*)jmessage["data"]["id"], jmessage["data"]["id"].length,SQLITE_STATIC) || sqlite3_bind_text(stmt,2,(char*)jmessage["data"]["password"], jmessage["data"]["password"].length,SQLITE_STATIC) ) //Error while binding parameters
+			{
+			  cout<<"SIGN_UP : Binding parmeters error"<<endl;
+			  sqlite3_close(db);
+			  response["type"]= CODE_SIGN_UP;
+			  response["data"]["error"]=true;
+			  response["data"]["response"]="Error during binding";
+			}
+			else//No binding error
+			{
+			  if(sqlite3_step(stmt) != SQLITE_DONE)
+			  {
+			    cout<<"SIGN_UP : Insert step (executing) error"<<endl;
+			    sqlite3_close(db);
+		 	    response["type"]= CODE_SIGN_UP;
+			    response["data"]["error"]=true;
+			    response["data"]["response"]="Error during Insertion execution";
+			  }
+			  else// SIGN_UP Success
+			  {
+
+			    cout<<"SIGN_UP : Success inserting new user"<<endl;
+			    sqlite3_close(db);
+			    response["type"]= CODE_SIGN_UP;
+			    response["data"]["error"]=false;
+			    response["data"]["response"]="Success";
+			  }
+			}
+		}
+	    }
+
+
+            sqlite3_finalize(stmt);
+	    }
             break;
 
         case CODE_CONNECT:
 
             if (!jmessage.count("data"))
             {
-                errorResponse(response, CODE_CONNECT, 
+                errorResponse(response, CODE_CONNECT,
                     "Invalid message format; insufficient parameters");
 
                 break;
@@ -119,10 +179,10 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-            if (!jmessage["data"].count("userID") 
+            if (!jmessage["data"].count("userID")
                 || !jmessage["data"].count("userPassword"))
             {
-                errorResponse(response, CODE_CONNECT, 
+                errorResponse(response, CODE_CONNECT,
                     "Invalid message format; insufficient parameters");
 
                 break;
@@ -134,13 +194,13 @@ string GameServer::treatMessage(string message, Connection connection)
                 errorResponse(response, CODE_CONNECT,
                     "Invalid message data types");
 
-                break;   
+                break;
             }
-            
-            cout << "Connection attempt by user (id = " 
-                << jmessage["data"]["userID"] << ", password = " 
+
+            cout << "Connection attempt by user (id = "
+                << jmessage["data"]["userID"] << ", password = "
                 << jmessage["data"]["userPassword"] << ")" << endl;
-                
+
             /* ... */
 
             /* move from unregistered connections into registered clients */
@@ -149,11 +209,11 @@ string GameServer::treatMessage(string message, Connection connection)
             /* remove from unregistered connections */
             {
                 bool found = false;
-                for (unsigned int i = 0; 
-                    i < unregisteredConnections.size() && !found; 
+                for (unsigned int i = 0;
+                    i < unregisteredConnections.size() && !found;
                     i++)
                 {
-                    if (unregisteredConnections[i].lock().get() == 
+                    if (unregisteredConnections[i].lock().get() ==
                         connection.lock().get())
                     {
                         found = true;
@@ -162,7 +222,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     }
                 }
             }
-            
+
             response["type"] = CODE_CONNECT;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
@@ -171,7 +231,7 @@ string GameServer::treatMessage(string message, Connection connection)
         case CODE_DISCONNECT:
             if (!jmessage.count("data"))
             {
-                errorResponse(response, CODE_DISCONNECT, 
+                errorResponse(response, CODE_DISCONNECT,
                     "Invalid message; insufficient parameters");
 
                 break;
@@ -179,7 +239,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             if (!jmessage["data"].is_object())
             {
-                errorResponse(response, CODE_DISCONNECT, 
+                errorResponse(response, CODE_DISCONNECT,
                     "Invalid message data types");
 
                 break;
@@ -187,20 +247,21 @@ string GameServer::treatMessage(string message, Connection connection)
 
             if (!jmessage["data"].count("userID"))
             {
-                errorResponse(response, CODE_DISCONNECT, 
+                errorResponse(response, CODE_DISCONNECT,
                     "Invalid message format; insufficient parameters");
-                    
+
                 break;
             }
 
             if (!jmessage["data"]["userID"].is_string())
             {
-                errorResponse(response, CODE_DISCONNECT, 
+                errorResponse(response, CODE_DISCONNECT,
                     "Invalid message data types");
-                
+
                 break;
             }
 
+<<<<<<< HEAD
             /* check if user is connected & owns connection */
             {
                 map<string, Connection>::iterator it;
@@ -224,6 +285,9 @@ string GameServer::treatMessage(string message, Connection connection)
             }
 
             cout << "User disconnected (id = " << jmessage["data"]["userID"] 
+=======
+            cout << "User disconnected (id = " << jmessage["data"]["userID"]
+>>>>>>> 9cbb486cd512c52474b419e94ef60040de0e7fef
                 << ")" << endl;
 
             /* disconnect user */
@@ -231,7 +295,18 @@ string GameServer::treatMessage(string message, Connection connection)
                 map<string, Connection>::iterator client =
                     clients.find(jmessage["data"]["userID"]);
 
+<<<<<<< HEAD
                 if (client != clients.end())
+=======
+                try
+                {
+                    endpoint.pause_reading(client->second);
+                    endpoint.close(client->second,
+                        websocketpp::close::status::normal,
+                        "Successfully disconnected");
+                }
+                catch(exception e)
+>>>>>>> 9cbb486cd512c52474b419e94ef60040de0e7fef
                 {
                     try
                     {
@@ -304,6 +379,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+<<<<<<< HEAD
             /* check if user is connected & owns connection */
             {
                 map<string, Connection>::iterator it;
@@ -327,6 +403,9 @@ string GameServer::treatMessage(string message, Connection connection)
             }
 
             cout << "User " << jmessage["data"]["userID"] 
+=======
+            cout << "User " << jmessage["data"]["userID"]
+>>>>>>> 9cbb486cd512c52474b419e94ef60040de0e7fef
                 << ": attempt to create lobby "
                 << jmessage["data"]["lobbyName"]
                 << "with password" << jmessage["data"]["lobbyPassword"]
@@ -334,7 +413,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 << "and on map " << jmessage["data"]["mapName"] << endl;
 
             {
-                int newGameId = createGame(jmessage["data"]["mapName"], 
+                int newGameId = createGame(jmessage["data"]["mapName"],
                     jmessage["data"]["userID"], jmessage["data"]["maxPlayers"]);
 
                 cout << "Lobby created" << endl;
@@ -435,8 +514,8 @@ string GameServer::treatMessage(string message, Connection connection)
                     "Invalid message data types");
 
                 break;
-            }    
-            
+            }
+
             if (!jmessage["data"].count("playerID") ||
                 !jmessage["data"].count("lobbyID") ||
                 !jmessage["data"].count("lobbyPassword")
@@ -458,9 +537,9 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-            cout << "User " << jmessage["data"]["playerID"] 
+            cout << "User " << jmessage["data"]["playerID"]
                 << " tried to join lobby with id: "
-                << jmessage["data"]["lobbyID"] 
+                << jmessage["data"]["lobbyID"]
                 << "and password: \"" << jmessage["data"]["lobbyPassword"]
                 << "\"" << endl;
 
@@ -502,7 +581,7 @@ string GameServer::treatMessage(string message, Connection connection)
                         }
                         else
                         {
-                            if (games[i].getPassword() != 
+                            if (games[i].getPassword() !=
                                 jmessage["data"]["lobbyPassword"])
                             {
                                 errorResponse(response, CODE_JOIN_LOBBY,
@@ -525,9 +604,9 @@ string GameServer::treatMessage(string message, Connection connection)
                                 update["data"]["error"] = false;
                                 update["data"]["response"] = "Success";
                                 update["data"]["gameData"] = games[i].toJSON();
-                                
+
                                 vector<Player> players = games[i].getPlayers();
-                                for (unsigned int i = 0; 
+                                for (unsigned int i = 0;
                                     i < players.size(); i++)
                                 {
                                     map<string, Connection>::iterator it;
@@ -535,7 +614,7 @@ string GameServer::treatMessage(string message, Connection connection)
                                     it = clients.find(players[i].getName());
                                     Connection c = it->second;
 
-                                    endpoint.send(c, update.dump(), 
+                                    endpoint.send(c, update.dump(),
                                         websocketpp::frame::opcode::text);
                                 }
                             }
@@ -556,7 +635,7 @@ string GameServer::treatMessage(string message, Connection connection)
             // id, id game
             if (!jmessage.count("data"))
             {
-                errorResponse(response, CODE_LEAVE_GAME, 
+                errorResponse(response, CODE_LEAVE_GAME,
                     "Invalid message; insufficient parameters");
 
                 break;
@@ -566,7 +645,7 @@ string GameServer::treatMessage(string message, Connection connection)
             {
                 errorResponse(response, CODE_LEAVE_GAME,
                     "Invalid message data types");
-                    
+
                 break;
             }
 
@@ -641,9 +720,9 @@ string GameServer::treatMessage(string message, Connection connection)
 
             if (!jmessage.count("data"))
             {
-                errorResponse(response, CODE_LOBBY_STATE, 
+                errorResponse(response, CODE_LOBBY_STATE,
                     "Invalid message; insufficient parameters");
-            
+
                 break;
             }
 
@@ -651,16 +730,16 @@ string GameServer::treatMessage(string message, Connection connection)
             {
                 errorResponse(response, CODE_LOBBY_STATE,
                     "Invalid message data types");
-            
+
                 break;
             }
 
             if (!jmessage["data"].count("gameID") ||
                 !jmessage["data"].count("playerID"))
             {
-                errorResponse(response, CODE_LOBBY_STATE, 
+                errorResponse(response, CODE_LOBBY_STATE,
                     "Invalid message; insufficient parameters");
-            
+
                 break;
             }
 
@@ -669,7 +748,7 @@ string GameServer::treatMessage(string message, Connection connection)
             {
                 errorResponse(response, CODE_LOBBY_STATE,
                     "Invalid game ID");
-            
+
                 break;
             }
 
@@ -707,7 +786,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
                 if (!found)
                 {
-                    errorResponse(response, CODE_LOBBY_STATE, 
+                    errorResponse(response, CODE_LOBBY_STATE,
                         "Lobby not found");
 
                     break;
@@ -720,7 +799,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             break;
 
-        
+
         default:
             cout << "Unhandled message code" << endl;
 
@@ -772,13 +851,13 @@ void GameServer::init()
         /* reuse 9002 address */
         endpoint.set_reuse_addr(true);
 
-        /* Set logging settings */ 
-        endpoint.set_error_channels(websocketpp::log::elevel::all); 
+        /* Set logging settings */
+        endpoint.set_error_channels(websocketpp::log::elevel::all);
         endpoint.set_access_channels(websocketpp::log::alevel::all ^
             websocketpp::log::alevel::frame_payload);
 
         /* Initialize Asio */
-        endpoint.init_asio(); 
+        endpoint.init_asio();
 
         /* Register new handlers */
         endpoint.set_message_handler(&onMessage);
@@ -800,11 +879,11 @@ void GameServer::run()
         /* Listen on port */
         endpoint.listen(SERVER_PORT);
 
-        /* Queues a connection accept operation */ 
+        /* Queues a connection accept operation */
         endpoint.start_accept();
 
         /* Start the Asio io_service run loop */
-        endpoint.run(); 
+        endpoint.run();
     }
     catch(websocketpp::exception e)
     {
@@ -833,7 +912,7 @@ void GameServer::stop()
         try
         {
             endpoint.pause_reading(i->second);
-            endpoint.close(i->second, 
+            endpoint.close(i->second,
                 websocketpp::close::status::going_away, "Server shutdown");
         }
         catch(websocketpp::exception e)
@@ -847,7 +926,7 @@ void GameServer::stop()
         try
         {
             endpoint.pause_reading(unregisteredConnections[j]);
-            endpoint.close(unregisteredConnections[j], 
+            endpoint.close(unregisteredConnections[j],
                 websocketpp::close::status::going_away, "Server shutdown");
         }
         catch(websocketpp::exception e)
@@ -876,7 +955,7 @@ void GameServer::onMessage(Connection connection, Message msg)
 
     if (msg->get_payload() == "nb-unregistered-connections")
     {
-        cout << "Number of unregistered connections: " 
+        cout << "Number of unregistered connections: "
             << nbUnregisteredConnections() << endl;
         return;
     }
@@ -938,7 +1017,7 @@ void GameServer::onCloseConnection(Connection connection)
         if (unregisteredConnections[j].lock().get() == connection.lock().get())
         {
             unregisteredConnections.erase(unregisteredConnections.begin() + j);
-            cout << "Removing connection " << connection.lock().get() 
+            cout << "Removing connection " << connection.lock().get()
                 << ": connection closed" << endl;
             found = true;
         }
