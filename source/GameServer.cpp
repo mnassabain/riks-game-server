@@ -261,7 +261,6 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-<<<<<<< HEAD
             /* check if user is connected & owns connection */
             {
                 map<string, Connection>::iterator it;
@@ -285,9 +284,6 @@ string GameServer::treatMessage(string message, Connection connection)
             }
 
             cout << "User disconnected (id = " << jmessage["data"]["userID"] 
-=======
-            cout << "User disconnected (id = " << jmessage["data"]["userID"]
->>>>>>> 9cbb486cd512c52474b419e94ef60040de0e7fef
                 << ")" << endl;
 
             /* disconnect user */
@@ -295,18 +291,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 map<string, Connection>::iterator client =
                     clients.find(jmessage["data"]["userID"]);
 
-<<<<<<< HEAD
                 if (client != clients.end())
-=======
-                try
-                {
-                    endpoint.pause_reading(client->second);
-                    endpoint.close(client->second,
-                        websocketpp::close::status::normal,
-                        "Successfully disconnected");
-                }
-                catch(exception e)
->>>>>>> 9cbb486cd512c52474b419e94ef60040de0e7fef
                 {
                     try
                     {
@@ -379,7 +364,6 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-<<<<<<< HEAD
             /* check if user is connected & owns connection */
             {
                 map<string, Connection>::iterator it;
@@ -403,9 +387,6 @@ string GameServer::treatMessage(string message, Connection connection)
             }
 
             cout << "User " << jmessage["data"]["userID"] 
-=======
-            cout << "User " << jmessage["data"]["userID"]
->>>>>>> 9cbb486cd512c52474b419e94ef60040de0e7fef
                 << ": attempt to create lobby "
                 << jmessage["data"]["lobbyName"]
                 << "with password" << jmessage["data"]["lobbyPassword"]
