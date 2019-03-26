@@ -337,11 +337,11 @@ int Game::removePlayer(string name)
 {
 	size_t i;
 	size_t max = players.size();
-	for (i = 0; (i < max) && (players[i].compare(name) != 0); i++) {
+	for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
 	}
 	if (i < max) {
 		this->nbPlayers--;
-		players.erase(i);
+		players.erase(players.begin() + i);
 		return 0;
 	}
 	return -1;
@@ -353,7 +353,7 @@ int Game::getPlayerOrder(string name)
 	size_t i;
 	size_t max = players.size();
 	for (i = 0; i < max; i++) {
-		if (players[i].compare(name) == 0) return i;
+		if (players[i].getName().compare(name) == 0) return i;
 	}
 	return -1;
 }
