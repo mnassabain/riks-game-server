@@ -11,6 +11,10 @@ Player::Player(string name)
 	{
 		this->tokens[i] = 0;
 	}
+	// Initialization of player status
+	reinforcement = 0;
+	isAlive = true;
+	territoriesOwned = 0;
 	/* initializing of player stats */
 	this->territoriesCaptured = 0;
 	this->territoriesLost   = 0;
@@ -21,20 +25,18 @@ Player::Player(string name)
 
 bool Player::hasSet(int tok1, int tok2, int tok3)
 {	
-		 if(this->tokens[tok1] == 0)
-		 {
-			 return false;
-		 }
-		 if(this->tokens[tok2] == 0 )
-		 {
+	int toSpend[4] = { 0 };
+	toSpend[tok1]++;
+	toSpend[tok2]++;
+	toSpend[tok3]++;
+
+	size_t i;
+	for (i = 0; i < 4; i++) {
+		if (toSpend[i] > tokens[i]) {
 			return false;
-		 }
-		 
-		 if(this->tokens[tok3] == 0)
-		 {
-			return false;
-		 }
-		 
+		}
+	}
+
 	return true;
 }
 int* Player::listTokens()   
@@ -82,7 +84,7 @@ int Player::getTerritoriesCaptured()
 {
 	return this->territoriesCaptured;
 }
-int Player::GetTerritoriesLost()
+int Player::getTerritoriesLost()
 {
 	return this->territoriesLost;
 }
@@ -122,6 +124,21 @@ void Player::spendReinforcement(int reinforcement)
 int Player::getReinforcement()
 {
 	return this->reinforcement;
+}
+
+int Player::getTerritoriesOwned()
+{
+	return territoriesOwned;
+}
+
+void Player::addTerritoriesOwned()
+{
+	territoriesOwned++;
+}
+
+void Player::subTerritoriesOwned()
+{
+	territoriesOwned--;
 }
 
 string Player::getName()
