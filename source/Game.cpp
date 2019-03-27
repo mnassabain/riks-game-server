@@ -174,7 +174,7 @@ void Game::grantToken()
 		else if (roll < tokens[0] + tokens[1]) {
 			token = 1;
 		}
-		else if (roll < tokens[0] + tokens[1] + token[2]) {
+		else if (roll < tokens[0] + tokens[1] + tokens[2]) {
 			token = 2;
 		}
 		else token = 3;
