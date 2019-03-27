@@ -24,6 +24,7 @@ void Game::start()
 	this->combat.destination = -1;
 	this->combat.attackerUnits = -1;
 	this->combat.defenderUnits = -1;
+	//Initialization of RNG
 	srand(time(NULL));
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
@@ -80,23 +81,19 @@ void Game::chooseFirstPlayer()
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
+	int nbContinents = map.nbContinents();
 
-	// The reinforcements depend on how many sets of 3 terriitories the player has captures
-	reinforcement = (this -> players[this -> activePlayer].getTerritoriesCaptured()\
-					- this -> players[this -> activePlayer].GetTerritoriesLost()) / 3;
+	// +1 unit for each set of 3 owned territories, with a minimum of 3
+	reinforcement += max(players[activePlayer].getTerritoriesOwned() / 3, 3);
 
 	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
-	for(size_t i = 0; i < 6; i++)
+	for(size_t i = 0; i < nbContinents; i++)
 	{
-		if (dominatedContinent(i, this -> activePlayer))
+		if (dominatedContinent(i) == activePlayer)
 			reinforcement += this -> map.getContinents()[i].bonus;
 	}
-	
 
-	// If the player gets less than 3 reinforcements, the number is rounded up to three
-	if (reinforcement < 3)
-		reinforcement = 3;
-	this->players[this->activePlayer].addReinforcement(reinforcement);
+	players[activePlayer].addReinforcement(reinforcement);
 }
 
 int Game::useSet(int tok1, int tok2, int tok3)
