@@ -28,41 +28,146 @@ typedef websocketpp::connection_hdl Connection;
 
 class GameServer {
 private:
-    /* game data */
+    /* == game data == */
+
+    /** id of the server hub (no lobby) **/
+    static const int SERVER_HUB;
+
+    /** map containing all active games **/
     static map<int, Game> games;
 
-    /* server & socket data */
+    /* == server & socket data == */
+    /** Server endpoint **/
     static ServerEndpoint endpoint;
+
+    /** Map containing all clients connected with id and password **/
     static map<void*, Client> clients;
+
+    /** Map containing all clients not connected with id and password **/
     static vector<Connection> unregisteredConnections;
 
-    /* server control methods */
+    /* == server control methods == */
+
+    /**
+	 * @brief Initialises the websocketpp server
+	 *  
+	 */
     static void init();
+
+    /**
+	 * @brief Starts accepting new connections & messages 
+	 * 
+	 */
     static void run();
+
+    /**
+	 * @brief Stops server and closes all connections 
+	 * 
+	 */
     static void stop();
 
-    /* connection & communication handlers */
+    /* == connection & communication handlers == */
+
+    /**
+	 * @brief Message receive handler
+	 * 
+	 * @param connection The connection which sent the message 
+	 * @param msg The received message 
+	 */
     static void onMessage(Connection connection, Message msg);
+
+    /**
+	 * @brief Open connection handler 
+	 * 
+	 * @param connection The connection that is opened
+	 */
     static void onOpenConnection(Connection connection);
+
+    /**
+	 * @brief Close connection handler 
+	 * 
+	 * @param connection The connection that is closed
+	 */
     static void onCloseConnection(Connection connection);
 
-    /* other communication methods */
+    /* == other communication methods == */
+
+    /**
+	 * @brief Constructs a json error response 
+	 * 
+	 * @param response The response structure to fill out 
+	 * @param code The message code 
+	 * @param message The message to send 
+	 */
     static void errorResponse(json& response, MessageCode code, string message);
 
 
 public:
-    /* server control methods */
+    /* == server control methods == */
+
+    /**
+	 * @brief Starts server and starts accepting connections & messages
+	 * 
+	 */
     static void listen();
+
+    /**
+	 * @brief Treats an incoming message 
+	 * 
+	 * @param message The received message 
+	 * @param connection The connection which sent the message
+	 * @return string The JSON format response (string) 
+	 */
     static string treatMessage(string message, Connection connection);
 
-    /* game control methods */
+    /* == game control methods == */
+
+    /**
+	 * @brief Creates a new game/lobby
+	 * 
+	 * @param mapName The map name 
+	 * @param host The game creator 
+	 * @param nbPlayers The maximum number of players 
+	 * @return int The ID of the newly created game/lobby 
+	 */
     static int createGame(string mapName, string host, int nbPlayers);
+
+    /**
+	 * @brief Destroys a game/lobby 
+	 * 
+	 * @param id The id of the game to destroy 
+	 * @return int 0 on success, -1 on error
+	 */
     static int destroyGame(int id);
 
-    /* debugging */
+    /* == logging == */
+
+    /**
+	 * @brief Returns the number of active games/lobbies 
+	 * 
+	 * @return int 
+	 */
     static int nbGames();
+
+    /**
+	 * @brief Returns the number of connections 
+	 * 
+	 * @return int 
+	 */
     static int nbConnections();
+
+    /**
+	 * @brief Returns the number of clients connected with id & password 
+	 * 
+	 * @return int 
+	 */
     static int nbClients();
+
+    /**
+	 * @brief Returns the number of clients not connection with id & password 
+	 * 
+	 * @return int 
+	 */
     static int nbUnregisteredConnections();
 
 };

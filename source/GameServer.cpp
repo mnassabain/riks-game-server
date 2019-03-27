@@ -6,7 +6,7 @@
 #define DB_NAME "DB/riksserverdb.db"
 
 
-
+const int GameServer::SERVER_HUB = -1;
 map<int, Game> GameServer::games;
 ServerEndpoint GameServer::endpoint;
 map<void*, Client> GameServer::clients;
@@ -15,16 +15,23 @@ vector<Connection> GameServer::unregisteredConnections;
 
 void GameServer::listen()
 {
+    /* Initialise server */
     init();
+
+    /* Start accepting connections & messages */
     run();
 }
 
 
 string GameServer::treatMessage(string message, Connection connection)
 {
+    /* structure in which the message will be parsed into json */
     json jmessage;
+
+    /* structure which will contain the response */
     json response;
 
+    /* we parse the message */
     try
     {
         jmessage = json::parse(message);
@@ -37,24 +44,27 @@ string GameServer::treatMessage(string message, Connection connection)
         return response.dump();
     }
 
-
+    /* if the message is not json we return an error */
     if (jmessage.size() <= 0 || !jmessage.count("type"))
     {
         errorResponse(response, CODE_ERROR, "Invalid message format");
         return response.dump();
     }
 
+    /* we check if the message has a valid type */
     if (!jmessage["type"].is_number())
     {
         errorResponse(response, CODE_ERROR, "Invalid message type");
         return response.dump();
     }
 
+    /* we extract the message type (message code) */
     MessageCode code = jmessage["type"];
     switch(code)
     {
         case CODE_SIGN_UP:
 
+            /* we check if the message has a data field */
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_SIGN_UP,
@@ -63,6 +73,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check if the data field is an object */
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_SIGN_UP,
@@ -71,6 +82,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check if the user provided an id and password */
             if (!jmessage["data"].count("userID")
                 || !jmessage["data"].count("userPassword"))
             {
@@ -80,6 +92,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check the formats of the id and password */
             if (!jmessage["data"]["userID"].is_string() ||
                 !jmessage["data"]["userPassword"].is_string())
             {
@@ -89,7 +102,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-
+            /* logging */
             cout << "Creating new user (id = " << jmessage["data"]["userID"]
                 << ", password = " << jmessage["data"]["userPassword"] << ")"
                 << endl;
@@ -165,6 +178,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
         case CODE_CONNECT:
 
+            /* we check if the message contains a data field */
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_CONNECT,
@@ -173,6 +187,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check if the data field is an object */
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_CONNECT,
@@ -181,6 +196,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check if the message contains an id and a password */
             if (!jmessage["data"].count("userID")
                 || !jmessage["data"].count("userPassword"))
             {
@@ -190,6 +206,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check the type of the id and the password */
             if (!jmessage["data"]["userID"].is_string() ||
                 !jmessage["data"]["userPassword"].is_string())
             {
@@ -199,6 +216,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* logging */
             cout << "Connection attempt by user (id = "
                 << jmessage["data"]["userID"] << ", password = "
                 << jmessage["data"]["userPassword"] << ")" << endl;
@@ -302,12 +320,11 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
             }
 
-
             break;
 
         case CODE_DISCONNECT:
 
-            /* check if user is connected & owns connection */
+            /* check if user is connected */
             {
                 map<void*, Client>::iterator it;
                 it = clients.find(connection.lock().get());
@@ -334,6 +351,7 @@ string GameServer::treatMessage(string message, Connection connection)
                         << e.what() << endl;
                 }
 
+                /* logging */
                 cout << "User disconnected (id = " << it->second.getName() 
                     << ")" << endl;
 
@@ -341,7 +359,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 clients.erase(it);
             }
 
-
+            /* construct response */
             response["type"] = CODE_DISCONNECT;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
@@ -356,6 +374,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
         case CODE_CREATE_LOBBY:
 
+            /* we check if the message has a data field */
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_CREATE_LOBBY,
@@ -364,6 +383,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check the data field type */
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_CREATE_LOBBY,
@@ -372,6 +392,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check if the data field contains the necessary info */
             if (!jmessage["data"].count("lobbyName") ||
                 !jmessage["data"].count("lobbyPassword") ||
                 !jmessage["data"].count("maxPlayers") ||
@@ -383,6 +404,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* and we check if the info is in the correct type */
             if (!jmessage["data"]["lobbyName"].is_string() ||
                 !jmessage["data"]["lobbyPassword"].is_string() ||
                 !jmessage["data"]["maxPlayers"].is_number() ||
@@ -394,7 +416,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-            /* check if user is connected & owns connection */
+            /* check if user is connected */
             {
                 map<void*, Client>::iterator it;
                 it = clients.find(connection.lock().get());
@@ -407,6 +429,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     break;
                 }
 
+                /* logging */
                 cout << "User " << it->second.getName()
                     << ": attempt to create lobby "
                     << jmessage["data"]["lobbyName"]
@@ -415,12 +438,15 @@ string GameServer::treatMessage(string message, Connection connection)
                     << "and on map " << jmessage["data"]["mapName"] << endl;
 
             
+                /* we create a new game */
                 int newGameId = createGame(jmessage["data"]["mapName"],
                     it->second.getName(), jmessage["data"]["maxPlayers"]);
                 it->second.setGameID(newGameId);
 
+                /* logging */
                 cout << "Lobby created" << endl;
 
+                /* construct the response */
                 response["type"] = CODE_CREATE_LOBBY;
                 response["data"]["error"] = false;
                 response["data"]["response"] = "Success";
@@ -430,9 +456,10 @@ string GameServer::treatMessage(string message, Connection connection)
 
         case CODE_LOBBY_LIST:
 
+            /* logging */
             cout << "Received lobby list demand" << endl;
 
-            /* check if user is connected & owns connection */
+            /* check if user is connected */
             {
                 map<void*, Client>::iterator it;
                 it = clients.find(connection.lock().get());
@@ -446,10 +473,14 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
             }
 
+            /* construct the first part of the response */
             response["type"] = CODE_LOBBY_LIST;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
 
+            /* we get the list of running games and we insert them into the 
+             * response 
+             */
             {
                 int nb = 0;
                 map<int, Game>::iterator it;
@@ -468,6 +499,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
         case CODE_JOIN_LOBBY:
 
+            /* we check if the message has a data field */
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_JOIN_LOBBY,
@@ -476,6 +508,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check the data field type */
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_JOIN_LOBBY,
@@ -484,6 +517,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check if the data field contains the necessary info */
             if (!jmessage["data"].count("lobbyID") ||
                 !jmessage["data"].count("lobbyPassword")
                 )
@@ -494,6 +528,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
+            /* we check if the info has the correct type */
             if (!jmessage["data"]["lobbyID"].is_number() ||
                 !jmessage["data"]["lobbyPassword"].is_string())
             {
@@ -503,7 +538,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 break;
             }
 
-            /* check if user is connected & owns connection */
+            /* check if user is connected */
             {
                 map<void*, Client>::iterator it;
                 it = clients.find(connection.lock().get());
@@ -516,12 +551,14 @@ string GameServer::treatMessage(string message, Connection connection)
                     break;
                 }
 
+                /* logging */
                 cout << "User " << it->second.getName()
                 << " tried to join lobby with id: "
                 << jmessage["data"]["lobbyID"]
                 << "and password: \"" << jmessage["data"]["lobbyPassword"]
                 << "\"" << endl;
 
+                /* we look for the lobby */
                 map<int, Game>::iterator game;
                 game = games.find(jmessage["data"]["lobbyID"]);
 
@@ -593,8 +630,6 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if client is in the lobby/game */
-
-            
                 map<int, Game>::iterator game;
                 game = games.find(it->second.getGameID());
 
@@ -602,12 +637,13 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (game == games.end())
                 {
                     errorResponse(response, CODE_LEAVE_GAME, 
-                        "Lobby doesn't exist");
+                        "User not in lobby");
                     break;
                 }
                 
                 /* if we find the game we remove the player from the game */
                 game->second.removePlayer(it->second.getName());
+                it->second.setGameID(SERVER_HUB);
 
                 /* and if the room is empty we delete it */
                 if (game->second.getNbPlayers() == 0)
@@ -616,6 +652,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
             }
 
+            /* construct the response */
             response["type"] = CODE_LEAVE_GAME;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
@@ -647,9 +684,11 @@ string GameServer::treatMessage(string message, Connection connection)
                     break;
                 }
 
+                /* insert the game data into the response */
                 response["data"]["gameData"] = game->second.toJSON();
             }
 
+            /* construct the response */
             response["type"] = CODE_LOBBY_STATE;
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
@@ -658,11 +697,15 @@ string GameServer::treatMessage(string message, Connection connection)
 
 
         default:
+            /* if we received an unhandled message code we tell the client */
+            /* logging */
             cout << "Unhandled message code" << endl;
 
+            /* construct the response */
             errorResponse(response, CODE_UNHANDLED, "Unrecognized message");
     }
 
+    /* turn json object into string */
     return response.dump();
 }
 
@@ -702,7 +745,7 @@ void GameServer::init()
 {
     try
     {
-        /* reuse 9002 address */
+        /* reuse same port */
         endpoint.set_reuse_addr(true);
 
         /* Set logging settings */
@@ -793,8 +836,10 @@ void GameServer::stop()
 
 void GameServer::onMessage(Connection connection, Message msg)
 {
+    /* logging */
     cout << "Message received: \"" << msg->get_payload() << "\"" << endl;
 
+    /* logging messages */
     if (msg->get_payload() == "stop-server")
     {
         stop();
@@ -826,8 +871,10 @@ void GameServer::onMessage(Connection connection, Message msg)
         return;
     }
 
+    /* treat message */
     string response = treatMessage(msg->get_payload(), connection);
 
+    /* send the response to the client */
     try
     {
         endpoint.send(connection, response, websocketpp::frame::opcode::text);
@@ -852,13 +899,12 @@ void GameServer::onCloseConnection(Connection connection)
 
     /* check clients list */
     map<void*, Client>::iterator i;
-    for (i = clients.begin(); i != clients.end(); i++)
+    i = clients.find(connection.lock().get());
+
+    if (i != clients.end())
     {
-        if (i->second.getConnection().lock().get() == connection.lock().get())
-        {
-            found = true;
-            clients.erase(i);
-        }
+        clients.erase(i);
+        found = true;
     }
 
     if (found)
@@ -897,7 +943,7 @@ int GameServer::nbGames()
 
 int GameServer::nbConnections()
 {
-    return nbClients() + nbUnregisteredConnections();
+    return clients.size() + nbUnregisteredConnections();
 }
 
 int GameServer::nbClients()
