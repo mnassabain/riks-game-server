@@ -306,37 +306,6 @@ string GameServer::treatMessage(string message, Connection connection)
             break;
 
         case CODE_DISCONNECT:
-            // if (!jmessage.count("data"))
-            // {
-            //     errorResponse(response, CODE_DISCONNECT,
-            //         "Invalid message; insufficient parameters");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"].is_object())
-            // {
-            //     errorResponse(response, CODE_DISCONNECT,
-            //         "Invalid message data types");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"].count("userID"))
-            // {
-            //     errorResponse(response, CODE_DISCONNECT,
-            //         "Invalid message format; insufficient parameters");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"]["userID"].is_string())
-            // {
-            //     errorResponse(response, CODE_DISCONNECT,
-            //         "Invalid message data types");
-
-            //     break;
-            // }
 
             /* check if user is connected & owns connection */
             {
@@ -350,15 +319,6 @@ string GameServer::treatMessage(string message, Connection connection)
                         "User not connected");
                     break;
                 }
-
-                /* check if user owns the connection */
-                // if (it->second.getConnection().lock().get() 
-                //     != connection.lock().get())
-                // {
-                //     errorResponse(response, CODE_DISCONNECT,
-                //         "Action not permitted");
-                //     break;
-                // }
 
                 /* disconnect user */
                 try
@@ -447,16 +407,6 @@ string GameServer::treatMessage(string message, Connection connection)
                     break;
                 }
 
-                /* check if user owns the connection */
-                // if (it->second.getConnection().lock().get() 
-                    // != connection.lock().get())
-                // {
-                    // errorResponse(response, CODE_CREATE_LOBBY,
-                        // "Action not permitted");
-                    // break;
-                // }
-            
-
                 cout << "User " << it->second.getName()
                     << ": attempt to create lobby "
                     << jmessage["data"]["lobbyName"]
@@ -482,34 +432,6 @@ string GameServer::treatMessage(string message, Connection connection)
 
             cout << "Received lobby list demand" << endl;
 
-            // if (!jmessage.count("data"))
-            // {
-            //     errorResponse(response, CODE_LOBBY_LIST,
-            //         "Invalid message; insufficient parameters");
-            //     break;
-            // }
-
-            // if (!jmessage["data"].is_object())
-            // {
-            //     errorResponse(response, CODE_LOBBY_LIST,
-            //         "Invalid message data types");
-            //     break;
-            // }
-
-            // if (!jmessage["data"].count("playerID"))
-            // {
-            //     errorResponse(response, CODE_LOBBY_LIST,
-            //         "Invalid message; insufficient parameters");
-            //     break;
-            // }
-
-            // if (!jmessage["data"]["playerID"].is_string())
-            // {
-            //     errorResponse(response, CODE_LOBBY_LIST,
-            //         "Invalid message data types");
-            //     break;
-            // }
-
             /* check if user is connected & owns connection */
             {
                 map<void*, Client>::iterator it;
@@ -522,15 +444,6 @@ string GameServer::treatMessage(string message, Connection connection)
                         "User not connected");
                     break;
                 }
-
-                /* check if user owns the connection */
-                // if (it->second.getConnection().lock().get() 
-                //     != connection.lock().get())
-                // {
-                //     errorResponse(response, CODE_LOBBY_LIST,
-                //         "Action not permitted");
-                //     break;
-                // }
             }
 
             response["type"] = CODE_LOBBY_LIST;
@@ -609,16 +522,6 @@ string GameServer::treatMessage(string message, Connection connection)
                 << "and password: \"" << jmessage["data"]["lobbyPassword"]
                 << "\"" << endl;
 
-                // /* check if user owns the connection */
-                // if (it->second.getConnection().lock().get() 
-                //     != connection.lock().get())
-                // {
-                //     errorResponse(response, CODE_JOIN_LOBBY,
-                //         "Action not permitted");
-                //     break;
-                // }
-
-
                 map<int, Game>::iterator game;
                 game = games.find(jmessage["data"]["lobbyID"]);
 
@@ -677,39 +580,6 @@ string GameServer::treatMessage(string message, Connection connection)
 
         case CODE_LEAVE_GAME:
 
-            // id, id game
-            // if (!jmessage.count("data"))
-            // {
-            //     errorResponse(response, CODE_LEAVE_GAME,
-            //         "Invalid message; insufficient parameters");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"].is_object())
-            // {
-            //     errorResponse(response, CODE_LEAVE_GAME,
-            //         "Invalid message data types");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"].count("lobbyID"))
-            // {
-            //     errorResponse(response, CODE_LEAVE_GAME,
-            //         "Invalid message; insufficient parameters");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"]["lobbyID"].is_number())
-            // {
-            //     errorResponse(response, CODE_LEAVE_GAME,
-            //         "Invalid message data types");
-
-            //     break;
-            // }
-
             /* check if user is connected */
             {
                 map<void*, Client>::iterator it;
@@ -722,16 +592,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     break;
                 }
 
-                /* check if the user owns the connections */
-                // if (it->second.getConnection().lock().get() 
-                //     != connection.lock().get())
-                // {
-                //     errorResponse(response, CODE_LEAVE_GAME,
-                //         "Action not permitted");
-                // }
-            
-
-            /* check if client is in the lobby/game */
+                /* check if client is in the lobby/game */
 
             
                 map<int, Game>::iterator game;
@@ -763,38 +624,6 @@ string GameServer::treatMessage(string message, Connection connection)
 
         case CODE_LOBBY_STATE:
 
-            // if (!jmessage.count("data"))
-            // {
-            //     errorResponse(response, CODE_LOBBY_STATE,
-            //         "Invalid message; insufficient parameters");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"].is_object())
-            // {
-            //     errorResponse(response, CODE_LOBBY_STATE,
-            //         "Invalid message data types");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"].count("gameID"))
-            // {
-            //     errorResponse(response, CODE_LOBBY_STATE,
-            //         "Invalid message; insufficient parameters");
-
-            //     break;
-            // }
-
-            // if (!jmessage["data"]["gameID"].is_number())
-            // {
-            //     errorResponse(response, CODE_LOBBY_STATE,
-            //         "Invalid game ID");
-
-            //     break;
-            // }
-
             /* check if user is connected */
             {
                 map<void*, Client>::iterator it;
@@ -806,15 +635,6 @@ string GameServer::treatMessage(string message, Connection connection)
                         "User not connected");
                     break;
                 }
-
-                /* check if user owns the connection */
-                // if (it->second.getConnection().lock().get() 
-                    // != connection.lock().get())
-                // {
-                    // errorResponse(response, CODE_LOBBY_STATE,
-                        // "Action not permitted");
-                    // break;
-                // }
 
                 map<int, Game>::iterator game;
                 game = games.find(it->second.getGameID());
