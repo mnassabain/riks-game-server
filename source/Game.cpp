@@ -89,7 +89,7 @@ void Game::turnReinforcement()
 	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
 	for(size_t i = 0; i < nbContinents; i++)
 	{
-		if (dominatedContinent(i) == activePlayer)
+		if (continentOwner(i) == activePlayer)
 			reinforcement += this -> map.getContinents()[i].bonus;
 	}
 
@@ -199,10 +199,10 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	result.defenderLoss = 0;
 	
 	int limit = pow(6, attackers + defenders);
-	int roll = rand()%limit; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+	int roll = rand()%limit; // Effective range : 0 to limit-1
 
 	// Calculating unit loss for all 6 possible combat setups
-	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
+	// The math behind it was done beforehand to avoid simulating multiple dice rolls, sorting them, and comparing them
 	// 3 Attackers
 	if (attackers == 3) {
 		// 2 defenders
@@ -294,25 +294,23 @@ bool Game::areAdjacent(int a, int b)
 		return false;
 }
 
-bool Game::dominatedContinent(int idContinent, int idPlayer)
+// Will return -1 if the continent has no owner
+int Game::continentOwner(int idContinent)
 {
-	bool isDominating = true;
+	// Setting up the lower and upper limits
 	int firstTerritory = this -> map.getContinents()[idContinent].firstTerritory;
 	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
-	int nbTerritoriesInContinent = firstTerritory - lastTerritory;
-	int nbTerritories = (this -> players[this -> activePlayer].getTerritoriesCaptured() - \
-		this -> players[this -> activePlayer].GetTerritoriesLost());
-	
-	// Checks if the player has at least the number of territories on that continent
-	if (nbTerritories < nbTerritoriesInContinent)
-		return false;
-	
-	for(int i = firstTerritory; i <= lastTerritory; i++)
-	{
-		if (board[i].owner != idPlayer)
-			return false;
+
+	// Checking who's the owner of the continent
+	int owner = board[firstTerritory];
+
+	for (size_t i = firstTerritory + 1; i <= lastTerritory; i++) {
+		if (board[i].owner != owner) {
+			return -1;
+		}
 	}
-	return isDominating;
+
+	return owner;
 }
 
 // Public methods
