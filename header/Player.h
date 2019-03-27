@@ -11,6 +11,7 @@ public:
     int tokens[4];
     int reinforcement;
 	bool isAlive;
+	int territoriesOwned;
 
 	// Player stats
     int territoriesCaptured;
@@ -39,6 +40,9 @@ public:
 	void addReinforcement(int reinforcement);
 	void spendReinforcement(int reinforcement);
 	int getReinforcement();
+	int getTerritoriesOwned();
+	void addTerritoriesOwned();
+	void subTerritoriesOwned();
 
 	std::string getName();
 private:

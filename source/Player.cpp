@@ -11,6 +11,10 @@ Player::Player(string name)
 	{
 		this->tokens[i] = 0;
 	}
+	// Initialization of player status
+	reinforcement = 0;
+	isAlive = true;
+	territoriesOwned = 0;
 	/* initializing of player stats */
 	this->territoriesCaptured = 0;
 	this->territoriesLost   = 0;
@@ -122,6 +126,21 @@ void Player::spendReinforcement(int reinforcement)
 int Player::getReinforcement()
 {
 	return this->reinforcement;
+}
+
+int Player::getTerritoriesOwned()
+{
+	return territoriesOwned;
+}
+
+void Player::addTerritoriesOwned()
+{
+	territoriesOwned++;
+}
+
+void Player::subTerritoriesOwned()
+{
+	territoriesOwned--;
 }
 
 string Player::getName()
