@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Structs.h"
+#include "MessageCode.h"
 
 #include "../libs/json/json.hpp"
 
@@ -18,7 +19,7 @@ using json = nlohmann::json;
 class Game {
 private:
 	// Attributes
-	// Lobby variables // Gotta remember to add a string name for the lobby and change the public constructor to reflect the change
+	// Lobby variables
 	static int nextId;
 	int id;
 	string name;
@@ -178,14 +179,14 @@ public:
 	 * 
 	 * @param name 
 	 */
-	void addPlayer(string name);
+	int addPlayer(string name);
 
 	/**
 	 * @brief 
 	 * 
 	 * @param name 
 	 */
-	void removePlayer(string name);
+	int removePlayer(string name);
 
 	/**
 	 * @brief Get the player's turn order
@@ -230,15 +231,6 @@ public:
 	*/
 	string message(string message);
 
-	/**
-	 * @brief Returns a random value between min and max (both included)
-	 * 
-	 * @param min 
-	 * @param max 
-	 * @return int 
-	 */
-	int intRand(int min, int max);
-
 	// Constructors
 
 	/**
@@ -250,6 +242,7 @@ public:
 	 */
 	Game(string mapName, string creatorId, int maxPlayers);
 	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation
+	Game(string mapName, string creatorId, int maxPlayers, string lobbyName, string password);
 };
 
 #endif //GAME_H

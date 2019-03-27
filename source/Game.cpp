@@ -24,6 +24,7 @@ void Game::start()
 	this->combat.destination = -1;
 	this->combat.attackerUnits = -1;
 	this->combat.defenderUnits = -1;
+	srand(time(NULL));
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
 	TerritoryState blank;
@@ -73,7 +74,7 @@ void Game::nextPhase()
 
 void Game::chooseFirstPlayer()
 {
-	this -> activePlayer = intRand(0, this -> nbPlayers - 1);
+	this -> activePlayer = rand()%(this -> nbPlayers);
 }
 
 void Game::turnReinforcement()
@@ -160,7 +161,7 @@ bool Game::isValidSet(int tok1, int tok2, int tok3)
 void Game::grantToken()
 {
 	// Granting a random token to the player
-	int r = intRand(0, 3);
+	int r = rand()%4;
 	tokens[r]--;
 	players[activePlayer].receiveToken(r);
 }
@@ -180,7 +181,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	result.defenderLoss = 0;
 	
 	int limit = pow(6, attackers + defenders);
-	int roll = intRand(0, limit - 1); // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+	int roll = rand()%limit; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
 
 	// Calculating unit loss for all 6 possible combat setups
 	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
@@ -303,8 +304,8 @@ json Game::toJSON()
 	json j;
 
 	j["lobbyName"] = this -> name;
-	j["password"] = this -> getPassword();
-	j["nbPlayers"] = this -> getNbPlayers();
+	j["password"] = this -> password;
+	j["nbPlayers"] = this -> nbPlayers;
 	j["maxPlayers"] = this -> maxPlayers;
 	j["mapName"] = this -> map.getName();
 	for (int i = 0; i < this -> nbPlayers; i++) {
@@ -322,22 +323,39 @@ bool Game::isFull(){
 	return (this -> nbPlayers == this -> maxPlayers);
 }
 
-void Game::addPlayer(string name)
+int Game::addPlayer(string name)
 {
 	if ((this->nbPlayers < this->maxPlayers) && (this->running == false))
 	{
 		this->nbPlayers++;
 		this->players.push_back(Player(name));
+		return 0;
 	}
+	return -1;
 }
 
-void Game::removePlayer(string name)
+int Game::removePlayer(string name)
 {
+	size_t i;
+	size_t max = players.size();
+	for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
+	}
+	if (i < max) {
+		this->nbPlayers--;
+		players.erase(players.begin() + i);
+		return 0;
+	}
+	return -1;
 }
 
 // Will return -1 if the player isn't in this game/lobby
 int Game::getPlayerOrder(string name)
 {
+	size_t i;
+	size_t max = players.size();
+	for (i = 0; i < max; i++) {
+		if (players[i].getName().compare(name) == 0) return i;
+	}
 	return -1;
 }
 
@@ -359,14 +377,6 @@ string Game::getPassword()
 vector<Player> Game::getPlayers()
 {
 	return this -> players;
-}
-
-int Game::intRand(int min, int max) 
-{
-    std::random_device rd;
-    std::mt19937 mt(rd());
-    std::uniform_real_distribution<float> dist(min, max);
-	return (int) dist(mt);
 }
 
 // This is where most of the game logic will happen
@@ -424,4 +434,28 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName)
 
 	// Setting up default password
 	this->password.assign("");
+}
+
+Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, string password)
+{
+	// Setting up game ID
+	this->id = nextId;
+	nextId++;
+
+	// Loading up map
+	this->map = Map::loadMap(mapName);
+
+	// Initialization of lobby variables
+	this->running = false;
+
+	// Initialization of players
+	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
+	this->nbPlayers = 0;
+	addPlayer(creatorId);
+
+	// Setting up lobby name
+	this->name.assign(lobbyName);
+
+	// Setting up password
+	this->password.assign(password);
 }
