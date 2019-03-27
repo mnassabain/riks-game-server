@@ -157,10 +157,31 @@ bool Game::isValidSet(int tok1, int tok2, int tok3)
 
 void Game::grantToken()
 {
+	// Calculating the total number of tokens available
+	int total = 0;
+	total += tokens[0];
+	total += tokens[1];
+	total += tokens[2];
+	total += tokens[3];
 	// Granting a random token to the player
-	int r = rand()%4;
-	tokens[r]--;
-	players[activePlayer].receiveToken(r);
+	if (total > 0) {
+		int roll = rand() % total;
+		// Determining what token the roll refers to
+		if (roll < tokens[0]) {
+			token = 0;
+		}
+		else if (roll < tokens[0] + tokens[1]) {
+			token = 1;
+		}
+		else if (roll < tokens[0] + tokens[1] + token[2]) {
+			token = 2;
+		}
+		else token = 3;
+
+		// Removing the token from the pool and crediting it to the player
+		tokens[tokens]--;
+		players[activePlayer].receiveToken(token);
+	}
 }
 
 void Game::putUnits(int territory, int units)
