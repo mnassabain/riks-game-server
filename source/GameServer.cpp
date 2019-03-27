@@ -66,7 +66,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* we check if the user is not already connected */
             {
-                map<void*, Client>::iterator client;
+                ClientIterator client;
                 client = clients.find(connection.lock().get());
 
                 if (client != clients.end())
@@ -193,7 +193,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* we check if the user is already connected */
             {
-                map<void*, Client>::iterator client;
+                ClientIterator client;
                 client = clients.find(connection.lock().get());
 
                 if (client != clients.end())
@@ -352,11 +352,11 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<void*, Client>::iterator it;
-                it = clients.find(connection.lock().get());
+                ClientIterator client;
+                client = clients.find(connection.lock().get());
 
                 /* if we can't find the user we send an error */
-                if (it == clients.end())
+                if (client == clients.end())
                 {
                     errorResponse(response, CODE_DISCONNECT,
                         "DISCONNECT: User not connected");
@@ -378,24 +378,24 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* logging */
-                cout << "User disconnected (id = " << it->second.getName() 
+                cout << "User disconnected (id = " << client->second.getName() 
                     << ")" << endl;
 
                 /* remove disconnected user from his game if he is in one */
-                int gameID = it->second.getGameID();
+                int gameID = client->second.getGameID();
                 if (gameID != SERVER_HUB)
                 {
-                    map<int, Game>::iterator game;
+                    GameIterator game;
                     game = games.find(gameID);
 
                     if (game != games.end())
                     {
-                        game->second.removePlayer(it->second.getName());
+                        game->second.removePlayer(client->second.getName());
                     }
                 }
 
                 /* remove disconnected user from clients map */
-                clients.erase(it);
+                clients.erase(client);
             }
 
             /* construct response */
@@ -457,11 +457,11 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<void*, Client>::iterator it;
-                it = clients.find(connection.lock().get());
+                ClientIterator client;
+                client = clients.find(connection.lock().get());
 
                 /* if we can't find the user we send an error */
-                if (it == clients.end())
+                if (client == clients.end())
                 {
                     errorResponse(response, CODE_CREATE_LOBBY,
                         "CREATE LOBBY: User not connected");
@@ -469,7 +469,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* we check if the user is not already in a game */
-                if (it->second.getGameID() != SERVER_HUB)
+                if (client->second.getGameID() != SERVER_HUB)
                 {
                     errorResponse(response, CODE_CREATE_LOBBY,
                         "CREATE LOBBY: User already in lobby/game");
@@ -477,7 +477,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* logging */
-                cout << "User " << it->second.getName()
+                cout << "User " << client->second.getName()
                     << ": attempt to create lobby "
                     << jmessage["data"]["lobbyName"]
                     << "with password" << jmessage["data"]["lobbyPassword"]
@@ -487,8 +487,8 @@ string GameServer::treatMessage(string message, Connection connection)
             
                 /* we create a new game */
                 int newGameId = createGame(jmessage["data"]["mapName"],
-                    it->second.getName(), jmessage["data"]["maxPlayers"]);
-                it->second.setGameID(newGameId);
+                    client->second.getName(), jmessage["data"]["maxPlayers"]);
+                client->second.setGameID(newGameId);
 
                 /* logging */
                 cout << "Lobby created" << endl;
@@ -508,11 +508,11 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<void*, Client>::iterator it;
-                it = clients.find(connection.lock().get());
+                ClientIterator client;
+                client = clients.find(connection.lock().get());
 
                 /* if we can't find the user we send an error */
-                if (it == clients.end())
+                if (client == clients.end())
                 {
                     errorResponse(response, CODE_LOBBY_LIST,
                         "LOBBY LIST: User not connected");
@@ -520,7 +520,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if the user is in a game */
-                if (it->second.getGameID() != SERVER_HUB)
+                if (client->second.getGameID() != SERVER_HUB)
                 {
                     errorResponse(response, CODE_LOBBY_LIST,
                         "LOBBY LIST: User already in lobby/game");
@@ -538,14 +538,14 @@ string GameServer::treatMessage(string message, Connection connection)
              */
             {
                 int nb = 0;
-                map<int, Game>::iterator it;
-                for (it = games.begin(); nb < MAX_GAMES && it != games.end();
-                    it++)
+                GameIterator game;
+                for (game = games.begin(); nb < MAX_GAMES && game != games.end();
+                    game++)
                 {
-                    if (!it->second.isRunning())
+                    if (!game->second.isRunning())
                     {
                         response["data"]["gameList"].push_back(
-                            it->second.toJSON());
+                            game->second.toJSON());
                         nb++;
                     }
                 }
@@ -595,11 +595,11 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<void*, Client>::iterator it;
-                it = clients.find(connection.lock().get());
+                ClientIterator client;
+                client = clients.find(connection.lock().get());
 
                 /* if we can't find the user we send an error */
-                if (it == clients.end())
+                if (client == clients.end())
                 {
                     errorResponse(response, CODE_JOIN_LOBBY,
                         "JOIN LOBBY: User not connected");
@@ -607,7 +607,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if the user is in a game */
-                if (it->second.getGameID() != SERVER_HUB)
+                if (client->second.getGameID() != SERVER_HUB)
                 {
                     errorResponse(response, CODE_JOIN_LOBBY,
                         "JOIN LOBBY: User already in lobby/game");
@@ -615,14 +615,14 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* logging */
-                cout << "User " << it->second.getName()
+                cout << "User " << client->second.getName()
                 << " tried to join lobby with id: "
                 << jmessage["data"]["lobbyID"]
                 << "and password: \"" << jmessage["data"]["lobbyPassword"]
                 << "\"" << endl;
 
                 /* we look for the lobby */
-                map<int, Game>::iterator game;
+                GameIterator game;
                 game = games.find(jmessage["data"]["lobbyID"]);
 
                 /* if the lobby is not found send error response */
@@ -649,8 +649,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* if all tests pass, we can join the game */
-                game->second.addPlayer(it->second.getName());
-                it->second.setGameID(jmessage["data"]["lobbyID"]);
+                game->second.addPlayer(client->second.getName());
+                client->second.setGameID(jmessage["data"]["lobbyID"]);
 
                 /* construct response */
                 response["type"] = CODE_JOIN_LOBBY;
@@ -667,7 +667,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 vector<Player> players = game->second.getPlayers();
                 for (unsigned int i = 0; i < players.size(); i++)
                 {
-                    map<void*, Client>::iterator player;
+                    ClientIterator player;
 
                     player = clients.find(connection.lock().get());
                     Connection c = player->second.getConnection();
@@ -682,10 +682,10 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<void*, Client>::iterator it;
-                it = clients.find(connection.lock().get());
+                ClientIterator client;
+                client = clients.find(connection.lock().get());
 
-                if (it == clients.end())
+                if (client == clients.end())
                 {
                     errorResponse(response, CODE_LEAVE_GAME, 
                         "User not connected");
@@ -693,8 +693,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* check if client is in the lobby/game */
-                map<int, Game>::iterator game;
-                game = games.find(it->second.getGameID());
+                GameIterator game;
+                game = games.find(client->second.getGameID());
 
                 /* if we can't find the game we send an error */
                 if (game == games.end())
@@ -705,8 +705,8 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
                 
                 /* if we find the game we remove the player from the game */
-                game->second.removePlayer(it->second.getName());
-                it->second.setGameID(SERVER_HUB);
+                game->second.removePlayer(client->second.getName());
+                client->second.setGameID(SERVER_HUB);
 
                 /* and if the room is empty we delete it */
                 if (game->second.getNbPlayers() == 0)
@@ -726,18 +726,18 @@ string GameServer::treatMessage(string message, Connection connection)
 
             /* check if user is connected */
             {
-                map<void*, Client>::iterator it;
-                it = clients.find(connection.lock().get());
+                ClientIterator client;
+                client = clients.find(connection.lock().get());
 
-                if (it == clients.end())
+                if (client == clients.end())
                 {
                     errorResponse(response, CODE_LOBBY_STATE,
                         "User not connected");
                     break;
                 }
 
-                map<int, Game>::iterator game;
-                game = games.find(it->second.getGameID());
+                GameIterator game;
+                game = games.find(client->second.getGameID());
                 
                 /* if we don't find the lobby we send an error */
                 if (game == games.end())
@@ -788,16 +788,16 @@ int GameServer::createGame(string mapName, string host, int nbPlayers)
 
 int GameServer::destroyGame(int id)
 {
-    map<int, Game>::iterator it;
-    it = games.find(id);
+    GameIterator game;
+    game = games.find(id);
 
-    if (it == games.end())
+    if (game == games.end())
     {
         cout << "Game " << id << " not found" << endl;
         return -1;
     }
 
-    games.erase(it);
+    games.erase(game);
     return 0;
 }
 
@@ -866,13 +866,13 @@ void GameServer::stop()
     }
 
     /* close all existing connections */
-    map<void*, Client>::iterator i;
-    for(i = clients.begin(); i != clients.end(); i++)
+    ClientIterator client;
+    for(client = clients.begin(); client != clients.end(); client++)
     {
         try
         {
-            endpoint.pause_reading(i->second.getConnection());
-            endpoint.close(i->second.getConnection(),
+            endpoint.pause_reading(client->second.getConnection());
+            endpoint.close(client->second.getConnection(),
                 websocketpp::close::status::going_away, "Server shutdown");
         }
         catch(websocketpp::exception e)
@@ -881,13 +881,15 @@ void GameServer::stop()
         }
     }
 
-    for (unsigned int j = 0; j < unregisteredConnections.size(); j++)
+    vector<Connection>::iterator connection;
+    for (connection = unregisteredConnections.begin(); 
+        connection != unregisteredConnections.end(); connection++)
     {
         try
         {
-            endpoint.pause_reading(unregisteredConnections[j]);
-            endpoint.close(unregisteredConnections[j],
-                websocketpp::close::status::going_away, "Server shutdown");
+            endpoint.pause_reading(*connection);
+            endpoint.close(*connection, websocketpp::close::status::going_away, 
+                "Server shutdown");
         }
         catch(websocketpp::exception e)
         {
@@ -961,12 +963,12 @@ void GameServer::onCloseConnection(Connection connection)
     bool found = false;
 
     /* check clients list */
-    map<void*, Client>::iterator i;
-    i = clients.find(connection.lock().get());
+    ClientIterator client;
+    client = clients.find(connection.lock().get());
 
-    if (i != clients.end())
+    if (client != clients.end())
     {
-        clients.erase(i);
+        clients.erase(client);
         found = true;
     }
 
@@ -974,11 +976,13 @@ void GameServer::onCloseConnection(Connection connection)
         return;
 
     /* check unregistered connections */
-    for (unsigned int j = 0; j < unregisteredConnections.size() && !found; j++)
+    vector<Connection>::iterator c;
+    for (c = unregisteredConnections.begin(); 
+        c != unregisteredConnections.end() && !found; c++)
     {
-        if (unregisteredConnections[j].lock().get() == connection.lock().get())
+        if (c->lock().get() == connection.lock().get())
         {
-            unregisteredConnections.erase(unregisteredConnections.begin() + j);
+            unregisteredConnections.erase(c);
             cout << "Removing connection " << connection.lock().get()
                 << ": connection closed" << endl;
             found = true;

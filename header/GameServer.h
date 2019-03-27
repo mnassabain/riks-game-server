@@ -25,6 +25,10 @@ typedef websocketpp::server<websocketpp::config::asio> ServerEndpoint;
 typedef ServerEndpoint::message_ptr Message;
 typedef websocketpp::connection_hdl Connection;
 
+/* typedefs for iterators */
+typedef map<int, Game>::iterator GameIterator;
+typedef map<void*, Client>::iterator ClientIterator;
+
 
 class GameServer {
 private:
