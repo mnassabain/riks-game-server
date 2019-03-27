@@ -166,6 +166,7 @@ void Game::grantToken()
 	// Granting a random token to the player
 	if (total > 0) {
 		int roll = rand() % total;
+		int token;
 		// Determining what token the roll refers to
 		if (roll < tokens[0]) {
 			token = 0;
@@ -173,13 +174,13 @@ void Game::grantToken()
 		else if (roll < tokens[0] + tokens[1]) {
 			token = 1;
 		}
-		else if (roll < tokens[0] + tokens[1] + token[2]) {
+		else if (roll < tokens[0] + tokens[1] + tokens[2]) {
 			token = 2;
 		}
 		else token = 3;
 
 		// Removing the token from the pool and crediting it to the player
-		tokens[tokens]--;
+		tokens[token]--;
 		players[activePlayer].receiveToken(token);
 	}
 }
@@ -302,7 +303,7 @@ int Game::continentOwner(int idContinent)
 	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
 
 	// Checking who's the owner of the continent
-	int owner = board[firstTerritory];
+	int owner = board[firstTerritory].owner;
 
 	for (size_t i = firstTerritory + 1; i <= lastTerritory; i++) {
 		if (board[i].owner != owner) {
