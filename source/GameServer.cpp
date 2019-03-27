@@ -797,6 +797,8 @@ int GameServer::destroyGame(int id)
         return -1;
     }
 
+    // TODO remove players from game 
+
     games.erase(game);
     return 0;
 }
@@ -985,6 +987,9 @@ void GameServer::onCloseConnection(Connection connection)
             unregisteredConnections.erase(c);
             cout << "Removing connection " << connection.lock().get()
                 << ": connection closed" << endl;
+
+            // TODO remove player from game
+            
             found = true;
         }
     }
