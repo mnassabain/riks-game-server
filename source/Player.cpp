@@ -84,7 +84,7 @@ int Player::getTerritoriesCaptured()
 {
 	return this->territoriesCaptured;
 }
-int Player::GetTerritoriesLost()
+int Player::getTerritoriesLost()
 {
 	return this->territoriesLost;
 }

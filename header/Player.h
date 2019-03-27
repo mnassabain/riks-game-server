@@ -30,7 +30,7 @@ public:
     void receiveTokens(int numberOfEachToken[4]);
     void removeTokens(int numberOfEachToken[4]);
     int getTerritoriesCaptured();
-    int GetTerritoriesLost();
+    int getTerritoriesLost();
     int getSetsSpent();
     void addTerritoriesCaptured();
     void addTerritoriesLost();
