@@ -210,6 +210,25 @@ vector<Continent> Map::getContinents()
   return vector<Continent>(this->continents);
 }
 
+Continent Map::getContinentById(int id)
+{
+  char found=0; //bool
+  Continent res;
+  res.id = -1;
+  for(size_t i =0; i<this->continents.size() && !found;i++)
+  {
+    if(this->continents.at(i).id == id)
+    {
+      res.id = id;
+      res.bonus = this->continents.at(i).bonus;
+      res.firstTerritory  = this->continents.at(i).firstTerritory;
+      res.lastTerritory = this->continents.at(i).lastTerritory;
+      found = 1;
+    }
+  }
+  return res;
+}
+
 vector<Territory> Map::getTerritories()
 {
   return vector<Territory>(this->territories);

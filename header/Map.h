@@ -83,6 +83,13 @@ public:
   vector<Continent> getContinents();
 
   /**
+   * @brief getContinentById : return a copy of the continent identified by the given id
+   * @param id : id of the continent
+   * @return continent copy (or a Continent with id == -1 if it doesn't exist)
+   */
+  Continent getContinentById(int id);
+
+  /**
    * @brief getTerritories : Getter on map's territories
    * @return territories
    */
