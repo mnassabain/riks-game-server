@@ -166,6 +166,7 @@ void Game::grantToken()
 	// Granting a random token to the player
 	if (total > 0) {
 		int roll = rand() % total;
+		int token;
 		// Determining what token the roll refers to
 		if (roll < tokens[0]) {
 			token = 0;
@@ -179,7 +180,7 @@ void Game::grantToken()
 		else token = 3;
 
 		// Removing the token from the pool and crediting it to the player
-		tokens[tokens]--;
+		tokens[token]--;
 		players[activePlayer].receiveToken(token);
 	}
 }
