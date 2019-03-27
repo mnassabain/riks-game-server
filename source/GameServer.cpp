@@ -64,6 +64,19 @@ string GameServer::treatMessage(string message, Connection connection)
     {
         case CODE_SIGN_UP:
 
+            /* we check if the user is not already connected */
+            {
+                map<void*, Client>::iterator client;
+                client = clients.find(connection.lock().get());
+
+                if (client != clients.end())
+                {
+                    errorResponse(response, CODE_SIGN_UP, 
+                        "SIGN UP: Already logged in");
+                    break;
+                }
+            }
+
             /* we check if the message has a data field */
             if (!jmessage.count("data"))
             {
@@ -177,6 +190,19 @@ string GameServer::treatMessage(string message, Connection connection)
             break;
 
         case CODE_CONNECT:
+
+            /* we check if the user is already connected */
+            {
+                map<void*, Client>::iterator client;
+                client = clients.find(connection.lock().get());
+
+                if (client != clients.end())
+                {
+                    errorResponse(response, CODE_CONNECT, 
+                        "CONNECT: Already logged in");
+                    break;
+                }
+            }
 
             /* we check if the message contains a data field */
             if (!jmessage.count("data"))
@@ -333,7 +359,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (it == clients.end())
                 {
                     errorResponse(response, CODE_DISCONNECT,
-                        "User not connected");
+                        "DISCONNECT: User not connected");
                     break;
                 }
 
@@ -354,6 +380,19 @@ string GameServer::treatMessage(string message, Connection connection)
                 /* logging */
                 cout << "User disconnected (id = " << it->second.getName() 
                     << ")" << endl;
+
+                /* remove disconnected user from his game if he is in one */
+                int gameID = it->second.getGameID();
+                if (gameID != SERVER_HUB)
+                {
+                    map<int, Game>::iterator game;
+                    game = games.find(gameID);
+
+                    if (game != games.end())
+                    {
+                        game->second.removePlayer(it->second.getName());
+                    }
+                }
 
                 /* remove disconnected user from clients map */
                 clients.erase(it);
@@ -425,7 +464,15 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (it == clients.end())
                 {
                     errorResponse(response, CODE_CREATE_LOBBY,
-                        "User not connected");
+                        "CREATE LOBBY: User not connected");
+                    break;
+                }
+
+                /* we check if the user is not already in a game */
+                if (it->second.getGameID() != SERVER_HUB)
+                {
+                    errorResponse(response, CODE_CREATE_LOBBY,
+                        "CREATE LOBBY: User already in lobby/game");
                     break;
                 }
 
@@ -468,7 +515,15 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (it == clients.end())
                 {
                     errorResponse(response, CODE_LOBBY_LIST,
-                        "User not connected");
+                        "LOBBY LIST: User not connected");
+                    break;
+                }
+
+                /* check if the user is in a game */
+                if (it->second.getGameID() != SERVER_HUB)
+                {
+                    errorResponse(response, CODE_LOBBY_LIST,
+                        "LOBBY LIST: User already in lobby/game");
                     break;
                 }
             }
@@ -547,7 +602,15 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (it == clients.end())
                 {
                     errorResponse(response, CODE_JOIN_LOBBY,
-                        "User not connected");
+                        "JOIN LOBBY: User not connected");
+                    break;
+                }
+
+                /* check if the user is in a game */
+                if (it->second.getGameID() != SERVER_HUB)
+                {
+                    errorResponse(response, CODE_JOIN_LOBBY,
+                        "JOIN LOBBY: User already in lobby/game");
                     break;
                 }
 
