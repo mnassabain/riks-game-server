@@ -25,20 +25,18 @@ Player::Player(string name)
 
 bool Player::hasSet(int tok1, int tok2, int tok3)
 {	
-		 if(this->tokens[tok1] == 0)
-		 {
-			 return false;
-		 }
-		 if(this->tokens[tok2] == 0 )
-		 {
+	int toSpend[4] = { 0 };
+	toSpend[tok1]++;
+	toSpend[tok2]++;
+	toSpend[tok3]++;
+
+	size_t i;
+	for (i = 0; i < 4; i++) {
+		if (toSpend[i] > tokens[i]) {
 			return false;
-		 }
-		 
-		 if(this->tokens[tok3] == 0)
-		 {
-			return false;
-		 }
-		 
+		}
+	}
+
 	return true;
 }
 int* Player::listTokens()   
