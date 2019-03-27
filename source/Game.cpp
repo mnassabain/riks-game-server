@@ -303,7 +303,7 @@ int Game::continentOwner(int idContinent)
 	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
 
 	// Checking who's the owner of the continent
-	int owner = board[firstTerritory];
+	int owner = board[firstTerritory].owner;
 
 	for (size_t i = firstTerritory + 1; i <= lastTerritory; i++) {
 		if (board[i].owner != owner) {
