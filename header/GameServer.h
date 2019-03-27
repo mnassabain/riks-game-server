@@ -33,7 +33,7 @@ private:
 
     /* server & socket data */
     static ServerEndpoint endpoint;
-    static map<string, Client> clients;
+    static map<void*, Client> clients;
     static vector<Connection> unregisteredConnections;
 
     /* server control methods */
