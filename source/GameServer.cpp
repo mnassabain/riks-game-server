@@ -803,7 +803,33 @@ int GameServer::destroyGame(int id)
         return -1;
     }
 
-    // TODO remove players from game 
+    /* get players list */
+    vector<Player> players = game->second.getPlayers();
+
+    /* loop through players and remove them */
+    vector<Player>::iterator player;
+    for (player = players.begin(); player != players.end(); player++)
+    {
+        /* remove player from game */
+        game->second.removePlayer(player->getName());
+
+        /* find player in client map ... */
+        ClientIterator client;
+        for(client = clients.begin(); 
+            client != clients.end() && 
+            client->second.getName() != player->getName(); client++)
+        {}
+
+        if (client == clients.end())
+        {
+            cout << "User not found" << endl;
+        }
+        else
+        {
+            /* ... and mark him as not in room */
+            client->second.setGameID(SERVER_HUB);
+        }
+    }
 
     games.erase(game);
     return 0;
