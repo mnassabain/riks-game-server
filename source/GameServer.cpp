@@ -265,6 +265,8 @@ string GameServer::treatMessage(string message, Connection connection)
 		response["type"]= CODE_CONNECT;
 		response["data"]["error"]=true;
 		response["data"]["response"]="CONNECT Data Base connection error";
+        sqlite3_finalize(stmt);
+        break;
 	      }
 	      else //No connection error
 	      {
@@ -275,6 +277,8 @@ string GameServer::treatMessage(string message, Connection connection)
 		  response["type"]= CODE_CONNECT;
 		  response["data"]["error"]=true;
 		  response["data"]["response"]="CONNECT Data Base Select preparing error";
+          sqlite3_finalize(stmt);
+          break;
 
 		}
 		else //No preparing error
@@ -288,6 +292,8 @@ string GameServer::treatMessage(string message, Connection connection)
 	  	    response["type"]= CODE_CONNECT;
 		    response["data"]["error"]=true;
 		    response["data"]["response"]="CONNECT Error during binding";
+            sqlite3_finalize(stmt);
+            break;
 		  }
 		  else//No binding error
 		  {
@@ -302,6 +308,8 @@ string GameServer::treatMessage(string message, Connection connection)
 	  	    	response["type"]= CODE_CONNECT;
 		    	response["data"]["error"]=true;
 		    	response["data"]["response"]="CONNECT Bad password";
+                sqlite3_finalize(stmt);
+                break;
 		      }
 		      else //CONNECT Success
 		      {
@@ -319,6 +327,8 @@ string GameServer::treatMessage(string message, Connection connection)
 	  	      response["type"]= CODE_CONNECT;
 		      response["data"]["error"]=true;
 		      response["data"]["response"]="CONNECT Bad Login (user not found)";
+              sqlite3_finalize(stmt);
+              break;
 		    }
 		  }
 
