@@ -40,21 +40,24 @@ string GameServer::treatMessage(string message, Connection connection)
     {
         cout << "JSON parse exception: " << e.what() << endl;
 
-        errorResponse(response, CODE_ERROR, "Invalid message format");
+        errorResponse(response, CODE_ERROR, 
+            "Invalid message format; cannot be parsed");
         return response.dump();
     }
 
     /* if the message is not json we return an error */
     if (jmessage.size() <= 0 || !jmessage.count("type"))
     {
-        errorResponse(response, CODE_ERROR, "Invalid message format");
+        errorResponse(response, CODE_ERROR, 
+            "Invalid message format; no message type");
         return response.dump();
     }
 
     /* we check if the message has a valid type */
     if (!jmessage["type"].is_number())
     {
-        errorResponse(response, CODE_ERROR, "Invalid message type");
+        errorResponse(response, CODE_ERROR, 
+            "Invalid message format; invalid type");
         return response.dump();
     }
 
@@ -72,7 +75,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client != clients.end())
                 {
                     errorResponse(response, CODE_SIGN_UP, 
-                        "SIGN UP: Already logged in");
+                        "SIGN_UP: Already logged in");
                     break;
                 }
             }
@@ -81,7 +84,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_SIGN_UP,
-                    "Invalid message format; insufficient parameters");
+                    "SIGN_UP: Invalid message format; insufficient parameters");
 
                 break;
             }
@@ -90,7 +93,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_SIGN_UP,
-                    "Invalid message data types");
+                    "SIGN_UP: Invalid message data field type");
 
                 break;
             }
@@ -100,7 +103,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 || !jmessage["data"].count("userPassword"))
             {
                 errorResponse(response, CODE_SIGN_UP,
-                    "Invalid message format; insufficient parameters");
+                    "SIGN_UP: Invalid message format; insufficient parameters");
 
                 break;
             }
@@ -110,7 +113,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 !jmessage["data"]["userPassword"].is_string())
             {
                 errorResponse(response, CODE_SIGN_UP,
-                    "Invalid message data types");
+                    "SIGN_UP: Invalid message data types");
 
                 break;
             }
@@ -208,7 +211,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_CONNECT,
-                    "Invalid message format; insufficient parameters");
+                    "CONNECT: Invalid message format; insufficient parameters");
 
                 break;
             }
@@ -217,7 +220,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_CONNECT,
-                    "Invalid message data types");
+                    "CONNECT: Invalid message data types");
 
                 break;
             }
@@ -227,7 +230,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 || !jmessage["data"].count("userPassword"))
             {
                 errorResponse(response, CODE_CONNECT,
-                    "Invalid message format; insufficient parameters");
+                    "CONNECT: Invalid message format; insufficient parameters");
 
                 break;
             }
@@ -237,7 +240,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 !jmessage["data"]["userPassword"].is_string())
             {
                 errorResponse(response, CODE_CONNECT,
-                    "Invalid message data types");
+                    "CONNECT: Invalid message data types");
 
                 break;
             }
@@ -391,6 +394,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     if (game != games.end())
                     {
                         game->second.removePlayer(client->second.getName());
+                        client->second.setGameID(SERVER_HUB);
                     }
                 }
 
@@ -417,7 +421,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_CREATE_LOBBY,
-                    "Invalid message; insufficient parameters");
+                    "CREATE_LOBBY: Invalid message; insufficient parameters");
 
                 break;
             }
@@ -426,7 +430,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_CREATE_LOBBY,
-                    "Invalid message data types");
+                    "CREATE_LOBBY: Invalid message data types");
 
                 break;
             }
@@ -438,7 +442,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 !jmessage["data"].count("mapName"))
             {
                 errorResponse(response, CODE_CREATE_LOBBY,
-                    "Invalid message; insufficient parameters");
+                    "CREATE_LOBBY: Invalid message; insufficient parameters");
 
                 break;
             }
@@ -450,7 +454,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 !jmessage["data"]["mapName"].is_string())
             {
                 errorResponse(response, CODE_CREATE_LOBBY,
-                    "Invalid message data types");
+                    "CREATE_LOBBY: Invalid message data types");
 
                 break;
             }
@@ -464,7 +468,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client == clients.end())
                 {
                     errorResponse(response, CODE_CREATE_LOBBY,
-                        "CREATE LOBBY: User not connected");
+                        "CREATE_LOBBY: User not connected");
                     break;
                 }
 
@@ -472,7 +476,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client->second.getGameID() != SERVER_HUB)
                 {
                     errorResponse(response, CODE_CREATE_LOBBY,
-                        "CREATE LOBBY: User already in lobby/game");
+                        "CREATE_LOBBY: User already in lobby/game");
                     break;
                 }
 
@@ -515,7 +519,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client == clients.end())
                 {
                     errorResponse(response, CODE_LOBBY_LIST,
-                        "LOBBY LIST: User not connected");
+                        "LOBBY_LIST: User not connected");
                     break;
                 }
 
@@ -523,7 +527,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client->second.getGameID() != SERVER_HUB)
                 {
                     errorResponse(response, CODE_LOBBY_LIST,
-                        "LOBBY LIST: User already in lobby/game");
+                        "LOBBY_LIST: User already in lobby/game");
                     break;
                 }
             }
@@ -558,7 +562,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage.count("data"))
             {
                 errorResponse(response, CODE_JOIN_LOBBY,
-                    "Invalid message; insufficient parameters");
+                    "JOIN_LOBBY: Invalid message; insufficient parameters");
 
                 break;
             }
@@ -567,7 +571,7 @@ string GameServer::treatMessage(string message, Connection connection)
             if (!jmessage["data"].is_object())
             {
                 errorResponse(response, CODE_JOIN_LOBBY,
-                    "Invalid message data types");
+                    "JOIN_LOBBY: Invalid message data types");
 
                 break;
             }
@@ -578,7 +582,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 )
             {
                 errorResponse(response, CODE_JOIN_LOBBY,
-                    "Invalid message; insufficient parameters");
+                    "JOIN_LOBBY: Invalid message; insufficient parameters");
 
                 break;
             }
@@ -588,7 +592,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 !jmessage["data"]["lobbyPassword"].is_string())
             {
                 errorResponse(response, CODE_JOIN_LOBBY,
-                    "Invalid message data types");
+                    "JOIN_LOBBY: Invalid message data types");
 
                 break;
             }
@@ -602,7 +606,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client == clients.end())
                 {
                     errorResponse(response, CODE_JOIN_LOBBY,
-                        "JOIN LOBBY: User not connected");
+                        "JOIN_LOBBY: User not connected");
                     break;
                 }
 
@@ -610,7 +614,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client->second.getGameID() != SERVER_HUB)
                 {
                     errorResponse(response, CODE_JOIN_LOBBY,
-                        "JOIN LOBBY: User already in lobby/game");
+                        "JOIN_LOBBY: User already in lobby/game");
                     break;
                 }
 
@@ -628,14 +632,16 @@ string GameServer::treatMessage(string message, Connection connection)
                 /* if the lobby is not found send error response */
                 if (game == games.end())
                 {
-                    errorResponse(response, CODE_JOIN_LOBBY, "Lobby not found");
+                    errorResponse(response, CODE_JOIN_LOBBY, 
+                        "JOIN_LOBBY: Lobby not found");
                     break;
                 }
 
                 /* check if the lobby is full */
                 if (game->second.isFull())
                 {
-                    errorResponse(response, CODE_JOIN_LOBBY, "Lobby is full");
+                    errorResponse(response, CODE_JOIN_LOBBY, 
+                        "JOIN_LOBBY: Lobby is full");
                     break;
                 }
 
@@ -644,7 +650,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     != jmessage["data"]["lobbyPassword"])
                 {
                     errorResponse(response, CODE_JOIN_LOBBY, 
-                        "Incorrect password");
+                        "JOIN_LOBBY: Incorrect password");
                     break;
                 }
 
@@ -688,7 +694,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client == clients.end())
                 {
                     errorResponse(response, CODE_LEAVE_GAME, 
-                        "User not connected");
+                        "LEAVE_GAME: User not connected");
                     break;
                 }
 
@@ -700,7 +706,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (game == games.end())
                 {
                     errorResponse(response, CODE_LEAVE_GAME, 
-                        "User not in lobby");
+                        "LEAVE_GAME: User not in lobby");
                     break;
                 }
                 
@@ -732,7 +738,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (client == clients.end())
                 {
                     errorResponse(response, CODE_LOBBY_STATE,
-                        "User not connected");
+                        "LOBBY_STATE: User not connected");
                     break;
                 }
 
@@ -743,7 +749,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 if (game == games.end())
                 {
                     errorResponse(response, CODE_LOBBY_STATE, 
-                        "Lobby not found");
+                        "LOBBY_STATE: Lobby not found");
                     break;
                 }
 
@@ -989,7 +995,7 @@ void GameServer::onCloseConnection(Connection connection)
                 << ": connection closed" << endl;
 
             // TODO remove player from game
-            
+
             found = true;
         }
     }
