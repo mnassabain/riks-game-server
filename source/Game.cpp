@@ -24,6 +24,7 @@ void Game::start()
 	this->combat.destination = -1;
 	this->combat.attackerUnits = -1;
 	this->combat.defenderUnits = -1;
+	//Initialization of RNG
 	srand(time(NULL));
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
@@ -80,23 +81,19 @@ void Game::chooseFirstPlayer()
 void Game::turnReinforcement()
 {
 	int reinforcement = 0;
+	int nbContinents = map.nbContinents();
 
-	// The reinforcements depend on how many sets of 3 terriitories the player has captures
-	reinforcement = (this -> players[this -> activePlayer].getTerritoriesCaptured()\
-					- this -> players[this -> activePlayer].GetTerritoriesLost()) / 3;
+	// +1 unit for each set of 3 owned territories, with a minimum of 3
+	reinforcement += max(players[activePlayer].getTerritoriesOwned() / 3, 3);
 
 	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
-	for(size_t i = 0; i < 6; i++)
+	for(size_t i = 0; i < nbContinents; i++)
 	{
-		if (dominatedContinent(i, this -> activePlayer))
+		if (continentOwner(i) == activePlayer)
 			reinforcement += this -> map.getContinents()[i].bonus;
 	}
-	
 
-	// If the player gets less than 3 reinforcements, the number is rounded up to three
-	if (reinforcement < 3)
-		reinforcement = 3;
-	this->players[this->activePlayer].addReinforcement(reinforcement);
+	players[activePlayer].addReinforcement(reinforcement);
 }
 
 int Game::useSet(int tok1, int tok2, int tok3)
@@ -160,10 +157,32 @@ bool Game::isValidSet(int tok1, int tok2, int tok3)
 
 void Game::grantToken()
 {
+	// Calculating the total number of tokens available
+	int total = 0;
+	total += tokens[0];
+	total += tokens[1];
+	total += tokens[2];
+	total += tokens[3];
 	// Granting a random token to the player
-	int r = rand()%4;
-	tokens[r]--;
-	players[activePlayer].receiveToken(r);
+	if (total > 0) {
+		int roll = rand() % total;
+		int token;
+		// Determining what token the roll refers to
+		if (roll < tokens[0]) {
+			token = 0;
+		}
+		else if (roll < tokens[0] + tokens[1]) {
+			token = 1;
+		}
+		else if (roll < tokens[0] + tokens[1] + tokens[2]) {
+			token = 2;
+		}
+		else token = 3;
+
+		// Removing the token from the pool and crediting it to the player
+		tokens[token]--;
+		players[activePlayer].receiveToken(token);
+	}
 }
 
 void Game::putUnits(int territory, int units)
@@ -181,10 +200,10 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	result.defenderLoss = 0;
 	
 	int limit = pow(6, attackers + defenders);
-	int roll = rand()%limit; // To be replaced with a rand where limit is the upper limit not included (Effective range : 0 - limit-1)
+	int roll = rand()%limit; // Effective range : 0 to limit-1
 
 	// Calculating unit loss for all 6 possible combat setups
-	// The math behind it was done beforehand to avoid simulating multiple dice rolls and comparing them
+	// The math behind it was done beforehand to avoid simulating multiple dice rolls, sorting them, and comparing them
 	// 3 Attackers
 	if (attackers == 3) {
 		// 2 defenders
@@ -276,25 +295,23 @@ bool Game::areAdjacent(int a, int b)
 		return false;
 }
 
-bool Game::dominatedContinent(int idContinent, int idPlayer)
+// Will return -1 if the continent has no owner
+int Game::continentOwner(int idContinent)
 {
-	bool isDominating = true;
+	// Setting up the lower and upper limits
 	int firstTerritory = this -> map.getContinents()[idContinent].firstTerritory;
 	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
-	int nbTerritoriesInContinent = firstTerritory - lastTerritory;
-	int nbTerritories = (this -> players[this -> activePlayer].getTerritoriesCaptured() - \
-		this -> players[this -> activePlayer].GetTerritoriesLost());
-	
-	// Checks if the player has at least the number of territories on that continent
-	if (nbTerritories < nbTerritoriesInContinent)
-		return false;
-	
-	for(int i = firstTerritory; i <= lastTerritory; i++)
-	{
-		if (board[i].owner != idPlayer)
-			return false;
+
+	// Checking who's the owner of the continent
+	int owner = board[firstTerritory].owner;
+
+	for (size_t i = firstTerritory + 1; i <= lastTerritory; i++) {
+		if (board[i].owner != owner) {
+			return -1;
+		}
 	}
-	return isDominating;
+
+	return owner;
 }
 
 // Public methods
