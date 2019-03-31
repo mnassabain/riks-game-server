@@ -1002,6 +1002,23 @@ void GameServer::onCloseConnection(Connection connection)
 
     if (client != clients.end())
     {
+        /* check if client is in game ... */
+        int clientGameID = client->second.getGameID();
+        if (clientGameID != SERVER_HUB)
+        {
+            GameIterator game = games.find(clientGameID);
+            if (game == games.end())
+            {
+                cout << "Game not found" << endl;
+            }
+            else
+            {
+                /* .. and if he is remove him from the game */
+                game->second.removePlayer(client->second.getName());
+            }
+        }
+
+        /* erase him from the clients table */
         clients.erase(client);
         found = true;
     }
@@ -1019,8 +1036,6 @@ void GameServer::onCloseConnection(Connection connection)
             unregisteredConnections.erase(c);
             cout << "Removing connection " << connection.lock().get()
                 << ": connection closed" << endl;
-
-            // TODO remove player from game
 
             found = true;
         }
