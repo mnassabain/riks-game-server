@@ -90,7 +90,7 @@ void Game::turnReinforcement()
 	for(size_t i = 0; i < nbContinents; i++)
 	{
 		if (continentOwner(i) == activePlayer)
-			reinforcement += this -> map.getContinents()[i].bonus;
+			reinforcement += this ->map.getContinentById(i).bonus;
 	}
 
 	players[activePlayer].addReinforcement(reinforcement);
@@ -187,7 +187,7 @@ void Game::grantToken()
 
 void Game::putUnits(int territory, int units)
 {
-	if ((this->activePlayer == this->board[this->activePlayer].owner) && (this->players[this->activePlayer].getReinforcement() >= units)) {
+	if ((this->activePlayer == this->board[territory].owner) && (this->players[this->activePlayer].getReinforcement() >= units)) {
 		this->players[this->activePlayer].spendReinforcement(units);
 		this->board[territory].units += units;
 	}
@@ -258,10 +258,10 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 void Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
 {
 	// checking the requirements of moving units
-	if(	this -> board[source].units - units >= 1 &&
+	if( areAdjacent(source, destination) &&
+		this -> board[source].units - units >= 1 &&
 		this -> activePlayer == this -> board[source].owner && 
-		this -> activePlayer == this -> board[destination].owner &&
-		areAdjacent(source, destination) ) { // I'd put areAdjacent as first checked condition
+		this -> activePlayer == this -> board[destination].owner ) {
 		this -> board[source].units -= units;
 		this -> board[destination].units += units;
 	}
@@ -274,18 +274,18 @@ void Game::setInitialReinforcement()
 	}
 }
 
-void Game::end()
+void Game::end() //
 {
 }
 
-int Game::updatePlayersStatsInDB()
+int Game::updatePlayersStatsInDB() //
 {
 	return 0;
 }
 
 bool Game::areAdjacent(int a, int b)
 {
-	vector<int> aNeighbors = this -> map.getTerritories()[a].neighbors;
+	vector<int> aNeighbors = this -> map.getContinentById(a).neighbors;
 
 	// checking if `b` is in the `neighbors` vector of the `a` territory
 	if(std::find(aNeighbors.begin(), aNeighbors.end(), b) != aNeighbors.end()) {
@@ -299,8 +299,8 @@ bool Game::areAdjacent(int a, int b)
 int Game::continentOwner(int idContinent)
 {
 	// Setting up the lower and upper limits
-	int firstTerritory = this -> map.getContinents()[idContinent].firstTerritory;
-	int lastTerritory = this -> map.getContinents()[idContinent].lastTerritory;
+	int firstTerritory = this -> map.getContinentById(idContinent).firstTerritory;
+	int lastTerritory = this -> map.getContinentById(idContinent).lastTerritory;
 
 	// Checking who's the owner of the continent
 	int owner = board[firstTerritory].owner;
@@ -397,9 +397,7 @@ vector<Player> Game::getPlayers()
 }
 
 // This is where most of the game logic will happen
-// The message received must have all arguments separated with ','
-// The message returned can be several messages, all separated with ';'
-string Game::message(string message)
+string Game::message(string message) //
 {
 	return string();
 }
