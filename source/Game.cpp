@@ -285,7 +285,7 @@ int Game::updatePlayersStatsInDB() //
 
 bool Game::areAdjacent(int a, int b)
 {
-	vector<int> aNeighbors = this -> map.getContinentById(a).neighbors;
+	vector<int> aNeighbors = this -> map.getTerritories()[a].neighbors; // A getTerritoryByID() would be appropriate
 
 	// checking if `b` is in the `neighbors` vector of the `a` territory
 	if(std::find(aNeighbors.begin(), aNeighbors.end(), b) != aNeighbors.end()) {
