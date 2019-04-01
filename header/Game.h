@@ -227,9 +227,9 @@ public:
 	/**
 	* @brief Send a message to the Game object and process it
 	*
-	* @return string
+	* @return vector<json>
 	*/
-	string message(string message);
+	vector<json> message(json message);
 
 	// Constructors
 

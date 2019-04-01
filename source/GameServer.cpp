@@ -774,6 +774,17 @@ string GameServer::treatMessage(string message, Connection connection)
 
             break;
 
+		// Messages treated by Game object // Verifications to add
+		case CODE_START_GAME:
+			break;
+		case CODE_END_PHASE:
+		case CODE_PUT:
+		case CODE_USE_TOKENS:
+		case CODE_ATTACK:
+		case CODE_DEFEND:
+		case CODE_MOVE:
+			break;
+
 
         default:
             /* if we received an unhandled message code we tell the client */

@@ -397,9 +397,55 @@ vector<Player> Game::getPlayers()
 }
 
 // This is where most of the game logic will happen
-string Game::message(string message) //
+// Interpreting actions attempted by players
+vector<json> Game::message(json message) // UNDER CONSTRUCTION
 {
-	return string();
+	vector<json> response;
+
+	// Basic checks were already performed in the GameServer object
+	// Checks here will be mostly gameplay oriented
+	MessageCode code = message["type"];
+
+	// Taking actions depending on the message code
+	switch (code)
+	{
+		// Starting the game
+		// Allowed when !isRunning
+		case CODE_START_GAME:
+			break;
+
+		// Following messages are allowed when isRunning
+		// End of current phase or turn
+		// Allowed in phase 0, 1, 2
+		case CODE_END_PHASE:
+			break;
+		// Putting reinforcement on the board
+		// Allowed in phase -1, 0
+		case CODE_PUT:
+			break;
+		// Using tokens to get reinforcement
+		// Allowed in phase 0
+		case CODE_USE_TOKENS:
+			break;
+		// Attacking a neighboring territory
+		// Allowed in phase 1
+		case CODE_ATTACK:
+			break;
+		// Defending against an attack
+		// Allowed in phase 1
+		case CODE_DEFEND:
+			break;
+		// Moving units from a friendly territory to another
+		// Allowed in phase 1, 2
+		case CODE_MOVE:
+			break;
+
+		// Unhandled message
+		default:
+			break;
+	}
+
+	return response;
 }
 
 // Public constructors

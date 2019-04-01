@@ -22,8 +22,8 @@ typedef enum
     CODE_KICK_FROM_LOBBY,
     CODE_KICKED,
     CODE_CLOSE_LOBBY,
-    CODE_START_GAME,
     CODE_LEAVE_GAME,
+	CODE_START_GAME,
 
     /* misc */
     CODE_GAME_RESULTS,
@@ -31,25 +31,30 @@ typedef enum
     CODE_MATCHMAKING,
 
     /* gameplay */
+	// Player actions
+	CODE_END_PHASE,
     CODE_PUT,
-    CODE_MOVE,
+	CODE_USE_TOKENS,
     CODE_ATTACK,
     CODE_DEFEND,
-    CODE_END_PHASE,
-    CODE_USE_TOKENS,
+	CODE_MOVE,
+
+	// Server gameplay updates
     CODE_REINFORCEMENT,
-    
     CODE_ATTACKED,
     CODE_COMBAT_RESULTS,
     CODE_PLAYER_ELIMINATION,
     CODE_GIVE_TOKENS,
     CODE_CURRENT_PHASE,
     CODE_GAME_OVER,
+
+	// Meta communication
+	CODE_CHAT,
+
+	CODE_SYNC_DEMAND,
     CODE_GAME_STATUS,
 
-    CODE_SYNC_DEMAND,
     CODE_POKE,
-    CODE_CHAT,
 
     CODE_HOVER,
     CODE_SELECT_TOKEN,
