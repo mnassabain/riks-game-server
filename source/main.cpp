@@ -1,4 +1,4 @@
-// #include "../header/GameServer.h"
+#include "../header/GameServer.h"
 
-// int main() { 	return 0;
-//}
+int main() { 	return 0;
+}
