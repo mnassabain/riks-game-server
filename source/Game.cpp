@@ -459,7 +459,7 @@ void Game::printString(Game g)
 	cout << "maxPlayers = " << g.maxPlayers << ", nbPlayers = " << g.nbPlayers << endl;
 	// cout << "players = " << g.players;	
 	cout << "***\t";
-	cout << "Running = " << g.running << " phase = " << g.phase << ", activePlayer = " << g.activePlayer << endl;
+	cout << "Running = " << g.running << ", phase = " << g.phase << ", activePlayer = " << g.activePlayer << endl;
 	// cout << "board = " << g.board;
 	cout << "***\t";
 	cout << "territoryCapture = " << g.territoryCapture << ", lastAttackedTerritory = " << g.lastAttackedTerritory << ", lastAttackCapture = " << g.lastAttackCapture << endl;
