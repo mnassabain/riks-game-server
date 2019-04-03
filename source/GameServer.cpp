@@ -814,6 +814,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
 		// Messages treated by Game object // Verifications to add
 		case CODE_START_GAME:
+			// Check in what game the sender is and if the game is !isRunning, in which case you invoke that game's message(jmessage), which will return a vector<json>
 			break;
 		case CODE_END_PHASE:
 		case CODE_PUT:
@@ -821,6 +822,7 @@ string GameServer::treatMessage(string message, Connection connection)
 		case CODE_ATTACK:
 		case CODE_DEFEND:
 		case CODE_MOVE:
+			// Check in what game the sender is and if the game is isRunning, in which case you invoke that game's message(jmessage), which will return a vector<json>
 			break;
 
 

@@ -321,6 +321,7 @@ json Game::toJSON()
 	json j;
 
 	j["lobbyName"] = this -> name;
+	j["lobbyID"] = this -> id;
 	j["password"] = this -> password;
 	j["nbPlayers"] = this -> nbPlayers;
 	j["maxPlayers"] = this -> maxPlayers;
@@ -446,6 +447,23 @@ vector<json> Game::message(json message) // UNDER CONSTRUCTION
 	}
 
 	return response;
+}
+
+void Game::printString(Game g)
+{
+	cout << "\t ***\t";
+	cout << "Game info, lobby name = '" << g.name << "' id = " << g.id;
+	cout << "\t ***" << endl;
+	cout << "***\t";
+	cout << "password = '" << g.password << "'" << endl;
+	cout << "***\t";
+	cout << "maxPlayers = " << g.maxPlayers << ", nbPlayers = " << g.nbPlayers << endl;
+	// cout << "players = " << g.players;	
+	cout << "***\t";
+	cout << "Running = " << g.running << " phase = " << g.phase << ", activePlayer = " << g.activePlayer << endl;
+	// cout << "board = " << g.board;
+	cout << "***\t";
+	cout << "territoryCapture = " << g.territoryCapture << ", lastAttackedTerritory = " << g.lastAttackedTerritory << ", lastAttackCapture = " << g.lastAttackCapture << endl;
 }
 
 // Public constructors
