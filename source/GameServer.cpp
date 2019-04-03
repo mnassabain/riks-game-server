@@ -501,7 +501,9 @@ string GameServer::treatMessage(string message, Connection connection)
             
                 /* we create a new game */
                 int newGameId = createGame(jmessage["data"]["mapName"],
-                    client->second.getName(), jmessage["data"]["maxPlayers"]);
+                    client->second.getName(), jmessage["data"]["maxPlayers"],
+                    jmessage["data"]["lobbyName"], 
+                    jmessage["data"]["lobbyPassword"]);
                 client->second.setGameID(newGameId);
 
                 /* logging */
@@ -685,11 +687,20 @@ string GameServer::treatMessage(string message, Connection connection)
                 {
                     ClientIterator player;
 
-                    player = clients.find(connection.lock().get());
-                    Connection c = player->second.getConnection();
+                    // player = clients.find(connection.lock().get());
+                    // Connection c = player->second.getConnection();
 
-                    endpoint.send(c, update.dump(), 
-                        websocketpp::frame::opcode::text);
+                    for (player = clients.begin(); player != clients.end(); 
+                        player++)
+                    {
+                        if (player->second.getName() == players[i].getName())
+                        {
+                            Connection c = player->second.getConnection();
+                            endpoint.send(c, update.dump(), 
+                                websocketpp::frame::opcode::text);
+                        }
+                    }
+
                 }
             }
             break;
@@ -724,17 +735,44 @@ string GameServer::treatMessage(string message, Connection connection)
                 game->second.removePlayer(client->second.getName());
                 client->second.setGameID(SERVER_HUB);
 
+                /* construct the response */
+                response["type"] = CODE_LEAVE_GAME;
+                response["data"]["error"] = false;
+                response["data"]["response"] = "Success";
+
                 /* and if the room is empty we delete it */
                 if (game->second.getNbPlayers() == 0)
                 {
                     games.erase(game);
+                    break;
                 }
-            }
 
-            /* construct the response */
-            response["type"] = CODE_LEAVE_GAME;
-            response["data"]["error"] = false;
-            response["data"]["response"] = "Success";
+                /* if the give all existing players new lobby state */
+                json update;
+                update["type"] = CODE_LOBBY_STATE;
+                update["data"]["error"] = false;
+                update["data"]["response"] = "Success";
+                update["data"]["gameData"] = game->second.toJSON();
+
+                vector<Player> players = game->second.getPlayers();
+                for (unsigned int i = 0; i < players.size(); i++)
+                {
+                    ClientIterator player;
+
+                    for (player = clients.begin(); player != clients.end(); 
+                        player++)
+                    {
+                        if (player->second.getName() == players[i].getName())
+                        {
+                            Connection c = player->second.getConnection();
+                            endpoint.send(c, update.dump(), 
+                                websocketpp::frame::opcode::text);
+                        }
+                    }
+
+                }
+
+            }
 
             break;
 
@@ -800,10 +838,11 @@ string GameServer::treatMessage(string message, Connection connection)
 }
 
 
-int GameServer::createGame(string mapName, string host, int nbPlayers)
+int GameServer::createGame(string mapName, string host, int nbPlayers, 
+    string name, string password)
 {
     /* create a new game */
-    Game newGame(mapName, host, MAX_PLAYERS);
+    Game newGame(mapName, host, MAX_PLAYERS, name, password);
 
     /* copy the new object into the games list */
     int newGameID = newGame.getId();
