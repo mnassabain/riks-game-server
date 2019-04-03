@@ -236,7 +236,7 @@ public:
 	 * 
 	 * @param g
 	 */
-	void printString(Game g);
+	void printString();
 
 	// Constructors
 
