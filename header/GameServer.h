@@ -132,9 +132,12 @@ public:
 	 * @param mapName The map name 
 	 * @param host The game creator 
 	 * @param nbPlayers The maximum number of players 
+	 * @param name The lobby name 
+	 * @param password The lobby password 
 	 * @return int The ID of the newly created game/lobby 
 	 */
-    static int createGame(string mapName, string host, int nbPlayers);
+    static int createGame(string mapName, string host, int nbPlayers, 
+		string name, string password);
 
     /**
 	 * @brief Destroys a game/lobby 
