@@ -236,7 +236,7 @@ public:
 	 * 
 	 * @param g
 	 */
-	void printString();
+	string toString();
 
 	// Constructors
 

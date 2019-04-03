@@ -407,21 +407,20 @@ vector<json> Game::message(json message) // UNDER CONSTRUCTION
 	return response;
 }
 
-void Game::printString()
+string Game::toString()
 {
-	cout << "\t ***\t";
-	cout << "Game info, lobby name = '" << this -> name << "' id = " << this -> id;
-	cout << "\t ***" << endl;
-	cout << "***\t";
-	cout << "password = '" << this -> password << "'" << endl;
-	cout << "***\t";
-	cout << "maxPlayers = " << this -> maxPlayers << ", nbPlayers = " << this -> nbPlayers << endl;
-	// cout << "players = " << this -> players;	
-	cout << "***\t";
-	cout << "Running = " << this -> running << ", phase = " << this -> phase << ", activePlayer = " << this -> activePlayer << endl;
+	string status = "lobby name = '" + this->name\
+		+ "', id = " + to_string(this->id) + ", password = '" + this->password\
+		+ "'" + ", maxPlayers = " + to_string(this->maxPlayers)\
+		+ ", nbPlayers = " + to_string(this->nbPlayers) + ", running = "\
+		+ to_string(this->running) + ", phase = " + to_string(this->phase)\
+		+ ", activePlayer = " + to_string(this->activePlayer)\
+		+ ", territoryCapture = " + to_string(this->territoryCapture)\
+		+ ", lastAttackedTerritory = " + to_string(this->lastAttackedTerritory)\
+		+ ", lastAttackCapture = " + to_string(this->lastAttackCapture);
 	// cout << "board = " << this -> board;
-	cout << "***\t";
-	cout << "territoryCapture = " << this -> territoryCapture << ", lastAttackedTerritory = " << this -> lastAttackedTerritory << ", lastAttackCapture = " << this -> lastAttackCapture << endl;
+	// cout << "players = " << this -> players;	
+	return status;
 }
 
 // Public constructors
