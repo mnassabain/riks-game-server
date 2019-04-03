@@ -321,6 +321,7 @@ json Game::toJSON()
 	json j;
 
 	j["lobbyName"] = this -> name;
+	j["lobbyID"] = this -> id;
 	j["password"] = this -> password;
 	j["nbPlayers"] = this -> nbPlayers;
 	j["maxPlayers"] = this -> maxPlayers;
