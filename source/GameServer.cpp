@@ -777,6 +777,78 @@ string GameServer::treatMessage(string message, Connection connection)
 		// Messages treated by Game object // Verifications to add
 		case CODE_START_GAME:
 			// Check in what game the sender is and if the game is !isRunning, in which case you invoke that game's message(jmessage), which will return a vector<json>
+            /* we check if the message has a data field */
+            if (!jmessage.count("data"))
+            {
+                errorResponse(response, CODE_START_GAME,
+                    "START_GAME: Invalid message; insufficient parameters");
+
+                break;
+            }
+
+            /* we check the data field type */
+            if (!jmessage["data"].is_object())
+            {
+                errorResponse(response, CODE_START_GAME,
+                    "START_GAME: Invalid message data types");
+
+                break;
+            }
+
+            /* we check if the data field contains the necessary info */
+            if (!jmessage["data"].count("lobbyID"))
+            {
+                errorResponse(response, CODE_START_GAME,
+                    "START_GAME: Invalid message; insufficient parameters");
+
+                break;
+            }
+
+            /* and we check if the info is in the correct type */
+            if (!jmessage["data"]["lobbyID"].is_number())
+            {
+                errorResponse(response, CODE_START_GAME,
+                    "START_GAME: Invalid message data types");
+
+                break;
+            }
+
+            /* check if user is connected */
+            {
+                ClientIterator client;
+                client = clients.find(connection.lock().get());
+
+                if (client == clients.end())
+                {
+                    errorResponse(response, CODE_START_GAME, 
+                        "START_GAME: User not connected");
+                    break;
+                }
+
+                /* check if client is in the lobby/game */
+                GameIterator game;
+                game = games.find(client->second.getGameID());
+
+                /* if we can't find the game we send an error */
+                if (game == games.end())
+                {
+                    errorResponse(response, CODE_START_GAME, 
+                        "START_GAME: User not in lobby");
+                    break;
+                }
+                
+                // Check game with lobbyID, maybe not necessary and could be removed
+
+                // Basic checks done, message can be sent to Game
+                // Don't forget to get return value
+                if (!game.isRunning()) game.message(jmessage); // game.message will disappear
+                else
+                {
+                    errorResponse(response, CODE_START_GAME, 
+                        "START_GAME: Game is already running");
+                    break;
+                }
+            }
 			break;
 		case CODE_END_PHASE:
 		case CODE_PUT:
