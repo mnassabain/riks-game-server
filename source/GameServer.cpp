@@ -730,7 +730,7 @@ string GameServer::treatMessage(string message, Connection connection)
                         "LEAVE_GAME: User not in lobby");
                     break;
                 }
-                
+
                 /* if we find the game we remove the player from the game */
                 game->second.removePlayer(client->second.getName());
                 client->second.setGameID(SERVER_HUB);
