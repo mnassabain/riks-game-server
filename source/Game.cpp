@@ -399,71 +399,29 @@ vector<Player> Game::getPlayers()
 
 // This is where most of the game logic will happen
 // Interpreting actions attempted by players
+// Scrapped, will be removed later
 vector<json> Game::message(json message) // UNDER CONSTRUCTION
 {
 	vector<json> response;
 
-	// Basic checks were already performed in the GameServer object
-	// Checks here will be mostly gameplay oriented
-	MessageCode code = message["type"];
-
-	// Taking actions depending on the message code
-	switch (code)
-	{
-		// Starting the game
-		// Allowed when !isRunning
-		case CODE_START_GAME:
-			break;
-
-		// Following messages are allowed when isRunning
-		// End of current phase or turn
-		// Allowed in phase 0, 1, 2
-		case CODE_END_PHASE:
-			break;
-		// Putting reinforcement on the board
-		// Allowed in phase -1, 0
-		case CODE_PUT:
-			break;
-		// Using tokens to get reinforcement
-		// Allowed in phase 0
-		case CODE_USE_TOKENS:
-			break;
-		// Attacking a neighboring territory
-		// Allowed in phase 1
-		case CODE_ATTACK:
-			break;
-		// Defending against an attack
-		// Allowed in phase 1
-		case CODE_DEFEND:
-			break;
-		// Moving units from a friendly territory to another
-		// Allowed in phase 1, 2
-		case CODE_MOVE:
-			break;
-
-		// Unhandled message
-		default:
-			break;
-	}
-
 	return response;
 }
 
-void Game::printString(Game g)
+void Game::printString()
 {
 	cout << "\t ***\t";
-	cout << "Game info, lobby name = '" << g.name << "' id = " << g.id;
+	cout << "Game info, lobby name = '" << this -> name << "' id = " << this -> id;
 	cout << "\t ***" << endl;
 	cout << "***\t";
-	cout << "password = '" << g.password << "'" << endl;
+	cout << "password = '" << this -> password << "'" << endl;
 	cout << "***\t";
-	cout << "maxPlayers = " << g.maxPlayers << ", nbPlayers = " << g.nbPlayers << endl;
-	// cout << "players = " << g.players;	
+	cout << "maxPlayers = " << this -> maxPlayers << ", nbPlayers = " << this -> nbPlayers << endl;
+	// cout << "players = " << this -> players;	
 	cout << "***\t";
-	cout << "Running = " << g.running << " phase = " << g.phase << ", activePlayer = " << g.activePlayer << endl;
-	// cout << "board = " << g.board;
+	cout << "Running = " << this -> running << ", phase = " << this -> phase << ", activePlayer = " << this -> activePlayer << endl;
+	// cout << "board = " << this -> board;
 	cout << "***\t";
-	cout << "territoryCapture = " << g.territoryCapture << ", lastAttackedTerritory = " << g.lastAttackedTerritory << ", lastAttackCapture = " << g.lastAttackCapture << endl;
+	cout << "territoryCapture = " << this -> territoryCapture << ", lastAttackedTerritory = " << this -> lastAttackedTerritory << ", lastAttackCapture = " << this -> lastAttackCapture << endl;
 }
 
 // Public constructors
@@ -537,4 +495,62 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, s
 
 	// Setting up password
 	this->password.assign(password);
+}
+
+// Allowed when !isRunning()
+vector<json> Game::messageStart()
+{
+	vector<json> response;
+
+	if (running) start();
+
+	return response;
+}
+
+// Allowed when isRunning()
+// Allowed in phase 0, 1, 2
+vector<json> Game::messageEndPhase(int player)
+{
+	vector<json> response;
+	return response;
+
+}
+
+// Allowed in phase -1, 0
+vector<json> Game::messagePut(int player, int territory, int units)
+{
+	vector<json> response;
+	return response;
+}
+
+// Allowed in phase 0
+vector<json> Game::messageUseTokens(int player, int token1, int token2, int token3)
+{
+	vector<json> response;
+	return response;
+
+}
+
+// Allowed in phase 1
+vector<json> Game::messageAttack(int player, int source, int destination, int units)
+{
+	vector<json> response;
+	return response;
+
+}
+
+// Allowed in phase 1
+vector<json> Game::messageDefend(int player, int units)
+{
+	vector<json> response;
+	return response;
+
+}
+
+// Allowed in phase 1, 2
+vector<json> Game::messageMove(int player, int source, int destination, int units)
+{
+	vector<json> response;
+	return response;
+
 }
