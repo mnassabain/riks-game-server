@@ -257,7 +257,7 @@ public:
 	vector<json> messageStart();
 	vector<json> messageEndPhase(int player);
 	vector<json> messagePut(int player, int territory, int units);
-	vector<json> messageUseTokens(int player, int token1; int token2, int token3);
+	vector<json> messageUseTokens(int player, int token1, int token2, int token3);
 	vector<json> messageAttack(int player, int source, int destination, int units);
 	vector<json> messageDefend(int player, int units);
 	vector<json> messageMove(int player, int source, int destination, int units);

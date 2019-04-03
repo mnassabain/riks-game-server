@@ -502,8 +502,8 @@ vector<json> Game::messageStart()
 {
 	vector<json> response;
 
-	if (isRunning) start();
-	
+	if (running) start();
+
 	return response;
 }
 
@@ -524,7 +524,7 @@ vector<json> Game::messagePut(int player, int territory, int units)
 }
 
 // Allowed in phase 0
-vector<json> Game::messageUseTokens(int player, int token1; int token2, int token3)
+vector<json> Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
 	vector<json> response;
 	return response;
