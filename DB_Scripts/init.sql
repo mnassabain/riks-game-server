@@ -1,7 +1,7 @@
 --users
 CREATE TABLE users(
 idu INTEGER PRIMARY KEY,
-login varchar(60) NOT NULL,
+login varchar(60) UNIQUE NOT NULL,
 password varchar(200) NOT NULL
 );
 
