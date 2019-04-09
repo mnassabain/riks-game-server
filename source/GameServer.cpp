@@ -40,7 +40,7 @@ string GameServer::treatMessage(string message, Connection connection)
     {
         cout << "JSON parse exception: " << e.what() << endl;
 
-        errorResponse(response, CODE_ERROR, 
+        errorResponse(response, CODE_ERROR,
             "Invalid message format; cannot be parsed");
         return response.dump();
     }
@@ -48,7 +48,7 @@ string GameServer::treatMessage(string message, Connection connection)
     /* if the message is not json we return an error */
     if (jmessage.size() <= 0 || !jmessage.count("type"))
     {
-        errorResponse(response, CODE_ERROR, 
+        errorResponse(response, CODE_ERROR,
             "Invalid message format; no message type");
         return response.dump();
     }
@@ -56,7 +56,7 @@ string GameServer::treatMessage(string message, Connection connection)
     /* we check if the message has a valid type */
     if (!jmessage["type"].is_number())
     {
-        errorResponse(response, CODE_ERROR, 
+        errorResponse(response, CODE_ERROR,
             "Invalid message format; invalid type");
         return response.dump();
     }
@@ -74,7 +74,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
                 if (client != clients.end())
                 {
-                    errorResponse(response, CODE_SIGN_UP, 
+                    errorResponse(response, CODE_SIGN_UP,
                         "SIGN_UP: Already logged in");
                     break;
                 }
@@ -201,7 +201,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
                 if (client != clients.end())
                 {
-                    errorResponse(response, CODE_CONNECT, 
+                    errorResponse(response, CODE_CONNECT,
                         "CONNECT: Already logged in");
                     break;
                 }
@@ -333,13 +333,13 @@ string GameServer::treatMessage(string message, Connection connection)
 		  }
 
 		}
-		
+
 	      }
 	     sqlite3_finalize(stmt);
 	    }
 
             /* move from unregistered connections into registered clients */
-            clients.emplace(connection.lock().get(), 
+            clients.emplace(connection.lock().get(),
                 Client(jmessage["data"]["userID"], connection));
 
             /* remove from unregistered connections */
@@ -380,18 +380,18 @@ string GameServer::treatMessage(string message, Connection connection)
                 try
                 {
                     endpoint.pause_reading(connection);
-                    endpoint.close(connection, 
-                        websocketpp::close::status::normal, 
+                    endpoint.close(connection,
+                        websocketpp::close::status::normal,
                         "Successfully disconnected");
                 }
                 catch(exception e)
                 {
-                    cout << "Caught websocket exception: " 
+                    cout << "Caught websocket exception: "
                         << e.what() << endl;
                 }
 
                 /* logging */
-                cout << "User disconnected (id = " << client->second.getName() 
+                cout << "User disconnected (id = " << client->second.getName()
                     << ")" << endl;
 
                 /* remove disconnected user from his game if he is in one */
@@ -498,11 +498,11 @@ string GameServer::treatMessage(string message, Connection connection)
                     << "of max players " << jmessage["data"]["maxPlayers"]
                     << "and on map " << jmessage["data"]["mapName"] << endl;
 
-            
+
                 /* we create a new game */
                 int newGameId = createGame(jmessage["data"]["mapName"],
                     client->second.getName(), jmessage["data"]["maxPlayers"],
-                    jmessage["data"]["lobbyName"], 
+                    jmessage["data"]["lobbyName"],
                     jmessage["data"]["lobbyPassword"]);
                 client->second.setGameID(newGameId);
 
@@ -549,8 +549,8 @@ string GameServer::treatMessage(string message, Connection connection)
             response["data"]["error"] = false;
             response["data"]["response"] = "Success";
 
-            /* we get the list of running games and we insert them into the 
-             * response 
+            /* we get the list of running games and we insert them into the
+             * response
              */
             {
                 int nb = 0;
@@ -644,7 +644,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 /* if the lobby is not found send error response */
                 if (game == games.end())
                 {
-                    errorResponse(response, CODE_JOIN_LOBBY, 
+                    errorResponse(response, CODE_JOIN_LOBBY,
                         "JOIN_LOBBY: Lobby not found");
                     break;
                 }
@@ -652,16 +652,16 @@ string GameServer::treatMessage(string message, Connection connection)
                 /* check if the lobby is full */
                 if (game->second.isFull())
                 {
-                    errorResponse(response, CODE_JOIN_LOBBY, 
+                    errorResponse(response, CODE_JOIN_LOBBY,
                         "JOIN_LOBBY: Lobby is full");
                     break;
                 }
 
                 /* check if the password is correct */
-                if (game->second.getPassword() 
+                if (game->second.getPassword()
                     != jmessage["data"]["lobbyPassword"])
                 {
-                    errorResponse(response, CODE_JOIN_LOBBY, 
+                    errorResponse(response, CODE_JOIN_LOBBY,
                         "JOIN_LOBBY: Incorrect password");
                     break;
                 }
@@ -690,13 +690,13 @@ string GameServer::treatMessage(string message, Connection connection)
                     // player = clients.find(connection.lock().get());
                     // Connection c = player->second.getConnection();
 
-                    for (player = clients.begin(); player != clients.end(); 
+                    for (player = clients.begin(); player != clients.end();
                         player++)
                     {
                         if (player->second.getName() == players[i].getName())
                         {
                             Connection c = player->second.getConnection();
-                            endpoint.send(c, update.dump(), 
+                            endpoint.send(c, update.dump(),
                                 websocketpp::frame::opcode::text);
                         }
                     }
@@ -714,7 +714,7 @@ string GameServer::treatMessage(string message, Connection connection)
 
                 if (client == clients.end())
                 {
-                    errorResponse(response, CODE_LEAVE_GAME, 
+                    errorResponse(response, CODE_LEAVE_GAME,
                         "LEAVE_GAME: User not connected");
                     break;
                 }
@@ -726,7 +726,7 @@ string GameServer::treatMessage(string message, Connection connection)
                 /* if we can't find the game we send an error */
                 if (game == games.end())
                 {
-                    errorResponse(response, CODE_LEAVE_GAME, 
+                    errorResponse(response, CODE_LEAVE_GAME,
                         "LEAVE_GAME: User not in lobby");
                     break;
                 }
@@ -759,13 +759,13 @@ string GameServer::treatMessage(string message, Connection connection)
                 {
                     ClientIterator player;
 
-                    for (player = clients.begin(); player != clients.end(); 
+                    for (player = clients.begin(); player != clients.end();
                         player++)
                     {
                         if (player->second.getName() == players[i].getName())
                         {
                             Connection c = player->second.getConnection();
-                            endpoint.send(c, update.dump(), 
+                            endpoint.send(c, update.dump(),
                                 websocketpp::frame::opcode::text);
                         }
                     }
@@ -792,11 +792,11 @@ string GameServer::treatMessage(string message, Connection connection)
 
                 GameIterator game;
                 game = games.find(client->second.getGameID());
-                
+
                 /* if we don't find the lobby we send an error */
                 if (game == games.end())
                 {
-                    errorResponse(response, CODE_LOBBY_STATE, 
+                    errorResponse(response, CODE_LOBBY_STATE,
                         "LOBBY_STATE: Lobby not found");
                     break;
                 }
@@ -839,7 +839,7 @@ string GameServer::treatMessage(string message, Connection connection)
 }
 
 
-int GameServer::createGame(string mapName, string host, int nbPlayers, 
+int GameServer::createGame(string mapName, string host, int nbPlayers,
     string name, string password)
 {
     /* create a new game */
@@ -876,8 +876,8 @@ int GameServer::destroyGame(int id)
 
         /* find player in client map ... */
         ClientIterator client;
-        for(client = clients.begin(); 
-            client != clients.end() && 
+        for(client = clients.begin();
+            client != clients.end() &&
             client->second.getName() != player->getName(); client++)
         {}
 
@@ -915,7 +915,7 @@ void GameServer::init()
         endpoint.init_asio();
 
         /* Register new handlers */
-        endpoint.set_message_handler(&onMessage);
+        endpoint.set_message_handler(&onMessageThread);
         endpoint.set_open_handler(&onOpenConnection);
         endpoint.set_close_handler(&onCloseConnection);
     }
@@ -977,13 +977,13 @@ void GameServer::stop()
     }
 
     vector<Connection>::iterator connection;
-    for (connection = unregisteredConnections.begin(); 
+    for (connection = unregisteredConnections.begin();
         connection != unregisteredConnections.end(); connection++)
     {
         try
         {
             endpoint.pause_reading(*connection);
-            endpoint.close(*connection, websocketpp::close::status::going_away, 
+            endpoint.close(*connection, websocketpp::close::status::going_away,
                 "Server shutdown");
         }
         catch(websocketpp::exception e)
@@ -993,6 +993,11 @@ void GameServer::stop()
     }
 }
 
+void GameServer::onMessageThread(Connection connection, Message msg)
+{
+  thread th(onMessage,connection,msg);
+  th.detach();
+}
 
 void GameServer::onMessage(Connection connection, Message msg)
 {
@@ -1089,7 +1094,7 @@ void GameServer::onCloseConnection(Connection connection)
 
     /* check unregistered connections */
     vector<Connection>::iterator c;
-    for (c = unregisteredConnections.begin(); 
+    for (c = unregisteredConnections.begin();
         c != unregisteredConnections.end() && !found; c++)
     {
         if (c->lock().get() == connection.lock().get())
