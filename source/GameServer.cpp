@@ -172,7 +172,7 @@ string GameServer::treatMessage(string message, Connection connection)
 			    sqlite3_close(db);
 		 	    response["type"]= CODE_SIGN_UP;
 			    response["data"]["error"]=true;
-			    response["data"]["response"]="SIGN_UP Error during Insertion execution";
+			    response["data"]["response"]="SIGN_UP Error during Insertion execution (login already taken)";
 			  }
 			  else// SIGN_UP Success
 			  {
