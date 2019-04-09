@@ -1,5 +1,5 @@
 TARGET = riks-server
-LIBS = -lm -L./libs/libboost -L./libs/libsqlite -lboost_system -lboost_chrono -lsqlite3 -ldl -Wl,-rpath=./libs/libboost/
+LIBS = -lm -L./libs/libboost -L./libs/libsqlite -lboost_system -lboost_chrono -lpthread -lsqlite3 -ldl -Wl,-rpath=./libs/libboost/
 CC = g++ -std=c++11
 CFLAGS = -g -Wall -Wno-deprecated-declarations -I./libs/
 

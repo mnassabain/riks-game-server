@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <thread>
 #include "../header/Game.h"
 #include "../header/MessageCode.h"
 #include "../header/Client.h"
@@ -54,42 +55,49 @@ private:
 
     /**
 	 * @brief Initialises the websocketpp server
-	 *  
+	 *
 	 */
     static void init();
 
     /**
-	 * @brief Starts accepting new connections & messages 
-	 * 
+	 * @brief Starts accepting new connections & messages
+	 *
 	 */
     static void run();
 
     /**
-	 * @brief Stops server and closes all connections 
-	 * 
+	 * @brief Stops server and closes all connections
+	 *
 	 */
     static void stop();
 
     /* == connection & communication handlers == */
 
     /**
+     * @brief Function calling the message handler in a new thread
+     * @param connection The connection whiwh sent the message
+     * @param msg The reveived message
+     */
+    static void onMessageThread(Connection connection, Message msg);
+
+    /**
 	 * @brief Message receive handler
-	 * 
-	 * @param connection The connection which sent the message 
-	 * @param msg The received message 
+	 *
+	 * @param connection The connection which sent the message
+	 * @param msg The received message
 	 */
     static void onMessage(Connection connection, Message msg);
 
     /**
-	 * @brief Open connection handler 
-	 * 
+	 * @brief Open connection handler
+	 *
 	 * @param connection The connection that is opened
 	 */
     static void onOpenConnection(Connection connection);
 
     /**
-	 * @brief Close connection handler 
-	 * 
+	 * @brief Close connection handler
+	 *
 	 * @param connection The connection that is closed
 	 */
     static void onCloseConnection(Connection connection);
@@ -97,11 +105,11 @@ private:
     /* == other communication methods == */
 
     /**
-	 * @brief Constructs a json error response 
-	 * 
-	 * @param response The response structure to fill out 
-	 * @param code The message code 
-	 * @param message The message to send 
+	 * @brief Constructs a json error response
+	 *
+	 * @param response The response structure to fill out
+	 * @param code The message code
+	 * @param message The message to send
 	 */
     static void errorResponse(json& response, MessageCode code, string message);
 
@@ -111,16 +119,16 @@ public:
 
     /**
 	 * @brief Starts server and starts accepting connections & messages
-	 * 
+	 *
 	 */
     static void listen();
 
     /**
-	 * @brief Treats an incoming message 
-	 * 
-	 * @param message The received message 
+	 * @brief Treats an incoming message
+	 *
+	 * @param message The received message
 	 * @param connection The connection which sent the message
-	 * @return string The JSON format response (string) 
+	 * @return string The JSON format response (string)
 	 */
     static string treatMessage(string message, Connection connection);
 
@@ -128,21 +136,21 @@ public:
 
     /**
 	 * @brief Creates a new game/lobby
-	 * 
-	 * @param mapName The map name 
-	 * @param host The game creator 
-	 * @param nbPlayers The maximum number of players 
-	 * @param name The lobby name 
-	 * @param password The lobby password 
-	 * @return int The ID of the newly created game/lobby 
+	 *
+	 * @param mapName The map name
+	 * @param host The game creator
+	 * @param nbPlayers The maximum number of players
+	 * @param name The lobby name
+	 * @param password The lobby password
+	 * @return int The ID of the newly created game/lobby
 	 */
-    static int createGame(string mapName, string host, int nbPlayers, 
+    static int createGame(string mapName, string host, int nbPlayers,
 		string name, string password);
 
     /**
-	 * @brief Destroys a game/lobby 
-	 * 
-	 * @param id The id of the game to destroy 
+	 * @brief Destroys a game/lobby
+	 *
+	 * @param id The id of the game to destroy
 	 * @return int 0 on success, -1 on error
 	 */
     static int destroyGame(int id);
@@ -150,30 +158,30 @@ public:
     /* == logging == */
 
     /**
-	 * @brief Returns the number of active games/lobbies 
-	 * 
-	 * @return int 
+	 * @brief Returns the number of active games/lobbies
+	 *
+	 * @return int
 	 */
     static int nbGames();
 
     /**
-	 * @brief Returns the number of connections 
-	 * 
-	 * @return int 
+	 * @brief Returns the number of connections
+	 *
+	 * @return int
 	 */
     static int nbConnections();
 
     /**
-	 * @brief Returns the number of clients connected with id & password 
-	 * 
-	 * @return int 
+	 * @brief Returns the number of clients connected with id & password
+	 *
+	 * @return int
 	 */
     static int nbClients();
 
     /**
-	 * @brief Returns the number of clients not connection with id & password 
-	 * 
-	 * @return int 
+	 * @brief Returns the number of clients not connection with id & password
+	 *
+	 * @return int
 	 */
     static int nbUnregisteredConnections();
 
