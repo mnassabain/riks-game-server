@@ -149,6 +149,7 @@ public:
      */
     std::string getName();
 
+	int countTokensOfType(int type);
 	int countTokens();
 
 private:

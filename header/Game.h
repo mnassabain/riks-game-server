@@ -38,9 +38,11 @@ private:
 	int tokens[4];
 	int totalExchangedSets;
 	// Turn variables - Reset after each turn
-	bool territoryCapture;
+	bool territoryCapture; // Used for granting tokens
+	int lastAttackingTerritory;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
+	bool moved;
 	// Combat handler - Used to save combat context between messages, to handle combat properly - Has to be reset after each combat is done
 	CombatHandler combat;
 
@@ -105,7 +107,7 @@ private:
 	 * @param destination 
 	 * @param units 
 	 */
-	void moveUnits(int source, int destination, int units);
+	int moveUnits(int source, int destination, int units);
 
 	/**
 	 * @brief Set the Initial Reinforcement object
@@ -145,6 +147,9 @@ private:
 	 * @return false 
 	 */
 	int continentOwner(int idContinent);
+
+	void resetCombat();
+	void resetTurnVariables();
 
 	// Constructors
 
@@ -261,7 +266,7 @@ public:
 	int messagePut(int player, int territory, int units);
 	int messageUseTokens(int player, int token1, int token2, int token3);
 	int messageAttack(int player, int source, int destination, int units);
-	int messageDefend(int player, int units);
+	CombatOutcome messageDefend(int player, int units);
 	int messageMove(int player, int source, int destination, int units);
 };
 

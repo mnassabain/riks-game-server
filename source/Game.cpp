@@ -14,16 +14,9 @@ void Game::start()
 	this->tokens[3] = 14;
 	this->totalExchangedSets = 0;
 	// Initialization of turn variables
-	this->territoryCapture = false;
-	this->lastAttackedTerritory = -1;
-	this->lastAttackCapture = false;
+	resetTurnVariables();
 	// Initialization of combat handler
-	this->combat.attackerId = -1;
-	this->combat.defenderId = -1;
-	this->combat.source = -1;
-	this->combat.destination = -1;
-	this->combat.attackerUnits = -1;
-	this->combat.defenderUnits = -1;
+	resetCombat();
 	//Initialization of RNG
 	srand(time(NULL));
 
@@ -62,9 +55,7 @@ void Game::nextPlayer()
 	}
 
 	// Resetting the turn related variables
-	this->territoryCapture = false;
-	this->lastAttackedTerritory = -1;
-	this->lastAttackCapture = false;
+	resetTurnVariables();
 }
 
 void Game::nextPhase()
@@ -112,6 +103,8 @@ int Game::useSet(int tok1, int tok2, int tok3)
 		// Incrementing totalExchangedSets
 		this->totalExchangedSets++;
 	}
+	else return -1;
+
 	return 0;
 }
 
@@ -257,7 +250,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	return CombatOutcome();
 }
 
-void Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
+int Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
 {
 	// checking the requirements of moving units
 	if (areAdjacent(source, destination) &&
@@ -267,6 +260,9 @@ void Game::moveUnits(int source, int destination, int units) // The phase checks
 		this->board[source].units -= units;
 		this->board[destination].units += units;
 	}
+	else return -1;
+
+	return 0;
 }
 
 int Game::setInitialReinforcement()
@@ -318,6 +314,25 @@ int Game::continentOwner(int idContinent)
 	}
 
 	return owner;
+}
+
+void Game::resetCombat()
+{
+	this->combat.attackerId = -1;
+	this->combat.defenderId = -1;
+	this->combat.source = -1;
+	this->combat.destination = -1;
+	this->combat.attackerUnits = -1;
+	this->combat.defenderUnits = -1;
+}
+
+void Game::resetTurnVariables()
+{
+	this->territoryCapture = false;
+	this->lastAttackingTerritory = -1;
+	this->lastAttackedTerritory = -1;
+	this->lastAttackCapture = false;
+	this->moved = false;
 }
 
 // Public methods
@@ -543,7 +558,9 @@ int Game::messageEndPhase(int player)
 	// Always allowed in phase 2
 
 	// All checks have been performed, we can proceed to the next phase
-	if (phase == 2) nextPlayer();
+	if (phase == 2) {
+		nextPlayer();
+	}
 	nextPhase();
 
 	return 0;
@@ -593,43 +610,176 @@ int Game::messagePut(int player, int territory, int units)
 			count += players[i].getReinforcement();
 		}
 		if (count == 0) nextPhase();
+
+		return 0;
 	}
 
 	// Treatment in phase 0
 	if (phase == 0) {
 		return putUnits(territory, units);
 	}
-	return 0;
+
+	return -1;
 }
 
 // Allowed in phase 0
 int Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
+	// Checking if the right player sent the message
+	if (player != activePlayer) return -1;
+
+	// Treatment
+	if (phase != 0) return -1;
+	return useSet(token1, token2, token3);
 
 	return 0;
-
 }
 
 // Allowed in phase 1
 int Game::messageAttack(int player, int source, int destination, int units)
 {
+	// Checking if the right player sent the message
+	if (player != activePlayer) return -1;
+
+	// Phase check
+	if (phase != 1) return -1;
+	// Checking if units is a valid amount
+	if (units < 1 || units > 3) return -1;
+	// Checking if a combat is not currently taking place
+	if (combat.attackerId != -1) return -1;
+	// Checking if the player owns the source
+	if (board[source].owner != player) return -1;
+	// Checking if the players doesn't own the destination
+	if (board[destination].owner == player) return -1;
+	// Checking if the territories are adjacent
+	if (!areAdjacent(source, destination)) return -1;
+	// Checking if the player has the required units
+	// <= since one unit must remain on the source
+	if (board[source].units <= units) return -1;
+
+	// All checks have been performed, the attack is thus allowed and waiting for the defender's response
+	combat.attackerId = player;
+	combat.defenderId = board[destination].owner;
+	combat.source = source;
+	combat.destination = destination;
+	combat.attackerUnits = units;
 
 	return 0;
 
 }
 
+// if any of the CombatOutcome returned values is -1, the meaning is the same as an int -1 returned value
 // Allowed in phase 1
-int Game::messageDefend(int player, int units)
+CombatOutcome Game::messageDefend(int player, int units)
 {
+	CombatOutcome result;
+	result.attackerLoss = -1;
+	result.defenderLoss = -1;
 
-	return 0;
+
+	// Checking if a combat requires solving
+	if (combat.attackerId == -1) return result;
+
+	// Checking if the right player sent the message
+	if (player != combat.defenderId) return result;
+	// Phase check
+	if (phase != 1) return result;
+	// Checking if units is a valid amount
+	if (units < 1 || units > 2) return result;
+	// Checking if the player has the required units
+	// < since the defender can use all of their units
+	if (board[combat.destination].units < units) return result;
+
+	// All checks have been performed, the combat can now be solved
+	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
+	result = solveCombat(combat.attackerUnits, combat.defenderUnits);
+
+	// Updating the unit count on both territories
+	board[combat.source].units -= result.attackerLoss;
+	board[combat.destination].units -= result.defenderLoss;
+
+	// Updating turn variables
+	lastAttackingTerritory = combat.source;
+	lastAttackedTerritory = combat.destination;
+
+	// Checking if the combat resulted in a capture
+	if (board[combat.destination].units == 0) {
+		// Check for granting a token to the attacker
+		if (!territoryCapture) {
+			grantToken(); // Will require external update
+			territoryCapture = true;
+		}
+
+		// Proceeding with the territory capture
+		// In the case of a capture, the attacking player didn't lose any unit, so we can move them directly to the destination and update the owner
+		board[combat.source].units -= combat.attackerUnits;
+		board[combat.destination].units = combat.attackerUnits;
+		board[combat.destination].owner = combat.attackerId;
+
+		// Updating players involved
+		players[combat.attackerId].addTerritoriesOwned();
+		players[combat.defenderId].subTerritoriesOwned();
+
+		// Checking for player elimination
+		if (players[combat.defenderId].getTerritoriesOwned() == 0) {
+			players[combat.defenderId].die();
+
+			// Token transfer between defender and attacker
+			// Temporary crude method // will also require external update
+			int transfer[4];
+			transfer[0] = players[combat.defenderId].countTokensOfType(0);
+			transfer[1] = players[combat.defenderId].countTokensOfType(1);
+			transfer[2] = players[combat.defenderId].countTokensOfType(2);
+			transfer[3] = players[combat.defenderId].countTokensOfType(3);
+
+			players[combat.defenderId].receiveTokens(transfer);
+
+			// Checking for victory, currently done in nextPlayer(), but should be done right away
+		}
+
+		// Updating lastAttackCapture
+		lastAttackCapture = true;
+	}
+	else lastAttackCapture = false;
+
+
+	// Resetting the CombatHandler
+	resetCombat();
+	return result;
 
 }
 
 // Allowed in phase 1, 2
 int Game::messageMove(int player, int source, int destination, int units)
 {
+	// Checking if the right player sent the message
+	if (player != activePlayer) return -1;
 
-	return 0;
+	// Treatment in phase 1
+	if (phase == 1) {
+		// Checking if the last attack resulted in a capture
+		if (!lastAttackCapture) return -1;
+		// Checking if the territories are the ones involved in the last combat
+		if (lastAttackingTerritory != source) return -1;
+		if (lastAttackedTerritory != destination) return -1;
+
+		// Proceeding with the move
+		return moveUnits(source, destination, units);
+	}
+
+	// Treatment in phase 2
+	if (phase == 2) {
+		// Checking if the player already used his free move this turn
+		if (!moved) {
+			if (moveUnits(source, destination, units) == 0) {
+				moved = true; // Putting this in moveUnits() would generate conflicts with phase 1 moves or require extra manual resets
+				return 0;
+			}
+			else return -1;
+		}
+		else return -1;
+	}
+
+	return -1;
 
 }
