@@ -267,11 +267,15 @@ void Game::moveUnits(int source, int destination, int units) // The phase checks
 	}
 }
 
-void Game::setInitialReinforcement()
+int Game::setInitialReinforcement()
 {
+	int reinforcement = 20 + 5 * (this->map.getMaxPlayers() - this->nbPlayers); // 20 units + 5 for each missing player
+
 	for (int i = 0; i < this->nbPlayers; i++) {
-		players[i].addReinforcement(20 + 5 * (this->map.getMaxPlayers() - this->nbPlayers)); // 20 units + 5 for each missing player
+		players[i].addReinforcement(reinforcement);
 	}
+
+	return reinforcement;
 }
 
 void Game::end() //
@@ -499,11 +503,15 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, s
 // Allowed when !isRunning()
 int Game::messageStart()
 {
-	
+	// Starting the game
+	if (!running) start();
+	else return -1;
 
-	if (running) start();
+	// Setting initial reinforcement for all players
+	setInitialReinforcement();
 
-	return 0;
+	// Returning the player chosen for the first turn
+	return activePlayer;
 }
 
 // Allowed when isRunning()

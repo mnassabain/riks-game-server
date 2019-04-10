@@ -109,7 +109,7 @@ private:
 	 * @brief Set the Initial Reinforcement object
 	 * 
 	 */
-	void setInitialReinforcement();
+	int setInitialReinforcement();
 
 	/**
 	 * @brief 
