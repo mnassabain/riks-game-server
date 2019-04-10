@@ -628,7 +628,7 @@ int Game::messageUseTokens(int player, int token1, int token2, int token3)
 
 	// Treatment
 	if (phase != 0) return -1;
-	else return useSet(token1, token2, token3);
+	return useSet(token1, token2, token3);
 
 	return 0;
 }
@@ -638,6 +638,28 @@ int Game::messageAttack(int player, int source, int destination, int units)
 {
 	// Checking if the right player sent the message
 	if (player != activePlayer) return -1;
+
+	// Phase check
+	if (phase != 1) return -1;
+	// Checking if units is a valid amount
+	if (units < 1 || units > 3) return -1;
+	// Checking if a combat is not currently taking place
+	if (combat.attackerId != -1) return -1;
+	// Checking if the player owns the source
+	if (board[source].owner != player) return -1;
+	// Checking if the players doesn't own the destination
+	if (board[destination].owner == player) return -1;
+	// Checking if the territories are adjacent
+	if (!areAdjacent(source, destination)) return -1;
+	// Checking if the player has the required units
+	if (board[source].units <= units) return -1;
+
+	// All checks have been performed, the attack is thus allowed and waiting for the defender's response
+	combat.attackerId = player;
+	combat.defenderId = board[destination].owner;
+	combat.source = source;
+	combat.destination = destination;
+	combat.attackerUnits = units;
 
 	return 0;
 
