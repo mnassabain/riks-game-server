@@ -262,7 +262,7 @@ int Game::moveUnits(int source, int destination, int units) // The phase checks 
 	}
 	else return -1;
 
-	return 0:
+	return 0;
 }
 
 int Game::setInitialReinforcement()
