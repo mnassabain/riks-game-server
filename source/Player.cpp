@@ -143,7 +143,7 @@ void Player::subTerritoriesOwned()
 
 int Player::countTokensOfType(int type)
 {
-	return tokens(type);
+	return tokens[type];
 }
 
 int Player::countTokens()
