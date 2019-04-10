@@ -539,8 +539,8 @@ int Game::messageEndPhase(int player)
 	// Always allowed in phase 2
 
 	// All checks have been performed, we can proceed to the next phase
-	if (phase == 2) nextPlayer;
-	nextPhase;
+	if (phase == 2) nextPlayer();
+	nextPhase();
 
 	return 0;
 
