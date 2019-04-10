@@ -141,6 +141,11 @@ void Player::subTerritoriesOwned()
 	territoriesOwned--;
 }
 
+int Player::countTokens()
+{
+	return tokens[0] + tokens[1] + tokens[2] + tokens[3];
+}
+
 string Player::getName()
 {
 	return this->name;

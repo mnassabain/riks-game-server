@@ -44,6 +44,8 @@ public:
 	void addTerritoriesOwned();
 	void subTerritoriesOwned();
 
+	int countTokens();
+
 	std::string getName();
 private:
 };
