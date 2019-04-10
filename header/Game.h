@@ -254,13 +254,13 @@ public:
 	// Game logic methods, names are currently placeholders
 	// We'll discuss the return value later
 
-	vector<json> messageStart();
-	vector<json> messageEndPhase(int player);
-	vector<json> messagePut(int player, int territory, int units);
-	vector<json> messageUseTokens(int player, int token1, int token2, int token3);
-	vector<json> messageAttack(int player, int source, int destination, int units);
-	vector<json> messageDefend(int player, int units);
-	vector<json> messageMove(int player, int source, int destination, int units);
+	int messageStart();
+	int messageEndPhase(int player);
+	int messagePut(int player, int territory, int units);
+	int messageUseTokens(int player, int token1, int token2, int token3);
+	int messageAttack(int player, int source, int destination, int units);
+	int messageDefend(int player, int units);
+	int messageMove(int player, int source, int destination, int units);
 };
 
 #endif //GAME_H
