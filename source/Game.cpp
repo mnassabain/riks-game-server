@@ -566,8 +566,8 @@ int Game::messagePut(int player, int territory, int units)
 		if (freeTerritories > 0) {
 			if (board[territory].owner != -1) return -1;
 			else {
-				board[territory].owner == player;
-				board[territory].units == 1;
+				board[territory].owner = player;
+				board[territory].units = 1;
 
 				freeTerritories--;
 				players[player].spendReinforcement(1);
