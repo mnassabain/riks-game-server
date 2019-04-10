@@ -1,6 +1,6 @@
 # Messages format
 
-* [Client to server]()
+* [Client to server](#client-to-server)
 * [Server to client]()
 
 
@@ -19,7 +19,7 @@
 * [ATTACK]()
 * [ATTACKED]()
 * [DEFEND]()
-* [MOVE]()
+* [MOVE](#move)
 
 ### SIGN UP:
 {
