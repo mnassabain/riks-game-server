@@ -14,16 +14,9 @@ void Game::start()
 	this->tokens[3] = 14;
 	this->totalExchangedSets = 0;
 	// Initialization of turn variables
-	this->territoryCapture = false;
-	this->lastAttackedTerritory = -1;
-	this->lastAttackCapture = false;
+	resetTurnVariables();
 	// Initialization of combat handler
-	this->combat.attackerId = -1;
-	this->combat.defenderId = -1;
-	this->combat.source = -1;
-	this->combat.destination = -1;
-	this->combat.attackerUnits = -1;
-	this->combat.defenderUnits = -1;
+	resetCombat();
 	//Initialization of RNG
 	srand(time(NULL));
 
@@ -112,6 +105,8 @@ int Game::useSet(int tok1, int tok2, int tok3)
 		// Incrementing totalExchangedSets
 		this->totalExchangedSets++;
 	}
+	else return -1;
+
 	return 0;
 }
 
@@ -318,6 +313,23 @@ int Game::continentOwner(int idContinent)
 	}
 
 	return owner;
+}
+
+void Game::resetCombat()
+{
+	this->combat.attackerId = -1;
+	this->combat.defenderId = -1;
+	this->combat.source = -1;
+	this->combat.destination = -1;
+	this->combat.attackerUnits = -1;
+	this->combat.defenderUnits = -1;
+}
+
+void Game::resetTurnVariables()
+{
+	this->territoryCapture = false;
+	this->lastAttackedTerritory = -1;
+	this->lastAttackCapture = false;
 }
 
 // Public methods
@@ -543,7 +555,10 @@ int Game::messageEndPhase(int player)
 	// Always allowed in phase 2
 
 	// All checks have been performed, we can proceed to the next phase
-	if (phase == 2) nextPlayer();
+	if (phase == 2) {
+		resetTurnVariables();
+		nextPlayer();
+	}
 	nextPhase();
 
 	return 0;
@@ -593,26 +608,36 @@ int Game::messagePut(int player, int territory, int units)
 			count += players[i].getReinforcement();
 		}
 		if (count == 0) nextPhase();
+
+		return 0;
 	}
 
 	// Treatment in phase 0
 	if (phase == 0) {
 		return putUnits(territory, units);
 	}
-	return 0;
+
+	return -1;
 }
 
 // Allowed in phase 0
 int Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
+	// Checking if the right player sent the message
+	if (player != activePlayer) return -1;
+
+	// Treatment
+	if (phase != 0) return -1;
+	else return useSet(token1, token2, token3);
 
 	return 0;
-
 }
 
 // Allowed in phase 1
 int Game::messageAttack(int player, int source, int destination, int units)
 {
+	// Checking if the right player sent the message
+	if (player != activePlayer) return -1;
 
 	return 0;
 
@@ -621,6 +646,8 @@ int Game::messageAttack(int player, int source, int destination, int units)
 // Allowed in phase 1
 int Game::messageDefend(int player, int units)
 {
+	// Checking if the right player sent the message
+	if (player != combat.defenderId) return -1;
 
 	return 0;
 
@@ -629,6 +656,8 @@ int Game::messageDefend(int player, int units)
 // Allowed in phase 1, 2
 int Game::messageMove(int player, int source, int destination, int units)
 {
+	// Checking if the right player sent the message
+	if (player != activePlayer) return -1;
 
 	return 0;
 

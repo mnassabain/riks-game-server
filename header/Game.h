@@ -146,6 +146,9 @@ private:
 	 */
 	int continentOwner(int idContinent);
 
+	void resetCombat();
+	void resetTurnVariables();
+
 	// Constructors
 
 public:
