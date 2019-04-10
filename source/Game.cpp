@@ -33,6 +33,7 @@ void Game::start()
 	blank.units = 0;
 	// Adding one blank TerritoryState per territory
 	int limit = this->map.nbTerritories();
+	freeTerritories = limit;
 	for (int i = 0; i < limit; i++) {
 		this->board.push_back(blank);
 	}
@@ -184,12 +185,14 @@ void Game::grantToken()
 	}
 }
 
-void Game::putUnits(int territory, int units)
+int Game::putUnits(int territory, int units)
 {
 	if ((this->activePlayer == this->board[territory].owner) && (this->players[this->activePlayer].getReinforcement() >= units)) {
 		this->players[this->activePlayer].spendReinforcement(units);
 		this->board[territory].units += units;
+		return 0;
 	}
+	else return -1;
 }
 
 CombatOutcome Game::solveCombat(int attackers, int defenders)
@@ -502,6 +505,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, s
 // Allowed when !isRunning()
 int Game::messageStart()
 {
+	// Might have to check if a certain player sent this message
 	// Starting the game
 	if (!running) start();
 	else return -1;
@@ -549,7 +553,52 @@ int Game::messageEndPhase(int player)
 // Allowed in phase -1, 0
 int Game::messagePut(int player, int territory, int units)
 {
+	// Checking if the right player sent the message
+	if (player != activePlayer) return -1;
 
+	// Treatment in phase -1
+	if (phase == -1) {
+		// Currently no check needed on player available reinforcement, since the game will forcefull proceed to next phase once they're all out
+		// A player can only put one unit at a time in this phase
+		if (units != 1) return -1;
+
+		// If there are still free territories, they have to put their unit in one of them
+		if (freeTerritories > 0) {
+			if (board[territory].owner != -1) return -1;
+			else {
+				board[territory].owner == player;
+				board[territory].units == 1;
+
+				freeTerritories--;
+				players[player].spendReinforcement(1);
+			}
+		}
+
+		// If there are no more free territories, they have to put their unit in one of theirs
+		if (freeTerritories == 0) {
+			if (board[territory].owner != player) return -1;
+			else {
+				putUnits(territory, 1);
+			}
+		}
+
+		// Unit successfully put, we can proceed to next player
+		nextPlayer();
+
+		// If all players are out of reinforcement, we can finally move to phase 0 and start the game
+		size_t i;
+		size_t max = players.size();
+		int count = 0;
+		for (i = 0; i < max; i++) {
+			count += players[i].getReinforcement();
+		}
+		if (count == 0) nextPhase();
+	}
+
+	// Treatment in phase 0
+	if (phase == 0) {
+		return putUnits(territory, units);
+	}
 	return 0;
 }
 

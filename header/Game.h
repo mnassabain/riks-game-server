@@ -31,6 +31,8 @@ private:
 	Map map;
 	// Game variables - Only available when Game is running
 	vector <TerritoryState> board;
+	int freeTerritories;
+
 	int phase;
 	int activePlayer;
 	int tokens[4];
@@ -88,7 +90,7 @@ private:
 	int currentSetValue();
 	bool isValidSet(int tok1, int tok2, int tok3);
 	void grantToken();
-	void putUnits(int territory, int units);
+	int putUnits(int territory, int units);
 
 	/**
 	 * @brief 
