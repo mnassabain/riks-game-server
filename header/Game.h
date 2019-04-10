@@ -39,8 +39,10 @@ private:
 	int totalExchangedSets;
 	// Turn variables - Reset after each turn
 	bool territoryCapture; // Used for granting tokens
+	int lastAttackingTerritory;
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
+	bool moved;
 	// Combat handler - Used to save combat context between messages, to handle combat properly - Has to be reset after each combat is done
 	CombatHandler combat;
 
@@ -105,7 +107,7 @@ private:
 	 * @param destination 
 	 * @param units 
 	 */
-	void moveUnits(int source, int destination, int units);
+	int moveUnits(int source, int destination, int units);
 
 	/**
 	 * @brief Set the Initial Reinforcement object

@@ -55,9 +55,7 @@ void Game::nextPlayer()
 	}
 
 	// Resetting the turn related variables
-	this->territoryCapture = false;
-	this->lastAttackedTerritory = -1;
-	this->lastAttackCapture = false;
+	resetTurnVariables();
 }
 
 void Game::nextPhase()
@@ -252,7 +250,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	return CombatOutcome();
 }
 
-void Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
+int Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
 {
 	// checking the requirements of moving units
 	if (areAdjacent(source, destination) &&
@@ -262,6 +260,9 @@ void Game::moveUnits(int source, int destination, int units) // The phase checks
 		this->board[source].units -= units;
 		this->board[destination].units += units;
 	}
+	else return -1;
+
+	return 0:
 }
 
 int Game::setInitialReinforcement()
@@ -328,8 +329,10 @@ void Game::resetCombat()
 void Game::resetTurnVariables()
 {
 	this->territoryCapture = false;
+	this->lastAttackingTerritory = -1;
 	this->lastAttackedTerritory = -1;
 	this->lastAttackCapture = false;
+	this->moved = false;
 }
 
 // Public methods
@@ -556,7 +559,6 @@ int Game::messageEndPhase(int player)
 
 	// All checks have been performed, we can proceed to the next phase
 	if (phase == 2) {
-		resetTurnVariables();
 		nextPlayer();
 	}
 	nextPhase();
@@ -696,7 +698,8 @@ CombatOutcome Game::messageDefend(int player, int units)
 	board[combat.source].units -= result.attackerLoss;
 	board[combat.destination].units -= result.defenderLoss;
 
-	// Updating lastAttackedTerritory
+	// Updating turn variables
+	lastAttackingTerritory = combat.source;
 	lastAttackedTerritory = combat.destination;
 
 	// Checking if the combat resulted in a capture
@@ -730,6 +733,8 @@ CombatOutcome Game::messageDefend(int player, int units)
 			transfer[3] = players[combat.defenderId].countTokensOfType(3);
 
 			players[combat.defenderId].receiveTokens(transfer);
+
+			// Checking for victory, currently done in nextPlayer(), but should be done right away
 		}
 
 		// Updating lastAttackCapture
@@ -750,6 +755,31 @@ int Game::messageMove(int player, int source, int destination, int units)
 	// Checking if the right player sent the message
 	if (player != activePlayer) return -1;
 
-	return 0;
+	// Treatment in phase 1
+	if (phase == 1) {
+		// Checking if the last attack resulted in a capture
+		if (!lastAttackCapture) return -1;
+		// Checking if the territories are the ones involved in the last combat
+		if (lastAttackingTerritory != source) return -1;
+		if (lastAttackedTerritory != destination) return -1;
+
+		// Proceeding with the move
+		return moveUnits(source, destination, units);
+	}
+
+	// Treatment in phase 2
+	if (phase == 2) {
+		// Checking if the player already used his free move this turn
+		if (!moved) {
+			if (moveUnits(source, destination, units) == 0) {
+				moved = true; // Putting this in moveUnits() would generate conflicts with phase 1 moves or require extra manual resets
+				return 0;
+			}
+			else return -1;
+		}
+		else return -1;
+	}
+
+	return -1;
 
 }
