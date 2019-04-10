@@ -143,7 +143,6 @@ public:
      */
     void subTerritoriesOwned();
 
-<<<<<<< header/Player.h
     /**
      * @brief getName : getter
      * @return player's name
