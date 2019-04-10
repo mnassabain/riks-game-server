@@ -497,7 +497,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, s
 }
 
 // Allowed when !isRunning()
-vector<json> Game::messageStart()
+int Game::messageStart()
 {
 	vector<json> response;
 
@@ -508,7 +508,7 @@ vector<json> Game::messageStart()
 
 // Allowed when isRunning()
 // Allowed in phase 0, 1, 2
-vector<json> Game::messageEndPhase(int player)
+int Game::messageEndPhase(int player)
 {
 	vector<json> response;
 	return response;
@@ -516,14 +516,14 @@ vector<json> Game::messageEndPhase(int player)
 }
 
 // Allowed in phase -1, 0
-vector<json> Game::messagePut(int player, int territory, int units)
+int Game::messagePut(int player, int territory, int units)
 {
 	vector<json> response;
 	return response;
 }
 
 // Allowed in phase 0
-vector<json> Game::messageUseTokens(int player, int token1, int token2, int token3)
+int Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
 	vector<json> response;
 	return response;
@@ -531,7 +531,7 @@ vector<json> Game::messageUseTokens(int player, int token1, int token2, int toke
 }
 
 // Allowed in phase 1
-vector<json> Game::messageAttack(int player, int source, int destination, int units)
+int Game::messageAttack(int player, int source, int destination, int units)
 {
 	vector<json> response;
 	return response;
@@ -539,7 +539,7 @@ vector<json> Game::messageAttack(int player, int source, int destination, int un
 }
 
 // Allowed in phase 1
-vector<json> Game::messageDefend(int player, int units)
+int Game::messageDefend(int player, int units)
 {
 	vector<json> response;
 	return response;
@@ -547,7 +547,7 @@ vector<json> Game::messageDefend(int player, int units)
 }
 
 // Allowed in phase 1, 2
-vector<json> Game::messageMove(int player, int source, int destination, int units)
+int Game::messageMove(int player, int source, int destination, int units)
 {
 	vector<json> response;
 	return response;
