@@ -499,57 +499,57 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, s
 // Allowed when !isRunning()
 int Game::messageStart()
 {
-	vector<json> response;
+	
 
 	if (running) start();
 
-	return response;
+	return 0;
 }
 
 // Allowed when isRunning()
 // Allowed in phase 0, 1, 2
 int Game::messageEndPhase(int player)
 {
-	vector<json> response;
-	return response;
+
+	return 0;
 
 }
 
 // Allowed in phase -1, 0
 int Game::messagePut(int player, int territory, int units)
 {
-	vector<json> response;
-	return response;
+
+	return 0;
 }
 
 // Allowed in phase 0
 int Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
-	vector<json> response;
-	return response;
+
+	return 0;
 
 }
 
 // Allowed in phase 1
 int Game::messageAttack(int player, int source, int destination, int units)
 {
-	vector<json> response;
-	return response;
+
+	return 0;
 
 }
 
 // Allowed in phase 1
 int Game::messageDefend(int player, int units)
 {
-	vector<json> response;
-	return response;
+
+	return 0;
 
 }
 
 // Allowed in phase 1, 2
 int Game::messageMove(int player, int source, int destination, int units)
 {
-	vector<json> response;
-	return response;
+
+	return 0;
 
 }
