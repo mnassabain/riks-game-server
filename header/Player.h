@@ -143,11 +143,15 @@ public:
      */
     void subTerritoriesOwned();
 
+<<<<<<< header/Player.h
     /**
      * @brief getName : getter
      * @return player's name
      */
     std::string getName();
+
+	int countTokens();
+
 private:
 };
 
