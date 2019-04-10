@@ -21,7 +21,7 @@
 * [DEFEND]()
 * [MOVE]()
 
-## SIGN UP:
+### SIGN UP:
 {
     type: SIGN_UP,
     data:
@@ -31,7 +31,7 @@
     }
 }
 
-## CONNECT:
+### CONNECT:
 {
     type: CONNECT,
     data: {
@@ -40,7 +40,7 @@
     }
 }
 
-## DISCONNECT:
+### DISCONNECT:
 {
     type: DISCONNECT,
     data:
@@ -49,7 +49,7 @@
     }
 }
 
-## CREATE_LOBBY:
+### CREATE_LOBBY:
 {
     type: CREATE_LOBBY,
     data:
@@ -62,12 +62,12 @@
     }
 }
 
-## LOBBY_LIST:
+### LOBBY_LIST:
 {
     type: LOBBY_LIST
 }
 
-## JOIN_LOBBY:
+### JOIN_LOBBY:
 {
     type: JOIN_LOBBY,
     data:
@@ -79,7 +79,7 @@
 }
 
 Player to server message format (Game side):
-## START_GAME:
+### START_GAME:
 {
     type: START_GAME,
     data:
@@ -88,7 +88,7 @@ Player to server message format (Game side):
     }
 }
 
-## END_PHASE:
+### END_PHASE:
 {
     type: END_PHASE,
     data:
@@ -97,7 +97,7 @@ Player to server message format (Game side):
     }
 }
 
-## PUT:
+### PUT:
 {
     type: PUT,
     data:
@@ -108,7 +108,7 @@ Player to server message format (Game side):
     }
 }
 
-## USE_TOKENS:
+### USE_TOKENS:
 {
     type: USE_TOKENS,
     data:
@@ -120,7 +120,7 @@ Player to server message format (Game side):
     }
 }
 
-## ATTACK:
+### ATTACK:
 {
     type: ATTACK,
     data:
@@ -132,9 +132,9 @@ Player to server message format (Game side):
     }
 }
 
-## ATTACKED:
+### ATTACKED:
 
-## DEFEND:
+### DEFEND:
 {
     type: DEFEND,
     data:
@@ -144,7 +144,7 @@ Player to server message format (Game side):
     }
 }
 
-## MOVE:
+### MOVE:
 {
     type: MOVE,
     data:
