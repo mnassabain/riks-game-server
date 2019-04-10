@@ -38,7 +38,7 @@ private:
 	int tokens[4];
 	int totalExchangedSets;
 	// Turn variables - Reset after each turn
-	bool territoryCapture;
+	bool territoryCapture; // Used for granting tokens
 	int lastAttackedTerritory;
 	bool lastAttackCapture;
 	// Combat handler - Used to save combat context between messages, to handle combat properly - Has to be reset after each combat is done
@@ -264,7 +264,7 @@ public:
 	int messagePut(int player, int territory, int units);
 	int messageUseTokens(int player, int token1, int token2, int token3);
 	int messageAttack(int player, int source, int destination, int units);
-	int messageDefend(int player, int units);
+	CombatOutcome messageDefend(int player, int units);
 	int messageMove(int player, int source, int destination, int units);
 };
 

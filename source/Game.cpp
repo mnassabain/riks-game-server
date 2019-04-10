@@ -652,6 +652,7 @@ int Game::messageAttack(int player, int source, int destination, int units)
 	// Checking if the territories are adjacent
 	if (!areAdjacent(source, destination)) return -1;
 	// Checking if the player has the required units
+	// <= since one unit must remain on the source
 	if (board[source].units <= units) return -1;
 
 	// All checks have been performed, the attack is thus allowed and waiting for the defender's response
@@ -665,13 +666,81 @@ int Game::messageAttack(int player, int source, int destination, int units)
 
 }
 
+// if any of the CombatOutcome returned values is -1, the meaning is the same as an int -1 returned value
 // Allowed in phase 1
-int Game::messageDefend(int player, int units)
+CombatOutcome Game::messageDefend(int player, int units)
 {
-	// Checking if the right player sent the message
-	if (player != combat.defenderId) return -1;
+	CombatOutcome result;
+	result.attackerLoss = -1;
+	result.defenderLoss = -1;
 
-	return 0;
+
+	// Checking if a combat requires solving
+	if (combat.attackerId == -1) return result;
+
+	// Checking if the right player sent the message
+	if (player != combat.defenderId) return result;
+	// Phase check
+	if (phase != 1) return result;
+	// Checking if units is a valid amount
+	if (units < 1 || units > 2) return result;
+	// Checking if the player has the required units
+	// < since the defender can use all of their units
+	if (board[combat.destination].units < units) return result;
+
+	// All checks have been performed, the combat can now be solved
+	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
+	result = solveCombat(combat.attackerUnits, combat.defenderUnits);
+
+	// Updating the unit count on both territories
+	board[combat.source].units -= result.attackerLoss;
+	board[combat.destination].units -= result.defenderLoss;
+
+	// Updating lastAttackedTerritory
+	lastAttackedTerritory = combat.destination;
+
+	// Checking if the combat resulted in a capture
+	if (board[combat.destination].units == 0) {
+		// Check for granting a token to the attacker
+		if (!territoryCapture) {
+			grantToken(); // Will require external update
+			territoryCapture = true;
+		}
+
+		// Proceeding with the territory capture
+		// In the case of a capture, the attacking player didn't lose any unit, so we can move them directly to the destination and update the owner
+		board[combat.source].units -= combat.attackerUnits;
+		board[combat.destination].units = combat.attackerUnits;
+		board[combat.destination].owner = combat.attackerId;
+
+		// Updating players involved
+		players[combat.attackerId].addTerritoriesOwned();
+		players[combat.defenderId].subTerritoriesOwned();
+
+		// Checking for player elimination
+		if (players[combat.defenderId].getTerritoriesOwned() == 0) {
+			players[combat.defenderId].die();
+
+			// Token transfer between defender and attacker
+			// Temporary crude method // will also require external update
+			int transfer[4];
+			transfer[0] = players[combat.defenderId].countTokensOfType(0);
+			transfer[1] = players[combat.defenderId].countTokensOfType(1);
+			transfer[2] = players[combat.defenderId].countTokensOfType(2);
+			transfer[3] = players[combat.defenderId].countTokensOfType(3);
+
+			players[combat.defenderId].receiveTokens(transfer);
+		}
+
+		// Updating lastAttackCapture
+		lastAttackCapture = true;
+	}
+	else lastAttackCapture = false;
+
+
+	// Resetting the CombatHandler
+	resetCombat();
+	return result;
 
 }
 
