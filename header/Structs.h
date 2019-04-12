@@ -26,6 +26,13 @@ typedef struct Continent Continent;
 //TerritoryState
 struct TerritoryState
 {
+  string toString()
+  {
+    string status;
+    status = "owner = " + to_string(owner) + ", units = "\
+    + to_string(owner);
+    return status;
+  }
   int owner;
   int units;
 };
