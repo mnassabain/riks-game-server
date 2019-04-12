@@ -78,7 +78,7 @@ void Game::turnReinforcement()
 	reinforcement += max(players[activePlayer].getTerritoriesOwned() / 3, 3);
 
 	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
-	for (size_t i = 0; i < nbContinents; i++)
+	for (int i = 0; i < nbContinents; i++)
 	{
 		if (continentOwner(i) == activePlayer)
 			reinforcement += this->map.getContinentById(i).bonus;
@@ -307,7 +307,7 @@ int Game::continentOwner(int idContinent)
 	// Checking who's the owner of the continent
 	int owner = board[firstTerritory].owner;
 
-	for (size_t i = firstTerritory + 1; i <= lastTerritory; i++) {
+	for (int i = firstTerritory + 1; i <= lastTerritory; i++) {
 		if (board[i].owner != owner) {
 			return -1;
 		}
