@@ -228,7 +228,6 @@
 * [GAME_RESULTS]()
 * [GAME_STATUS]()
 * [GIVE_TOKENS]()
-* [JOIN_LOBBY]()
 * [KICKED]()
 * [LEAVE_GAME]()
 * [LOBBY_LIST]()
@@ -242,7 +241,7 @@
 * [USE_TOKENS]()
 
 ### Server response:
-(Standard server response)
+(Standard server response for "personnal" messages, for example SIGN_UP, CONNECT, JOIN_LOBBY,...)
 ```json
 {
     type: MESSAGE_TYPE,
@@ -253,4 +252,236 @@
 }
 ```
 
+### ATTACK:
+```json
+{
+    type: ATTACK,
+    data:
+    {
+        attackerName: "...",
+        defenderName: "...",
+	    source: "...",
+	    destination: "...",
+	    units: "..."
+    }
+}
+```
+
 ### ATTACKED:
+```json
+{
+    type: ATTACKED,
+    data:
+    {
+	    units: "..."
+    }
+}
+```
+
+### COMBAT_RESULTS:
+```json
+{
+    type: COMBAT_RESULTS,
+    data:
+    {
+	    source: "...",
+	    destination: "...",
+	    attackerLoss: "...",
+	    defenderLoss: "..."
+    }
+}
+```
+
+### CURRENT_PHASE:
+```json
+{
+    type: CURRENT_PHASE,
+    data:
+    {
+	    phase: <-1|0|1|2>
+    }
+}
+```
+
+### DEFEND:
+```json
+{
+    type: DEFEND,
+    data:
+    {
+        defenderName: "...",
+	    units: "..."
+    }
+}
+```
+
+### ERROR:
+```json
+{
+    type: ERROR,
+    data:
+    {
+	    errType : <MESSAGE_TYPE>,
+	    message : "MESSAGE_TYPE : ..."
+    }
+}
+```
+
+### GAME_OVER:
+```json
+{
+    type: GAME_OVER,
+    data:
+    {
+	    winner: "..."
+    }
+}
+```
+
+### GAME_RESULTS:
+```json
+{
+    type: GAME_RESULTS,
+    data:
+    {
+	    ranking:{first,second,...}
+    }
+}
+```
+
+### GAME_STATUS:
+
+### GIVE_TOKENS:
+```json
+{
+    type: GIVE_TOKENS,
+    data:
+    {
+	    player: "...",
+	    token1: "...",
+	    token2: "...",
+	    token3: "..."
+    }
+}
+```
+### JOIN_LOBBY:
+```json
+{
+    type: JOIN_LOBBY,
+    data:
+    {
+	    player: "..."
+    }
+}
+```
+
+### KICKED:
+```json
+{
+    type: KICKED,
+    data:
+    {
+	    kickerName: "..."
+    }
+}
+```
+
+### LEAVE_GAME:
+```json
+{
+    type: LEAVE_GAME,
+    data:
+    {
+	    player: "..."
+    }
+}
+```
+
+### LOBBY_LIST:
+
+### LOBBY_STATE:
+```json
+{
+    type: LOBBY_STATE,
+    data:
+    {
+        lobbyName: "...",
+        lobbyPassword: "...",
+        maxPlayers: "...",
+        mapName: "...",
+        hidden: <true|false>
+    }
+}
+```
+
+### MOVE:
+```json
+{
+    type: MOVE,
+    data:
+    {
+	    source: "...",
+	    destination: "...",
+	    units: "..."
+    }
+}
+```
+
+### PLAYER_ELIMINATION:
+```json
+{
+    type: PLAYER_ELIMINATION,
+    data:
+    {
+	    player: "..."
+    }
+}
+```
+
+### PLAYER_PROFILE:
+
+### PUT:
+```json
+{
+    type: PUT,
+    data:
+    {
+        player: "...",
+	    territory: "...",
+	    units: "..."
+    }
+}
+```
+
+### REINFORCEMENT:
+```json
+{
+    type: REINFORCEMENT,
+    data:
+    {
+	    player: "...",
+	    units: "..."
+    }
+}
+```
+
+### START_GAME:
+```json
+{
+    type: START_GAME,
+}
+```
+
+### USE_TOKENS:
+```json
+{
+    type: USE_TOKENS,
+    data:
+    {
+        player: "...",
+	    token1: "...",
+	    token2: "...",
+	    token3: "..."
+    }
+}
+```
