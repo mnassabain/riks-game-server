@@ -78,7 +78,7 @@ void Game::turnReinforcement()
 	reinforcement += max(players[activePlayer].getTerritoriesOwned() / 3, 3);
 
 	// Checks if the player has continents conquered, if so, add him the reinforcements bonus
-	for (size_t i = 0; i < nbContinents; i++)
+	for (int i = 0; i < nbContinents; i++)
 	{
 		if (continentOwner(i) == activePlayer)
 			reinforcement += this->map.getContinentById(i).bonus;
@@ -307,7 +307,7 @@ int Game::continentOwner(int idContinent)
 	// Checking who's the owner of the continent
 	int owner = board[firstTerritory].owner;
 
-	for (size_t i = firstTerritory + 1; i <= lastTerritory; i++) {
+	for (int i = firstTerritory + 1; i <= lastTerritory; i++) {
 		if (board[i].owner != owner) {
 			return -1;
 		}
@@ -430,20 +430,30 @@ vector<json> Game::message(json message) // UNDER CONSTRUCTION
 
 string Game::toString()
 {
-	string status = "lobby name = '" + this->name\
-		+ "', id = " + to_string(this->id) + ", password = '" + this->password\
-		+ "'" + ", maxPlayers = " + to_string(this->maxPlayers)\
-		+ ", nbPlayers = " + to_string(this->nbPlayers) + ", running = "\
-		+ to_string(this->running) + ", phase = " + to_string(this->phase)\
-		+ ", activePlayer = " + to_string(this->activePlayer)\
-		+ ", territoryCapture = " + to_string(this->territoryCapture)\
-		+ ", lastAttackedTerritory = " + to_string(this->lastAttackedTerritory)\
-		+ ", lastAttackCapture = " + to_string(this->lastAttackCapture);
+	string status = "lobby name = '" + name\
+		+ "', id = " + to_string(id) + ", password = '" + password\
+		+ "'" + ", maxPlayers = " + to_string(maxPlayers)\
+		+ ", nbPlayers = " + to_string(nbPlayers) + ", running = "\
+		+ to_string(running) + ", phase = " + to_string(phase)\
+		+ ", activePlayer = " + to_string(activePlayer)\
+		+ ", territoryCapture = " + to_string(territoryCapture)\
+		+ ", lastAttackedTerritory = " + to_string(lastAttackedTerritory)\
+		+ ", lastAttackCapture = " + to_string(lastAttackCapture);
 	// cout << "board = " << this -> board;
 	// cout << "players = " << this -> players;	
 	return status;
 }
 
+void Game::printGame()
+{
+	cout << this->toString() << endl;
+	cout << players.size() << endl;
+	for(size_t i = 0; i < players.size(); i++)
+	{
+		players[i].printPlayer();
+		cout << endl;
+	}
+}
 // Public constructors
 Game::Game(string mapName, string creatorId, int maxPlayers)
 {

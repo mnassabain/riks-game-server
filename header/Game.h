@@ -239,11 +239,16 @@ public:
 	vector<json> message(json message);
 
 	/**
-	 * @brief Prints information about the game
+	 * @brief Puts information about the game in a string
 	 * 
-	 * @param g
 	 */
 	string toString();
+
+	/**
+	 * @brief Prints the status of the game
+	 * 
+	 */
+	void printGame();
 
 	// Constructors
 

@@ -3,6 +3,11 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <../libs/boost/algorithm/string.hpp> 
+
+using namespace std;
+
 
 class Player {
 public:
@@ -147,7 +152,19 @@ public:
      * @brief getName : getter
      * @return player's name
      */
-    std::string getName();
+    string getName();
+
+    /**
+     * @brief toString: returning information about a player into a string
+     * @return string 
+     */
+    string toString();
+
+    /**
+     * @brief printPlayer: prints the status of a players
+     * 
+     */
+    void printPlayer();
 
 	int countTokensOfType(int type);
 	int countTokens();
