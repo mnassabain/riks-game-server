@@ -19,6 +19,8 @@ Player::Player(string name)
 	this->territoriesCaptured = 0;
 	this->territoriesLost   = 0;
 	this->setsSpent     = 0;
+	this->unitsKilled=0;
+	this->unitsLost=0;
     
 }
 
