@@ -149,6 +149,12 @@ public:
      */
     std::string getName();
 
+    /**
+     * @brief toString: returning information about a player into a string
+     * @return string 
+     */
+    std::string toString();
+
 	int countTokensOfType(int type);
 	int countTokens();
 
