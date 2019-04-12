@@ -247,9 +247,8 @@ public:
 	/**
 	 * @brief Prints the status of the game
 	 * 
-	 * @param g
 	 */
-	void printGame(Game g);
+	void printGame();
 
 	// Constructors
 
