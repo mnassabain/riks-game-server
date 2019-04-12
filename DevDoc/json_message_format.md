@@ -6,33 +6,38 @@
 
 # Client to server
 
-* [SIGN-UP]()
-* [CONNECT]()
-* [DISCONNECT]()
-* [CREATE_LOBBY]()
-* [LOBBY_LIST]()
-* [JOIN_LOBBY]()
-* [START_GAME]()
-* [END_PHASE]()
-* [PUT]()
-* [USE_TOKENS]()
 * [ATTACK]()
-* [ATTACKED]()
+* [CONNECT]()
+* [CREATE_LOBBY]()
 * [DEFEND]()
+* [DISCONNECT]()
+* [EDIT_LOBBY]()
+* [END_PHASE]()
+* [GET_GAME_STATUS]()
+* [JOIN_LOBBY]()
+* [KICK_FROM_LOBBY]()
+* [LEAVE_GAME]()
+* [LOBBY_LIST]()
 * [MOVE](#move)
+* [PLAYER_PROFILE]()
+* [PUT]()
+* [SIGN-UP]()
+* [START_GAME]()
+* [USE_TOKENS]()
 
-### SIGN UP:
+### ATTACK:
 ```json
 {
-    type: SIGN_UP,
+    type: ATTACK,
     data:
     {
-        userID: "...",
-        userPassword: "..."
+        player: "...",
+	source: "...",
+	destination: "...",
+	units: "..."
     }
 }
 ```
-
 ### CONNECT:
 ```json
 {
@@ -43,18 +48,6 @@
     }
 }
 ```
-
-### DISCONNECT:
-```json
-{
-    type: DISCONNECT,
-    data:
-    {
-        userID: "..."
-    }
-}
-```
-
 ### CREATE_LOBBY:
 ```json
 {
@@ -70,12 +63,43 @@
 }
 ```
 
-### LOBBY_LIST:
+### DEFEND:
 ```json
 {
-    type: LOBBY_LIST
+    type: DEFEND,
+    data:
+    {
+        player: "...",
+	units: "..."
+    }
 }
 ```
+
+### DISCONNECT:
+```json
+{
+    type: DISCONNECT,
+    data:
+    {
+        userID: "..."
+    }
+}
+```
+
+### EDIT_LOBBY:
+
+### END_PHASE:
+```json
+{
+    type: END_PHASE,
+    data:
+    {
+        player: "..."
+    }
+}
+```
+
+### GET_GAME_STATUS:
 
 ### JOIN_LOBBY:
 ```json
@@ -90,28 +114,32 @@
 }
 ```
 
-Player to server message format (Game side):
-### START_GAME:
+### KICK_FROM_LOBBY:
+
+### LEAVE_GAME:
+
+### LOBBY_LIST:
 ```json
 {
-    type: START_GAME,
+    type: LOBBY_LIST
+}
+```
+
+### MOVE:
+```json
+{
+    type: MOVE,
     data:
     {
-        lobbyID: "..."
+        player: "...",
+	source: "...",
+	destination: "...",
+	units: "..."
     }
 }
 ```
 
-### END_PHASE:
-```json
-{
-    type: END_PHASE,
-    data:
-    {
-        player: "..."
-    }
-}
-```
+### PLAYER_PROFILE:
 
 ### PUT:
 ```json
@@ -122,6 +150,29 @@ Player to server message format (Game side):
         player: "...",
 	territory: "...",
 	units: "..."
+    }
+}
+```
+
+### SIGN UP:
+```json
+{
+    type: SIGN_UP,
+    data:
+    {
+        userID: "...",
+        userPassword: "..."
+    }
+}
+```
+
+### START_GAME:
+```json
+{
+    type: START_GAME,
+    data:
+    {
+        lobbyID: "..."
     }
 }
 ```
@@ -140,57 +191,23 @@ Player to server message format (Game side):
 }
 ```
 
-### ATTACK:
+
+
+
+## Server to client
+* [Server response](#server-response)
+* [ATTACKED](#attacked)
+
+### Server response:
+(Standard server response)
 ```json
 {
-    type: ATTACK,
-    data:
-    {
-        player: "...",
-	source: "...",
-	destination: "...",
-	units: "..."
+    type: MESSAGE_TYPE,
+    data: {
+        error: <true|false>
+        response: "..."
     }
 }
 ```
 
 ### ATTACKED:
-
-### DEFEND:
-```json
-{
-    type: DEFEND,
-    data:
-    {
-        player: "...",
-	units: "..."
-    }
-}
-```
-
-### MOVE:
-```json
-{
-    type: MOVE,
-    data:
-    {
-        player: "...",
-	source: "...",
-	destination: "...",
-	units: "..."
-    }
-}
-```
-
-## Server to client
-
-### Server response:
-```json
-{
-    type: MESSAGE_TYPE,
-    data: {
-        error: bool
-        response: "..."
-    }
-}
-```
