@@ -356,7 +356,7 @@
     {
 	    name: "...",
 	    nbPlayers: "...",
-	    players: {name1,name2,...},
+	    players: {{name,tokens:{tok1,tok2,tok3,tok4}},{name,tokens:{tok1,tok2,tok3,tok4}},...},
 	    mapName:"...",
 	    board: {{terId,ownerId,nbUnits},{terId,ownerId,nbUnits},...},
 	    freeTerritories: "...",
