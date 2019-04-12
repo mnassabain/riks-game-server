@@ -432,7 +432,7 @@ string Game::toString()
 {
 	string status = "lobby name = '" + name\
 		+ "', id = " + to_string(id) + ", password = '" + password\
-		+ "'" + ", maxPlayers = " + to_string(maxPlayers)\
+		+ "', maxPlayers = " + to_string(maxPlayers)\
 		+ ", nbPlayers = " + to_string(nbPlayers) + ", running = "\
 		+ to_string(running) + ", phase = " + to_string(phase)\
 		+ ", activePlayer = " + to_string(activePlayer)\
@@ -446,8 +446,14 @@ string Game::toString()
 
 void Game::printGame()
 {
-	cout << this->toString() << endl;
-	cout << players.size() << endl;
+	vector<string> result;
+	string input = toString();
+	boost::split(result, input, boost::is_any_of(",")); 
+	cout << result[0] + " : " << endl;
+	for(size_t i = 1; i < result.size(); i++)
+		cout << "\t" + result[i] << endl;
+
+	cout << "\tplayers[] :" << endl;
 	for(size_t i = 0; i < players.size(); i++)
 	{
 		players[i].printPlayer();
