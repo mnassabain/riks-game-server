@@ -444,6 +444,10 @@ string Game::toString()
 	return status;
 }
 
+void Game::printGame(Game g)
+{
+	cout << g.toString << endl;
+}
 // Public constructors
 Game::Game(string mapName, string creatorId, int maxPlayers)
 {
