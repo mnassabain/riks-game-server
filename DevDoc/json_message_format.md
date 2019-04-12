@@ -230,7 +230,6 @@
 * [GIVE_TOKENS]()
 * [KICKED]()
 * [LEAVE_GAME]()
-* [LOBBY_LIST]()
 * [LOBBY_STATE]()
 * [MOVE]()
 * [PLAYER_ELIMINATION]()
@@ -350,6 +349,23 @@
 ```
 
 ### GAME_STATUS:
+```json
+{
+    type: GAME_STATUS,
+    data:
+    {
+	    name: "...",
+	    nbPlayers: "...",
+	    players: {name1,name2,...},
+	    mapName:"...",
+	    board: {{terId,ownerId,nbUnits},{terId,ownerId,nbUnits},...},
+	    freeTerritories: "...",
+	    phase: <-1|0|1|2>,
+	    activePlayer: <0|1|2|3|4|5>,
+	    totalExchangedSets: "..."
+    }
+}
+```
 
 ### GIVE_TOKENS:
 ```json
@@ -397,8 +413,6 @@
 }
 ```
 
-### LOBBY_LIST:
-
 ### LOBBY_STATE:
 ```json
 {
@@ -439,6 +453,21 @@
 ```
 
 ### PLAYER_PROFILE:
+```json
+{
+    type: PLAYER_PROFILE,
+    data:
+    {
+        player:"...",
+        victories:"...",
+        defeats: "...",
+        gainedTerritories: "...",
+        lostTerritories: "...",
+        reinforcementEarned: "...",
+        setsOfTokensUsed: "..."
+    }
+}
+```
 
 ### PUT:
 ```json
