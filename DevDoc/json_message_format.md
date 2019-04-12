@@ -218,7 +218,28 @@
 
 ## Server to client
 * [Server response](#server-response)
+* [ATTACK](#attack)
 * [ATTACKED](#attacked)
+* [COMBAT_RESULTS]()
+* [CURRENT_PHASE]()
+* [DEFEND]()
+* [ERROR]()
+* [GAME_OVER]()
+* [GAME_RESULTS]()
+* [GAME_STATUS]()
+* [GIVE_TOKENS]()
+* [JOIN_LOBBY]()
+* [KICKED]()
+* [LEAVE_GAME]()
+* [LOBBY_LIST]()
+* [LOBBY_STATE]()
+* [MOVE]()
+* [PLAYER_ELIMINATION]()
+* [PLAYER_PROFILE]()
+* [PUT]()
+* [REINFORCEMENT]()
+* [START_GAME]()
+* [USE_TOKENS]()
 
 ### Server response:
 (Standard server response)
