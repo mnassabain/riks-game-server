@@ -12,6 +12,7 @@
 #include "MessageCode.h"
 
 #include "../libs/json/json.hpp"
+#include "../libs/boost/algorithm/string.hpp"
 
 using namespace std;
 using json = nlohmann::json;
