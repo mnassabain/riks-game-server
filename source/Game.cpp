@@ -436,6 +436,7 @@ string Game::toString()
 		+ ", nbPlayers = " + to_string(nbPlayers) + ", running = "\
 		+ to_string(running) + ", phase = " + to_string(phase)\
 		+ ", activePlayer = " + to_string(activePlayer)\
+		+ ", freeTerritories = " + to_string(freeTerritories)\
 		+ ", territoryCapture = " + to_string(territoryCapture)\
 		+ ", lastAttackedTerritory = " + to_string(lastAttackedTerritory)\
 		+ ", lastAttackCapture = " + to_string(lastAttackCapture);
