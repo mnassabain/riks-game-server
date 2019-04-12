@@ -430,15 +430,15 @@ vector<json> Game::message(json message) // UNDER CONSTRUCTION
 
 string Game::toString()
 {
-	string status = "lobby name = '" + this->name\
-		+ "', id = " + to_string(this->id) + ", password = '" + this->password\
-		+ "'" + ", maxPlayers = " + to_string(this->maxPlayers)\
-		+ ", nbPlayers = " + to_string(this->nbPlayers) + ", running = "\
-		+ to_string(this->running) + ", phase = " + to_string(this->phase)\
-		+ ", activePlayer = " + to_string(this->activePlayer)\
-		+ ", territoryCapture = " + to_string(this->territoryCapture)\
-		+ ", lastAttackedTerritory = " + to_string(this->lastAttackedTerritory)\
-		+ ", lastAttackCapture = " + to_string(this->lastAttackCapture);
+	string status = "lobby name = '" + name\
+		+ "', id = " + to_string(id) + ", password = '" + password\
+		+ "'" + ", maxPlayers = " + to_string(maxPlayers)\
+		+ ", nbPlayers = " + to_string(nbPlayers) + ", running = "\
+		+ to_string(running) + ", phase = " + to_string(phase)\
+		+ ", activePlayer = " + to_string(activePlayer)\
+		+ ", territoryCapture = " + to_string(territoryCapture)\
+		+ ", lastAttackedTerritory = " + to_string(lastAttackedTerritory)\
+		+ ", lastAttackCapture = " + to_string(lastAttackCapture);
 	// cout << "board = " << this -> board;
 	// cout << "players = " << this -> players;	
 	return status;
@@ -447,6 +447,12 @@ string Game::toString()
 void Game::printGame()
 {
 	cout << this->toString() << endl;
+	cout << players.size() << endl;
+	for(size_t i = 0; i < players.size(); i++)
+	{
+		players[i].printPlayer();
+		cout << endl;
+	}
 }
 // Public constructors
 Game::Game(string mapName, string creatorId, int maxPlayers)
