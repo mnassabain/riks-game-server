@@ -1,7 +1,7 @@
 # Messages format
 
 * [Client to server](#client-to-server)
-* [Server to client]()
+* [Server to client](#server-to-client)
 
 
 # Client to server
@@ -22,6 +22,7 @@
 * [MOVE](#move)
 
 ### SIGN UP:
+```json
 {
     type: SIGN_UP,
     data:
@@ -30,8 +31,10 @@
         userPassword: "..."
     }
 }
+```
 
 ### CONNECT:
+```json
 {
     type: CONNECT,
     data: {
@@ -39,8 +42,10 @@
         userPassword: "..."
     }
 }
+```
 
 ### DISCONNECT:
+```json
 {
     type: DISCONNECT,
     data:
@@ -48,8 +53,10 @@
         userID: "..."
     }
 }
+```
 
 ### CREATE_LOBBY:
+```json
 {
     type: CREATE_LOBBY,
     data:
@@ -61,13 +68,17 @@
         mapName: "..."
     }
 }
+```
 
 ### LOBBY_LIST:
+```json
 {
     type: LOBBY_LIST
 }
+```
 
 ### JOIN_LOBBY:
+```json
 {
     type: JOIN_LOBBY,
     data:
@@ -77,9 +88,11 @@
         lobbyPassword: "..."
     }
 }
+```
 
 Player to server message format (Game side):
 ### START_GAME:
+```json
 {
     type: START_GAME,
     data:
@@ -87,8 +100,10 @@ Player to server message format (Game side):
         lobbyID: "..."
     }
 }
+```
 
 ### END_PHASE:
+```json
 {
     type: END_PHASE,
     data:
@@ -96,8 +111,10 @@ Player to server message format (Game side):
         player: "..."
     }
 }
+```
 
 ### PUT:
+```json
 {
     type: PUT,
     data:
@@ -107,8 +124,10 @@ Player to server message format (Game side):
 	units: "..."
     }
 }
+```
 
 ### USE_TOKENS:
+```json
 {
     type: USE_TOKENS,
     data:
@@ -119,8 +138,10 @@ Player to server message format (Game side):
 	token3: "..."
     }
 }
+```
 
 ### ATTACK:
+```json
 {
     type: ATTACK,
     data:
@@ -131,10 +152,12 @@ Player to server message format (Game side):
 	units: "..."
     }
 }
+```
 
 ### ATTACKED:
 
 ### DEFEND:
+```json
 {
     type: DEFEND,
     data:
@@ -143,8 +166,10 @@ Player to server message format (Game side):
 	units: "..."
     }
 }
+```
 
 ### MOVE:
+```json
 {
     type: MOVE,
     data:
@@ -155,8 +180,12 @@ Player to server message format (Game side):
 	units: "..."
     }
 }
+```
 
-Server response:
+## Server to client
+
+### Server response:
+```json
 {
     type: MESSAGE_TYPE,
     data: {
@@ -164,3 +193,4 @@ Server response:
         response: "..."
     }
 }
+```
