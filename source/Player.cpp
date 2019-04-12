@@ -179,9 +179,9 @@ void Player::printPlayer()
 	vector<string> result;
 	string input = toString();
 	boost::split(result, input, boost::is_any_of(",")); 
-	cout << "\t" + result[0] + " : " << endl;
+	cout << "\t\t" + result[0] + " : " << endl;
 	for(size_t i = 1; i < result.size(); i++)
 	{
-		cout << "\t\t" + result[i] << endl;
+		cout << "\t\t\t" + result[i] << endl;
 	}
 }
