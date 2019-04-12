@@ -13,7 +13,7 @@
 * [DISCONNECT](#disconnect)
 * [EDIT_LOBBY](#edit_lobby)
 * [END_PHASE](#end_phase)
-* [GET_GAME_STATUS](#get_game_status)
+* [GAME_STATUS](#game_status)
 * [JOIN_LOBBY](#join_lobby)
 * [KICK_FROM_LOBBY](#kick_from_lobby)
 * [LEAVE_GAME](#leave_game)
@@ -21,7 +21,7 @@
 * [MOVE](#move)
 * [PLAYER_PROFILE](#player_profile)
 * [PUT](#put)
-* [SIGN-UP](#sign-up)
+* [SIGN_UP](#sign_up)
 * [START_GAME](#start_game)
 * [USE_TOKENS](#use_tokens)
 
@@ -31,10 +31,9 @@
     type: ATTACK,
     data:
     {
-        player: "...",
-	source: "...",
-	destination: "...",
-	units: "..."
+	    source: "...",
+	    destination: "...",
+	    units: "..."
     }
 }
 ```
@@ -42,7 +41,8 @@
 ```json
 {
     type: CONNECT,
-    data: {
+    data: 
+    {
         userID: "...",
         userPassword: "..."
     }
@@ -54,11 +54,11 @@
     type: CREATE_LOBBY,
     data:
     {
-        userID: "...",
         lobbyName: "...",
         lobbyPassword: "...",
         maxPlayers: "...",
-        mapName: "..."
+        mapName: "...",
+        hidden: <true|false>
     }
 }
 ```
@@ -69,8 +69,7 @@
     type: DEFEND,
     data:
     {
-        player: "...",
-	units: "..."
+	    units: "..."
     }
 }
 ```
@@ -78,28 +77,38 @@
 ### DISCONNECT:
 ```json
 {
-    type: DISCONNECT,
-    data:
-    {
-        userID: "..."
-    }
+    type: DISCONNECT
 }
 ```
 
 ### EDIT_LOBBY:
-
-### END_PHASE:
 ```json
 {
-    type: END_PHASE,
+    type: EDIT_LOBBY,
     data:
     {
-        player: "..."
+        lobbyName: "...",
+        lobbyPassword: "...",
+        maxPlayers: "...",
+        mapName: "...",
+        hidden: <true|false>
     }
 }
 ```
 
-### GET_GAME_STATUS:
+### END_PHASE:
+```json
+{
+    type: END_PHASE
+}
+```
+
+### GAME_STATUS:
+```json
+{
+    type: GAME_STATUS
+}
+```
 
 ### JOIN_LOBBY:
 ```json
@@ -107,7 +116,6 @@
     type: JOIN_LOBBY,
     data:
     {
-        playerID: "...",
         lobbyID: "...",
         lobbyPassword: "..."
     }
@@ -115,8 +123,22 @@
 ```
 
 ### KICK_FROM_LOBBY:
+```json
+{
+    type: KICK_FROM_LOBBY,
+    data:
+    {
+        playerToBeKicked: "..."
+    }
+}
+```
 
 ### LEAVE_GAME:
+```json
+{
+    type: LEAVE_GAME
+}
+```
 
 ### LOBBY_LIST:
 ```json
@@ -131,15 +153,23 @@
     type: MOVE,
     data:
     {
-        player: "...",
-	source: "...",
-	destination: "...",
-	units: "..."
+	    source: "...",
+	    destination: "...",
+	    units: "..."
     }
 }
 ```
 
 ### PLAYER_PROFILE:
+```json
+{
+    type: PLAYER_PROFILE,
+    data:
+    {
+        playerName: "..."
+    }
+}
+```
 
 ### PUT:
 ```json
@@ -147,14 +177,13 @@
     type: PUT,
     data:
     {
-        player: "...",
-	territory: "...",
-	units: "..."
+	    territory: "...",
+	    units: "..."
     }
 }
 ```
 
-### SIGN UP:
+### SIGN_UP:
 ```json
 {
     type: SIGN_UP,
@@ -170,10 +199,6 @@
 ```json
 {
     type: START_GAME,
-    data:
-    {
-        lobbyID: "..."
-    }
 }
 ```
 
@@ -183,15 +208,12 @@
     type: USE_TOKENS,
     data:
     {
-        player: "...",
-	token1: "...",
-	token2: "...",
-	token3: "..."
+	    token1: "...",
+	    token2: "...",
+	    token3: "..."
     }
 }
 ```
-
-
 
 
 ## Server to client
