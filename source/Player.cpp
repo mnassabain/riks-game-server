@@ -161,15 +161,15 @@ string Player::getName()
 
 string Player::toString()
 {
-	string status="Player name='" + name + "', tokens[] = ";
+	string status="Player name = '" + name + "', tokens[] = ";
 	for(size_t i = 0; i < 4; i++)
 		status += " " + tokens[i];
-	status += ", isAlive=" + to_string(isAlive) + ", reinforcement=" +\
-	to_string(reinforcement) + ", territoriesOwned=" +\
-	to_string(territoriesOwned) + ", territoriesLost=" +\
-	to_string(territoriesLost) + ", unitsKilled=" +\
-	to_string(unitsKilled) + ", unitsLost=" +\
-	to_string(unitsLost) + ", setsSpent=" + to_string(setsSpent);
+	status += ", isAlive = " + to_string(isAlive) + ", reinforcement = " +\
+	to_string(reinforcement) + ", territoriesOwned = " +\
+	to_string(territoriesOwned) + ", territoriesLost = " +\
+	to_string(territoriesLost) + ", unitsKilled = " +\
+	to_string(unitsKilled) + ", unitsLost = " +\
+	to_string(unitsLost) + ", setsSpent = " + to_string(setsSpent);
 
 	return status;
 }
