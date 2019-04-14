@@ -30,7 +30,7 @@ struct TerritoryState
   {
     string status;
     status = "owner = " + to_string(owner) + ", units = "\
-    + to_string(owner);
+    + to_string(units);
     return status;
   }
   int owner;
