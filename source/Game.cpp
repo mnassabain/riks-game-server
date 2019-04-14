@@ -5,6 +5,8 @@ int Game::nextId = 0;
 // Private methods
 void Game::start()
 {
+	//Initialization of RNG
+	srand(time(NULL));
 	// Initialization of game variables
 	this->phase = -1;
 	chooseFirstPlayer();
@@ -17,8 +19,6 @@ void Game::start()
 	resetTurnVariables();
 	// Initialization of combat handler
 	resetCombat();
-	//Initialization of RNG
-	srand(time(NULL));
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
 	TerritoryState blank;
@@ -492,6 +492,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers)
 	this->running = false;
 
 	// Initialization of players
+	this->activePlayer = -1;
 	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
@@ -516,6 +517,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName)
 	this->running = false;
 
 	// Initialization of players
+	this->activePlayer = -1;
 	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
@@ -540,6 +542,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, s
 	this->running = false;
 
 	// Initialization of players
+	this->activePlayer = -1;
 	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
