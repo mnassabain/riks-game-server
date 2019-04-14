@@ -492,6 +492,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers)
 	this->running = false;
 
 	// Initialization of players
+	this->activePlayer = -1;
 	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
@@ -516,6 +517,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName)
 	this->running = false;
 
 	// Initialization of players
+	this->activePlayer = -1;
 	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
@@ -540,6 +542,7 @@ Game::Game(string mapName, string creatorId, int maxPlayers, string lobbyName, s
 	this->running = false;
 
 	// Initialization of players
+	this->activePlayer = -1;
 	this->maxPlayers = min(maxPlayers, this->map.getMaxPlayers());
 	this->nbPlayers = 0;
 	addPlayer(creatorId);
