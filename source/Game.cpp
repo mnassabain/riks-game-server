@@ -5,6 +5,8 @@ int Game::nextId = 0;
 // Private methods
 void Game::start()
 {
+	//Initialization of RNG
+	srand(time(NULL));
 	// Initialization of game variables
 	this->phase = -1;
 	chooseFirstPlayer();
@@ -17,8 +19,6 @@ void Game::start()
 	resetTurnVariables();
 	// Initialization of combat handler
 	resetCombat();
-	//Initialization of RNG
-	srand(time(NULL));
 
 	// Initialization of board // I'm actually not sure if the value will be copied or referenced, so there's a potential dangerous behavior to be tested
 	TerritoryState blank;
