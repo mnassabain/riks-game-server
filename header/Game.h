@@ -226,6 +226,13 @@ public:
 	int getActivePlayer();
 
 	/**
+	 * @brief Get the board attribute
+	 * 
+	 * @return vector<TerritoryState> 
+	 */
+	vector<TerritoryState> getGameBoard();
+
+	/**
 	 * @brief Get the Password attribute
 	 * 
 	 * @return string 

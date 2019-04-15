@@ -413,6 +413,11 @@ int Game::getActivePlayer()
 	return this->activePlayer;
 }
 
+vector<TerritoryState> Game::getGameBoard()
+{
+	return this->board; 
+}
+
 string Game::getPassword()
 {
 	return this->password;
