@@ -877,6 +877,43 @@ string GameServer::treatMessage(string message, Connection connection)
 
 		break;
 
+    case CODE_GAME_STATUS:
+    {
+        ClientIterator client;
+        client = clients.find(connection.lock().get());
+
+        if (client == clients.end())
+        {
+            errorResponse(response, CODE_GAME_STATUS,
+                "GAME_STATUS: User not connected");
+            break;
+        }
+
+        GameIterator game;
+        game = games.find(client->second.getGameID());
+
+        /* if we don't find the game we send an error */
+        if (game == games.end())
+        {
+            errorResponse(response, CODE_GAME_STATUS,
+                "GAME_STATUS: Game not found");
+            break;
+        }
+
+        //If the game has not been started
+        if(!game->second.isRunning())
+        {
+          errorResponse(response, CODE_GAME_STATUS,
+              "GAME_STATUS: The game is not running yet");
+          break;
+        }
+
+        //Sending GAME_STATUS to the client
+        return "{\"type\":"+to_string(CODE_GAME_STATUS)+",\"data\":"+game->second.toJson()+"}";
+
+    }
+    break;
+
 		case CODE_END_PHASE:
 		case CODE_PUT:
 		case CODE_USE_TOKENS:
