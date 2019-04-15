@@ -6,7 +6,7 @@ Player::Player(string name)
 
 	/* initializing with player's name */
 	this->name = name;
-	/* at the beiginning of the game, every player has 0 tokens  */  
+	/* at the beiginning of the game, every player has 0 tokens  */
 	for(size_t i = 0; i < 4; i++)
 	{
 		this->tokens[i] = 0;
@@ -21,12 +21,12 @@ Player::Player(string name)
 	this->setsSpent     = 0;
 	this->unitsKilled=0;
 	this->unitsLost=0;
-    
+
 }
 
 
 bool Player::hasSet(int tok1, int tok2, int tok3)
-{	
+{
 	int toSpend[4] = { 0 };
 	toSpend[tok1]++;
 	toSpend[tok2]++;
@@ -41,7 +41,7 @@ bool Player::hasSet(int tok1, int tok2, int tok3)
 
 	return true;
 }
-int* Player::listTokens()   
+int* Player::listTokens()
 {
 
 	return this->tokens;
@@ -178,10 +178,15 @@ void Player::printPlayer()
 {
 	vector<string> result;
 	string input = toString();
-	boost::split(result, input, boost::is_any_of(",")); 
+	boost::split(result, input, boost::is_any_of(","));
 	cout << "\t\t" + result[0] + " : " << endl;
 	for(size_t i = 1; i < result.size(); i++)
 	{
 		cout << "\t\t\t" + result[i] << endl;
 	}
+}
+
+string Player::toJson()
+{
+	return "{\"name\":\""+name+"\",\"tokens\":{\"tok1\":\""+to_string(tokens[0])+"\",\"tok2\":\""+to_string(tokens[1])+"\",\"tok3\":\""+to_string(tokens[2])+"\",\"tok4\":\""+to_string(tokens[3])+"\"}}";
 }
