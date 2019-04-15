@@ -188,5 +188,5 @@ void Player::printPlayer()
 
 string Player::toJson()
 {
-	return "{\"name\":\""+name+"\",\"tokens\":{\"tok1\":"+to_string(tokens[0])+",\"tok2\":"+to_string(tokens[1])+",\"tok3\":"+to_string(tokens[2])+",\"tok4\":"+to_string(tokens[3])+"}}";
+	return "{\"name\":\""+name+"\",\"reinforcements\":"+to_string(reinforcement)+",\"tokens\":{\"tok1\":"+to_string(tokens[0])+",\"tok2\":"+to_string(tokens[1])+",\"tok3\":"+to_string(tokens[2])+",\"tok4\":"+to_string(tokens[3])+"}}";
 }
