@@ -806,9 +806,77 @@ string GameServer::treatMessage(string message, Connection connection)
 
             break;
 
-		// Messages treated by Game object // Verifications to add
 		case CODE_START_GAME:
-			break;
+    /* check if user is connected */
+    {
+        ClientIterator client;
+        client = clients.find(connection.lock().get());
+
+        if (client == clients.end())
+        {
+            errorResponse(response, CODE_START_GAME,
+                "START_GAME: User not connected");
+            break;
+        }
+
+        GameIterator game;
+        game = games.find(client->second.getGameID());
+
+        /* if we don't find the lobby we send an error */
+        if (game == games.end())
+        {
+            errorResponse(response, CODE_START_GAME,
+                "START_GAME: Lobby not found");
+            break;
+        }
+
+        //check if the message is sent by the game owner
+        if(game->second.getPlayers().at(0).getName() != client->second.getName())
+        {
+          errorResponse(response, CODE_START_GAME,
+              "START_GAME: You are not the owner of the game");
+          break;
+        }
+
+        //Starting the game
+        if(game->second.messageStart()==-1)
+        {
+          errorResponse(response, CODE_START_GAME,
+              "START_GAME: The game is already started");
+          break;
+        }
+
+        //Sending START_GAME and GAME_STATUS to all clients in this game
+        json start;
+        start["type"]=CODE_START_GAME;
+        string status ="{\"type\":"+to_string(CODE_GAME_STATUS)+",\"data\":"+game->second.toJson()+"}";
+        vector<Player> players = game->second.getPlayers();
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            ClientIterator player;
+
+            for (player = clients.begin(); player != clients.end();
+                player++)
+            {
+                if (player->second.getName() == players[i].getName())
+                {
+                    Connection c = player->second.getConnection();
+                    endpoint.send(c, start.dump(),
+                        websocketpp::frame::opcode::text);//sending start
+                    endpoint.send(c, status,
+                        websocketpp::frame::opcode::text);//sending status
+                }
+            }
+
+        }
+
+    }
+
+    /* construct the response */
+    response["type"] = CODE_START_GAME;
+
+		break;
+
 		case CODE_END_PHASE:
 		case CODE_PUT:
 		case CODE_USE_TOKENS:
