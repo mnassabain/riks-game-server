@@ -50,26 +50,26 @@ private:
 	// Methods
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	void start();
 
 	/**
 	 * @brief nextPlayer : Passes the turn to the next player
-	 * 
+	 *
 	 */
 	void nextPlayer();
 
 	/**
 	 * @brief nextPhase : Goes to the next phase
-	 * 
+	 *
 	 */
 	void nextPhase();
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	void chooseFirstPlayer();
 
@@ -89,56 +89,56 @@ private:
 	int putUnits(int territory, int units);
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	CombatOutcome solveCombat(int attackers, int defenders);
 
 	/**
 	 * @brief moveUnits : Moving units from one territory to another
-	 * 
-	 * @param source 
-	 * @param destination 
-	 * @param units 
+	 *
+	 * @param source
+	 * @param destination
+	 * @param units
 	 */
 	int moveUnits(int source, int destination, int units);
 
 	/**
 	 * @brief Set the Initial Reinforcement object
-	 * 
+	 *
 	 */
 	int setInitialReinforcement();
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	void end();
 
 	/**
-	 * @brief 
-	 * 
-	 * @return int 
+	 * @brief
+	 *
+	 * @return int
 	 */
 	int updatePlayersStatsInDB();
 
 	/**
 	 * @brief areAdjacent : Checks if `a` and `b` are neighbors
-	 * 
-	 * @param a 
-	 * @param b 
-	 * @return true 
-	 * @return false 
+	 *
+	 * @param a
+	 * @param b
+	 * @return true
+	 * @return false
 	 */
 	bool areAdjacent(int a, int b);
 
 	/**
 	 * @brief continentOwner : Checks if the continent is dominated by the player
-	 * 
+	 *
 	 * @param id
-	 * @param idPlayer 
-	 * @return true 
-	 * @return false 
+	 * @param idPlayer
+	 * @return true
+	 * @return false
 	 */
 	int continentOwner(int idContinent);
 
@@ -167,32 +167,32 @@ public:
 	json toJSON();
 
 	/**
-	 * @brief 
-	 * 
-	 * @return true 
-	 * @return false 
+	 * @brief
+	 *
+	 * @return true
+	 * @return false
 	 */
 	bool isRunning();
 
 	/**
 	 * @brief isFull : tells if the Gameroom is full or not
-	 * 
-	 * @return true 
-	 * @return false 
+	 *
+	 * @return true
+	 * @return false
 	 */
 	bool isFull();
 
 	/**
-	 * @brief 
-	 * 
-	 * @param name 
+	 * @brief
+	 *
+	 * @param name
 	 */
 	int addPlayer(string name);
 
 	/**
-	 * @brief 
-	 * 
-	 * @param name 
+	 * @brief
+	 *
+	 * @param name
 	 */
 	int removePlayer(string name);
 
@@ -206,23 +206,23 @@ public:
 
 	/**
 	 * @brief Get the player's turn order
-	 * 
-	 * @param name 
-	 * @return int 
+	 *
+	 * @param name
+	 * @return int
 	 */
 	int getPlayerOrder(string name);
 
 	/**
 	 * @brief Get the Id attribute
-	 * 
-	 * @return int 
+	 *
+	 * @return int
 	 */
 	int getId();
 
 	/**
 	 * @brief Get the nbPlayers attribute
-	 * 
-	 * @return int 
+	 *
+	 * @return int
 	 */
 	int getNbPlayers();
 
@@ -242,15 +242,15 @@ public:
 
 	/**
 	 * @brief Get the Password attribute
-	 * 
-	 * @return string 
+	 *
+	 * @return string
 	 */
 	string getPassword();
 
 	/**
 	 * @brief Get the players attribute
-	 * 
-	 * @return vector<Player> 
+	 *
+	 * @return vector<Player>
 	 */
 	vector<Player> getPlayers();
 
@@ -263,24 +263,30 @@ public:
 
 	/**
 	 * @brief Puts information about the game in a string
-	 * 
+	 *
 	 */
 	string toString();
 
 	/**
 	 * @brief Prints the status of the game
-	 * 
+	 *
 	 */
 	void printGame();
+
+	/**
+	 * @brief toJson : return a json formated string of the game
+	 * @return json formated string of the game
+	 */
+	string toJson();
 
 	// Constructors
 
 	/**
 	 * @brief Construct a new Game object
-	 * 
-	 * @param mapName 
-	 * @param creatorId 
-	 * @param maxPlayers 
+	 *
+	 * @param mapName
+	 * @param creatorId
+	 * @param maxPlayers
 	 */
 	Game(string mapName, string creatorId, int maxPlayers);
 	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation

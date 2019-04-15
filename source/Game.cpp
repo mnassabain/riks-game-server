@@ -462,7 +462,7 @@ string Game::toString()
 		+ ", lastAttackedTerritory = " + to_string(lastAttackedTerritory)\
 		+ ", lastAttackCapture = " + to_string(lastAttackCapture);
 	// cout << "board = " << this -> board;
-	// cout << "players = " << this -> players;	
+	// cout << "players = " << this -> players;
 	return status;
 }
 
@@ -471,7 +471,7 @@ void Game::printGame()
 	// Printing Game::toString info
 	vector<string> gameInfo;
 	string gameInput = toString();
-	boost::split(gameInfo, gameInput, boost::is_any_of(",")); 
+	boost::split(gameInfo, gameInput, boost::is_any_of(","));
 	cout << gameInfo[0] + " : " << endl;
 	for(size_t i = 1; i < gameInfo.size(); i++)
 		cout << "\t" + gameInfo[i] << endl;
@@ -488,7 +488,7 @@ void Game::printGame()
 		cout << " ts" + to_string(i) + "{" + board[i].toString()\
 		+ "}";
 	}
-	
+
 	cout << endl;
 
 	// Printing players info
@@ -841,4 +841,33 @@ int Game::messageMove(int player, int source, int destination, int units)
 
 	return -1;
 
+}
+
+
+string Game::toJson()
+{
+	string res="{\"name\":\""+name+"\",\"nbPlayers\":\""+to_string(nbPlayers)+"\",";
+	res+= "\"players\":{";
+				for(size_t i = 0;i<players.size();i++)
+				{
+					res+=players.at(i).toJson();
+					if(i<players.size()-1)
+						res+=",";
+				}
+			res+="},";
+	res+="\"mapName\":\""+map.getName()+"\",";
+	res+="\"board\":{";
+				for(size_t i = 0; i<board.size();i++)
+				{
+					res+="{\"terId\":\""+to_string(i)+"\",\"ownerId\":\""+to_string(board.at(i).owner)+"\",\"nbUnits\":\""+to_string(board.at(i).units)+"\"}";
+					if(i<board.size()-1)
+						res+=",";
+				}
+			res+="},";
+	res+="\"freeTerritories\":\""+to_string(freeTerritories)+"\",";
+	res+="\"phase\":\""+to_string(phase)+"\",";
+	res+="\"activePlayer\":\""+to_string(activePlayer)+"\",";
+	res+="\"totalExchangedSets\":\""+to_string(totalExchangedSets)+"\"}";
+
+	return res;
 }

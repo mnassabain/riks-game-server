@@ -418,12 +418,6 @@ string GameServer::treatMessage(string message, Connection connection)
             response["data"]["response"] = "Success";
             break;
 
-        case CODE_ERROR:
-
-            /* ? */
-            errorResponse(response, CODE_ERROR, "Error");
-
-            break;
 
         case CODE_CREATE_LOBBY:
 
