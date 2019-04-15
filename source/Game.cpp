@@ -625,6 +625,7 @@ int Game::messagePut(int player, int territory, int units)
 
 				freeTerritories--;
 				players[player].spendReinforcement(1);
+				players[player].addTerritoriesOwned();
 			}
 		}
 
