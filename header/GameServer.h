@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <algorithm>
 #include "../header/Game.h"
 #include "../header/MessageCode.h"
 #include "../header/Client.h"
