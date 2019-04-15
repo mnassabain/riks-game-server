@@ -197,6 +197,14 @@ public:
 	int removePlayer(string name);
 
 	/**
+	 * @brief Get the player's owned territories
+	 * 
+	 * @param name 
+	 * @return int 
+	 */
+	vector<int> getPlayerTerritories(int player);
+
+	/**
 	 * @brief Get the player's turn order
 	 * 
 	 * @param name 

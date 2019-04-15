@@ -387,6 +387,17 @@ int Game::removePlayer(string name)
 	return -1;
 }
 
+vector<int> Game::getPlayerTerritories(int player)
+{
+	vector<int> territories;
+	for(int i = 0; i < map.nbTerritories(); i++)
+	{
+		if(player == board[i].owner)
+			territories.push_back(i);
+	}
+	return territories;
+}
+
 // Will return -1 if the player isn't in this game/lobby
 int Game::getPlayerOrder(string name)
 {
