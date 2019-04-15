@@ -630,7 +630,7 @@ int Game::messagePut(int player, int territory, int units)
 		}
 
 		// If there are no more free territories, they have to put their unit in one of theirs
-		if (freeTerritories == 0) {
+		else if (freeTerritories == 0) {
 			if (board[territory].owner != player) return -1;
 			else {
 				putUnits(territory, 1);
