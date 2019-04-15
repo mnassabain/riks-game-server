@@ -160,6 +160,13 @@ public:
 	// Methods
 
 	/**
+	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to 
+	 * 	at the beginning of the turn
+	 * 
+	 */
+	void turnReinforcement();
+
+	/**
 	 * @brief toJSON: Gives information about the game instance in json 
 	 * 
 	 * @return json 
