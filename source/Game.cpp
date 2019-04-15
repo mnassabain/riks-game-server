@@ -426,7 +426,7 @@ int Game::getActivePlayer()
 
 vector<TerritoryState> Game::getGameBoard()
 {
-	return this->board; 
+	return this->board;
 }
 
 string Game::getPassword()
@@ -846,7 +846,7 @@ int Game::messageMove(int player, int source, int destination, int units)
 
 string Game::toJson()
 {
-	string res="{\"name\":\""+name+"\",\"nbPlayers\":\""+to_string(nbPlayers)+"\",";
+	string res="{\"name\":\""+name+"\",\"nbPlayers\":"+to_string(nbPlayers)+",";
 	res+= "\"players\":{";
 				for(size_t i = 0;i<players.size();i++)
 				{
@@ -859,15 +859,15 @@ string Game::toJson()
 	res+="\"board\":{";
 				for(size_t i = 0; i<board.size();i++)
 				{
-					res+="{\"terId\":\""+to_string(i)+"\",\"ownerId\":\""+to_string(board.at(i).owner)+"\",\"nbUnits\":\""+to_string(board.at(i).units)+"\"}";
+					res+="{\"terId\":"+to_string(i)+",\"ownerId\":"+to_string(board.at(i).owner)+",\"nbUnits\":"+to_string(board.at(i).units)+"}";
 					if(i<board.size()-1)
 						res+=",";
 				}
 			res+="},";
-	res+="\"freeTerritories\":\""+to_string(freeTerritories)+"\",";
-	res+="\"phase\":\""+to_string(phase)+"\",";
-	res+="\"activePlayer\":\""+to_string(activePlayer)+"\",";
-	res+="\"totalExchangedSets\":\""+to_string(totalExchangedSets)+"\"}";
+	res+="\"freeTerritories\":"+to_string(freeTerritories)+",";
+	res+="\"phase\":"+to_string(phase)+",";
+	res+="\"activePlayer\":"+to_string(activePlayer)+",";
+	res+="\"totalExchangedSets\":"+to_string(totalExchangedSets)+"}";
 
 	return res;
 }
