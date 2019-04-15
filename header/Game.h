@@ -219,6 +219,13 @@ public:
 	int getNbPlayers();
 
 	/**
+	 * @brief Get the activePlayer attribute
+	 * 
+	 * @return int 
+	 */
+	int getActivePlayer();
+
+	/**
 	 * @brief Get the Password attribute
 	 * 
 	 * @return string 

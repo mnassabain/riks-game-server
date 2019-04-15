@@ -408,6 +408,11 @@ int Game::getNbPlayers()
 	return this->nbPlayers;
 }
 
+int Game::getActivePlayer()
+{
+	return this->activePlayer;
+}
+
 string Game::getPassword()
 {
 	return this->password;
