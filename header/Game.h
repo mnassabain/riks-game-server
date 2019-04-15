@@ -74,13 +74,6 @@ private:
 	void chooseFirstPlayer();
 
 	/**
-	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to 
-	 * 	at the beginning of the turn
-	 * 
-	 */
-	void turnReinforcement();
-
-	/**
 	 * @brief 
 	 * 
 	 * @param tok1 
@@ -160,6 +153,13 @@ public:
 	// Methods
 
 	/**
+	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to 
+	 * 	at the beginning of the turn
+	 * 
+	 */
+	void turnReinforcement();
+
+	/**
 	 * @brief toJSON: Gives information about the game instance in json 
 	 * 
 	 * @return json 
@@ -197,6 +197,14 @@ public:
 	int removePlayer(string name);
 
 	/**
+	 * @brief Get the player's owned territories
+	 * 
+	 * @param name 
+	 * @return int 
+	 */
+	vector<int> getPlayerTerritories(int player);
+
+	/**
 	 * @brief Get the player's turn order
 	 * 
 	 * @param name 
@@ -217,6 +225,20 @@ public:
 	 * @return int 
 	 */
 	int getNbPlayers();
+
+	/**
+	 * @brief Get the activePlayer attribute
+	 * 
+	 * @return int 
+	 */
+	int getActivePlayer();
+
+	/**
+	 * @brief Get the board attribute
+	 * 
+	 * @return vector<TerritoryState> 
+	 */
+	vector<TerritoryState> getGameBoard();
 
 	/**
 	 * @brief Get the Password attribute

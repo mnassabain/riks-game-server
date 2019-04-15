@@ -387,6 +387,17 @@ int Game::removePlayer(string name)
 	return -1;
 }
 
+vector<int> Game::getPlayerTerritories(int player)
+{
+	vector<int> territories;
+	for(int i = 0; i < map.nbTerritories(); i++)
+	{
+		if(player == board[i].owner)
+			territories.push_back(i);
+	}
+	return territories;
+}
+
 // Will return -1 if the player isn't in this game/lobby
 int Game::getPlayerOrder(string name)
 {
@@ -406,6 +417,16 @@ int Game::getId()
 int Game::getNbPlayers()
 {
 	return this->nbPlayers;
+}
+
+int Game::getActivePlayer()
+{
+	return this->activePlayer;
+}
+
+vector<TerritoryState> Game::getGameBoard()
+{
+	return this->board; 
 }
 
 string Game::getPassword()
@@ -625,11 +646,12 @@ int Game::messagePut(int player, int territory, int units)
 
 				freeTerritories--;
 				players[player].spendReinforcement(1);
+				players[player].addTerritoriesOwned();
 			}
 		}
 
 		// If there are no more free territories, they have to put their unit in one of theirs
-		if (freeTerritories == 0) {
+		else if (freeTerritories == 0) {
 			if (board[territory].owner != player) return -1;
 			else {
 				putUnits(territory, 1);
