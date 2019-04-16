@@ -267,7 +267,11 @@ int Game::moveUnits(int source, int destination, int units) // The phase checks 
 
 int Game::setInitialReinforcement()
 {
-	int reinforcement = 20 + 5 * (this->map.getMaxPlayers() - this->nbPlayers); // 20 units + 5 for each missing player
+	// We can't take the Game's instance attribute of maxPlayer
+	// otherwise we would end up with 20 reinforcements for 
+	// each player when playing in a 1v1 map for example
+	int maxPlayersRisk = 6;
+	int reinforcement = 20 + 5 * (maxPlayersRisk - this->nbPlayers); // 20 units + 5 for each missing player
 
 	for (int i = 0; i < this->nbPlayers; i++) {
 		players[i].addReinforcement(reinforcement);
