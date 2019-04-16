@@ -805,6 +805,9 @@ CombatOutcome Game::messageDefend(int player, int units)
 	{
 		cerr << "MSG_DEF: Not enough units on the territory, exiting..."\
 		<< endl;
+		// We have to reset the combat handler otherwise it will
+		// not let other combats to occur
+		resetCombat();
 		return result;
 	}
 
