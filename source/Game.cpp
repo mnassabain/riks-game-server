@@ -702,23 +702,59 @@ int Game::messageUseTokens(int player, int token1, int token2, int token3)
 int Game::messageAttack(int player, int source, int destination, int units)
 {
 	// Checking if the right player sent the message
-	if (player != activePlayer) return -1;
+	if (player != activePlayer)
+	{
+		cerr << "MSG_ATT: It's not Player" + to_string(player) +\
+		"'s turn, exiting...";
+		 return -1;
+	}
 
 	// Phase check
-	if (phase != 1) return -1;
+	if (phase != 1)
+	{
+		cerr << "MSG_ATT: Phase check failed, exiting..." << endl;
+		return -1;
+	}
 	// Checking if units is a valid amount
-	if (units < 1 || units > 3) return -1;
+	if (units < 1 || units > 3)
+	{
+		cerr << "MSG_ATT: Units check failed, exiting..." << endl;
+		return -1;
+	}
 	// Checking if a combat is not currently taking place
-	if (combat.attackerId != -1) return -1;
+	if (combat.attackerId != -1)
+	{
+		cerr << "MSG_ATT: Combat already taking place, exiting..."\
+		<< endl;
+	 	return -1;
+	}
 	// Checking if the player owns the source
-	if (board[source].owner != player) return -1;
+	if (board[source].owner != player)
+	{
+		cerr << "MSG_ATT: Active player doesn't own the source, \
+		exiting..." << endl;
+		return -1;
+	}
 	// Checking if the players doesn't own the destination
-	if (board[destination].owner == player) return -1;
+	if (board[destination].owner == player)
+	{
+		cerr << "MSG_ATT: You can't attack your own territory, exiting..."\
+		<< endl;
+		return -1;
+	} 
 	// Checking if the territories are adjacent
-	if (!areAdjacent(source, destination)) return -1;
+	if (!areAdjacent(source, destination))
+	{
+		cerr << "MSG_ATT: Territories aren't adjacent, exiting..." << endl;
+		return -1;
+	}
 	// Checking if the player has the required units
 	// <= since one unit must remain on the source
-	if (board[source].units <= units) return -1;
+	if (board[source].units <= units)
+	{
+		cerr << "MSG_ATT: One unit must remain on the source, exiting..." << endl;
+		return -1;
+	}
 
 	// All checks have been performed, the attack is thus allowed and waiting for the defender's response
 	combat.attackerId = player;
