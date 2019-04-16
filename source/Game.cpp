@@ -820,6 +820,12 @@ CombatOutcome Game::messageDefend(int player, int units)
 	lastAttackingTerritory = combat.source;
 	lastAttackedTerritory = combat.destination;
 
+	// Updating unitsLost and unitsKilled
+	players[combat.attackerId].unitsKilled += result.defenderLoss;
+	players[combat.defenderId].unitsKilled += result.attackerLoss;
+	players[combat.attackerId].unitsLost += result.attackerLoss;
+	players[combat.defenderId].unitsLost += result.defenderLoss;
+
 	// Checking if the combat resulted in a capture
 	if (board[combat.destination].units == 0) {
 		// Check for granting a token to the attacker
