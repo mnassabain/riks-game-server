@@ -777,17 +777,36 @@ CombatOutcome Game::messageDefend(int player, int units)
 
 
 	// Checking if a combat requires solving
-	if (combat.attackerId == -1) return result;
+	if (combat.attackerId == -1)
+	{
+		cerr << "MSG_DEF: A combat requires solving, exiting..." << endl;
+		return result;
+	}
 
 	// Checking if the right player sent the message
-	if (player != combat.defenderId) return result;
+	if (player != combat.defenderId)
+	{
+		cerr << "MSG_DEF: The player is not the right defender, exiting..." << endl;
+		return result;
+	}
 	// Phase check
-	if (phase != 1) return result;
+	if (phase != 1) 
+	{
+		cerr << "MSG_DEF: Phase check failed, exiting..." << endl;		
+		return result;
+	}
 	// Checking if units is a valid amount
-	if (units < 1 || units > 2) return result;
+	if (units < 1 || units > 2){
+		cerr << "MSG_DEF: Units check failed, exiting..." << endl;
+	}
 	// Checking if the player has the required units
 	// < since the defender can use all of their units
-	if (board[combat.destination].units < units) return result;
+	if (board[combat.destination].units < units)
+	{
+		cerr << "MSG_DEF: Not enough units on the territory, exiting..."\
+		<< endl;
+		return result;
+	}
 
 	// All checks have been performed, the combat can now be solved
 	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
