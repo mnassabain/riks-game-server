@@ -247,7 +247,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 		}
 	}
 
-	return CombatOutcome();
+	return result;
 }
 
 int Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
