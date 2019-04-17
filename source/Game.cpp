@@ -185,7 +185,7 @@ int Game::putUnits(int territory, int units)
 		this->board[territory].units += units;
 		return 0;
 	}
-	else return -1;
+	else return -4;
 }
 
 CombatOutcome Game::solveCombat(int attackers, int defenders)
@@ -268,7 +268,7 @@ int Game::moveUnits(int source, int destination, int units) // The phase checks 
 int Game::setInitialReinforcement()
 {
 	// We can't take the Game's instance attribute of maxPlayer
-	// otherwise we would end up with 20 reinforcements for 
+	// otherwise we would end up with 20 reinforcements for
 	// each player when playing in a 1v1 map for example
 	int maxPlayersRisk = 6;
 	int reinforcement = 20 + 5 * (maxPlayersRisk - this->nbPlayers); // 20 units + 5 for each missing player
@@ -635,6 +635,12 @@ int Game::messageEndPhase(int player)
 }
 
 // Allowed in phase -1, 0
+//returns : 0 -> ok
+//					1 -> ok + end of phase -1
+//				 -1 -> not active player
+// 				 -2 -> units >1 (only in phase -1)
+//				 -3 -> not a free territory (only in phase -1 when freeTerritories > 0)
+//				 -4 -> not your territory (or not enough units in phase 0)
 int Game::messagePut(int player, int territory, int units)
 {
 	// Checking if the right player sent the message
@@ -644,11 +650,11 @@ int Game::messagePut(int player, int territory, int units)
 	if (phase == -1) {
 		// Currently no check needed on player available reinforcement, since the game will forcefull proceed to next phase once they're all out
 		// A player can only put one unit at a time in this phase
-		if (units != 1) return -1;
+		if (units != 1) return -2;
 
 		// If there are still free territories, they have to put their unit in one of them
 		if (freeTerritories > 0) {
-			if (board[territory].owner != -1) return -1;
+			if (board[territory].owner != -1) return -3;
 			else {
 				board[territory].owner = player;
 				board[territory].units = 1;
@@ -661,7 +667,7 @@ int Game::messagePut(int player, int territory, int units)
 
 		// If there are no more free territories, they have to put their unit in one of theirs
 		else if (freeTerritories == 0) {
-			if (board[territory].owner != player) return -1;
+			if (board[territory].owner != player) return -4;
 			else {
 				putUnits(territory, 1);
 			}
@@ -677,8 +683,11 @@ int Game::messagePut(int player, int territory, int units)
 		for (i = 0; i < max; i++) {
 			count += players[i].getReinforcement();
 		}
-		if (count == 0) nextPhase();
-
+		if (count == 0)
+		{
+			nextPhase();
+			return 1;
+		}
 		return 0;
 	}
 
@@ -746,7 +755,7 @@ int Game::messageAttack(int player, int source, int destination, int units)
 		cerr << "MSG_ATT: You can't attack your own territory, exiting..."\
 		<< endl;
 		return -1;
-	} 
+	}
 	// Checking if the territories are adjacent
 	if (!areAdjacent(source, destination))
 	{
@@ -795,9 +804,9 @@ CombatOutcome Game::messageDefend(int player, int units)
 		return result;
 	}
 	// Phase check
-	if (phase != 1) 
+	if (phase != 1)
 	{
-		cerr << "MSG_DEF: Phase check failed, exiting..." << endl;		
+		cerr << "MSG_DEF: Phase check failed, exiting..." << endl;
 		return result;
 	}
 	// Checking if units is a valid amount
