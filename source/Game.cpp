@@ -779,7 +779,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 	// Checking if a combat requires solving
 	if (combat.attackerId == -1)
 	{
-		cerr << "MSG_DEF: A combat requires solving, exiting..." << endl;
+		cerr << "MSG_DEF: No combat requires solving, exiting..." << endl;
 		return result;
 	}
 
@@ -805,9 +805,6 @@ CombatOutcome Game::messageDefend(int player, int units)
 	{
 		cerr << "MSG_DEF: Not enough units on the territory, exiting..."\
 		<< endl;
-		// We have to reset the combat handler otherwise it will
-		// not let other combats to occur
-		resetCombat();
 		return result;
 	}
 
@@ -846,6 +843,8 @@ CombatOutcome Game::messageDefend(int player, int units)
 		// Updating players involved
 		players[combat.attackerId].addTerritoriesOwned();
 		players[combat.defenderId].subTerritoriesOwned();
+		players[combat.attackerId].territoriesCaptured++;
+		players[combat.defenderId].territoriesLost++;
 
 		// Checking for player elimination
 		if (players[combat.defenderId].getTerritoriesOwned() == 0) {
