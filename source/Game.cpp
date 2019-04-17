@@ -843,8 +843,8 @@ CombatOutcome Game::messageDefend(int player, int units)
 		// Updating players involved
 		players[combat.attackerId].addTerritoriesOwned();
 		players[combat.defenderId].subTerritoriesOwned();
-		players[combat.attackerId].territoriesCaptured++;
-		players[combat.defenderId].territoriesLost++;
+		players[combat.attackerId].addTerritoriesCaptured();
+		players[combat.defenderId].addTerritoriesLost();
 
 		// Checking for player elimination
 		if (players[combat.defenderId].getTerritoriesOwned() == 0) {
