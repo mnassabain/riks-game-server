@@ -952,7 +952,8 @@ string GameServer::treatMessage(string message, Connection connection)
         }
 
         json end;
-        end["type"]=CODE_END_PHASE;
+        end["type"]=CODE_CURRENT_PHASE;
+        end["data"]["phase"]=game->second.getPhase();
         vector<Player> players = game->second.getPlayers();
         for (unsigned int i = 0; i < players.size(); i++)
         {
@@ -970,7 +971,8 @@ string GameServer::treatMessage(string message, Connection connection)
             }
 
         }
-        response["type"]=CODE_END_PHASE;
+        response["type"]=CODE_CURRENT_PHASE;
+        response["data"]["phase"]= game->second.getPhase();
 
 
     }
