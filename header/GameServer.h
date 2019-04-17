@@ -114,6 +114,15 @@ private:
 	 */
     static void errorResponse(json& response, MessageCode code, string message);
 
+  /**
+	 * @brief errorMessage : Constructs a json error message
+	 *
+	 * @param response The response structure to fill out
+	 * @param codeThatCausedError The message code that caused an error
+	 * @param errorDescription The descritpion of the error
+	 */
+    static void errorMessage(json& response, MessageCode codeThatCausedError, string errorDescription);
+
 
 public:
     /* == server control methods == */

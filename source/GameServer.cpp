@@ -915,7 +915,68 @@ string GameServer::treatMessage(string message, Connection connection)
     break;
 
 		case CODE_END_PHASE:
+    {
+        ClientIterator client;
+        client = clients.find(connection.lock().get());
+
+        if (client == clients.end())
+        {
+            errorMessage(response, CODE_END_PHASE,
+                "END_PHASE: User not connected");
+            break;
+        }
+
+        GameIterator game;
+        game = games.find(client->second.getGameID());
+
+        /* if we don't find the game we send an error */
+        if (game == games.end())
+        {
+            errorMessage(response, CODE_END_PHASE,
+                "END_PHASE: Game not found");
+            break;
+        }
+
+        if(!game->second.isActivePlayer(client->second.getName()))
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: It's not your turn");
+          break;
+        }
+
+        if(game->second.getPhase() == -1)
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: Message not alowed in phase -1");
+          break;
+        }
+
+        json end;
+        end["type"]=CODE_END_PHASE;
+        vector<Player> players = game->second.getPlayers();
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            ClientIterator player;
+
+            for (player = clients.begin(); player != clients.end();
+                player++)
+            {
+                if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+                {
+                    Connection c = player->second.getConnection();
+                    endpoint.send(c,end.dump(),
+                        websocketpp::frame::opcode::text);//sending end_phase
+                }
+            }
+
+        }
+        response["type"]=CODE_END_PHASE;
+
+
+    }
+    break;
 		case CODE_PUT:
+    break;
 		case CODE_USE_TOKENS:
 		case CODE_ATTACK:
 		case CODE_DEFEND:
@@ -1213,6 +1274,13 @@ void GameServer::errorResponse(json& response, MessageCode code, string message)
     response["type"] = code;
     response["data"]["error"] = true;
     response["data"]["response"] = message;
+}
+
+void GameServer::errorMessage(json& response, MessageCode codeThatCausedError, string errorDescription)
+{
+    response["type"] = CODE_ERROR;
+    response["data"]["errType"]= codeThatCausedError;
+    response["data"]["message"]=errorDescription;
 }
 
 
