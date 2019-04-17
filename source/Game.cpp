@@ -366,6 +366,11 @@ bool Game::isFull() {
 	return (this->nbPlayers == this->maxPlayers);
 }
 
+bool Game::isActivePlayer(string name)
+{
+	return (getPlayerOrder(name) == activePlayer);
+}
+
 int Game::addPlayer(string name)
 {
 	if ((this->nbPlayers < this->maxPlayers) && (this->running == false))
