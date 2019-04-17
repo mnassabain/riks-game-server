@@ -606,6 +606,11 @@ int Game::messageStart()
 
 // Allowed when isRunning()
 // Allowed in phase 0, 1, 2
+// returns : 0 -> ok
+//				  -1 -> not your turn
+//					-2 -> need to spend reinforcement
+//          -3 -> need to spend tokens
+//					-4 -> a combat is not finished
 int Game::messageEndPhase(int player)
 {
 	// Checking if the right player sent the message
@@ -614,17 +619,17 @@ int Game::messageEndPhase(int player)
 	// Checks in phase 0
 	if (phase == 0) {
 		// The active player must have spent all of their reinforcement
-		if (players[player].getReinforcement() > 0) return -1;
+		if (players[player].getReinforcement() > 0) return -2;
 
 		// The active player must have less than 5 tokens
-		if (players[player].countTokens() >= 5) return -1;
+		if (players[player].countTokens() >= 5) return -3;
 	}
 
 	// Checks in phase 1
 	if (phase == 1) {
 		// An unfinished combat has to be resolved
 		// combat.attackerId is always reset to -1 when no combat is taking place
-		if (combat.attackerId != -1) return -1;
+		if (combat.attackerId != -1) return -4;
 	}
 
 	// Always allowed in phase 2
@@ -642,7 +647,7 @@ int Game::messageEndPhase(int player)
 // Allowed in phase -1, 0
 //returns : 0 -> ok
 //					1 -> ok + end of phase -1
-//				 -1 -> not active player
+//				 -1 -> not active player or bad phase
 // 				 -2 -> units >1 (only in phase -1)
 //				 -3 -> not a free territory (only in phase -1 when freeTerritories > 0)
 //				 -4 -> not your territory (or not enough units in phase 0)
