@@ -366,6 +366,11 @@ bool Game::isFull() {
 	return (this->nbPlayers == this->maxPlayers);
 }
 
+bool Game::isActivePlayer(string name)
+{
+	return (getPlayerOrder(name) == activePlayer);
+}
+
 int Game::addPlayer(string name)
 {
 	if ((this->nbPlayers < this->maxPlayers) && (this->running == false))
@@ -843,8 +848,8 @@ CombatOutcome Game::messageDefend(int player, int units)
 		// Updating players involved
 		players[combat.attackerId].addTerritoriesOwned();
 		players[combat.defenderId].subTerritoriesOwned();
-		players[combat.attackerId].territoriesCaptured++;
-		players[combat.defenderId].territoriesLost++;
+		players[combat.attackerId].addTerritoriesCaptured();
+		players[combat.defenderId].addTerritoriesLost();
 
 		// Checking for player elimination
 		if (players[combat.defenderId].getTerritoriesOwned() == 0) {
