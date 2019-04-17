@@ -443,6 +443,11 @@ string Game::getPassword()
 	return this->password;
 }
 
+int Game::getPhase()
+{
+	return this->phase;
+}
+
 vector<Player> Game::getPlayers()
 {
 	return this->players;
