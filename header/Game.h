@@ -74,12 +74,12 @@ private:
 	void chooseFirstPlayer();
 
 	/**
-	 * @brief 
-	 * 
-	 * @param tok1 
-	 * @param tok2 
-	 * @param tok3 
-	 * @return int 
+	 * @brief
+	 *
+	 * @param tok1
+	 * @param tok2
+	 * @param tok3
+	 * @return int
 	 */
 	int useSet(int tok1, int tok2, int tok3);
 
@@ -153,16 +153,16 @@ public:
 	// Methods
 
 	/**
-	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to 
+	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to
 	 * 	at the beginning of the turn
-	 * 
+	 *
 	 */
 	void turnReinforcement();
 
 	/**
-	 * @brief toJSON: Gives information about the game instance in json 
-	 * 
-	 * @return json 
+	 * @brief toJSON: Gives information about the game instance in json
+	 *
+	 * @return json
 	 */
 	json toJSON();
 
@@ -206,9 +206,9 @@ public:
 
 	/**
 	 * @brief Get the player's owned territories
-	 * 
-	 * @param name 
-	 * @return int 
+	 *
+	 * @param name
+	 * @return int
 	 */
 	vector<int> getPlayerTerritories(int player);
 
@@ -236,15 +236,15 @@ public:
 
 	/**
 	 * @brief Get the activePlayer attribute
-	 * 
-	 * @return int 
+	 *
+	 * @return int
 	 */
 	int getActivePlayer();
 
 	/**
 	 * @brief Get the board attribute
-	 * 
-	 * @return vector<TerritoryState> 
+	 *
+	 * @return vector<TerritoryState>
 	 */
 	vector<TerritoryState> getGameBoard();
 
@@ -254,6 +254,13 @@ public:
 	 * @return string
 	 */
 	string getPassword();
+
+	/**
+	 * @brief getPḧase : getter on phase
+	 *
+	 * @return current phase
+	 */
+	int getPhase();
 
 	/**
 	 * @brief Get the players attribute
