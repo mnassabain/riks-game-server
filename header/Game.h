@@ -185,6 +185,14 @@ public:
 	/**
 	 * @brief
 	 *
+	 * @return true
+	 * @return false
+	 */
+	bool isActivePlayer(string name);
+
+	/**
+	 * @brief
+	 *
 	 * @param name
 	 */
 	int addPlayer(string name);

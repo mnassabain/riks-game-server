@@ -166,7 +166,8 @@ string Player::toString()
 		status += " " + tokens[i];
 	status += ", isAlive = " + to_string(isAlive) + ", reinforcement = " +\
 	to_string(reinforcement) + ", territoriesOwned = " +\
-	to_string(territoriesOwned) + ", territoriesLost = " +\
+	to_string(territoriesOwned) + ", territoriesCaptured = " +\
+	to_string(territoriesCaptured) + ", territoriesLost = " +\
 	to_string(territoriesLost) + ", unitsKilled = " +\
 	to_string(unitsKilled) + ", unitsLost = " +\
 	to_string(unitsLost) + ", setsSpent = " + to_string(setsSpent);
