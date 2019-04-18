@@ -87,7 +87,7 @@ public:
      * @return number of terrirories lost
      */
     int getTerritoriesLost();
-   
+
     /**
      * @brief getSetsSpent : getter
      * @return number of sets spent
@@ -119,7 +119,7 @@ public:
      * @param reinforcement : number of reinforcement to add
      */
     void addReinforcement(int reinforcement);
-   
+
     /**
      * @brief spendReindorcement : spend some reinforcement of the player
      * @param reinforcement : number of reinforcement to spend
@@ -156,15 +156,21 @@ public:
 
     /**
      * @brief toString: returning information about a player into a string
-     * @return string 
+     * @return string
      */
     string toString();
 
     /**
      * @brief printPlayer: prints the status of a players
-     * 
+     *
      */
     void printPlayer();
+
+		/**
+		 * @brief toJson : return a json formated string of the player (name and tokens)
+		 * @return json formated string of the player
+		 */
+		 string toJson();
 
 	int countTokensOfType(int type);
 	int countTokens();
@@ -172,4 +178,4 @@ public:
 private:
 };
 
-#endif 
+#endif
