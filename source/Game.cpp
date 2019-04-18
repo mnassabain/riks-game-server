@@ -487,27 +487,27 @@ void Game::printGame()
 	string gameInput = toString();
 	boost::split(gameInfo, gameInput, boost::is_any_of(","));
 	cout << gameInfo[0] + " : " << endl;
-	for(size_t i = 1; i < gameInfo.size(); i++)
+	for (size_t i = 1; i < gameInfo.size(); i++)
 		cout << "\t" + gameInfo[i] << endl;
 
 	// Printing board info
 	cout << "\tboard[] = ";
-	for(size_t i = 0; i < board.size(); i++)
+	for (size_t i = 0; i < board.size(); i++)
 	{
-		if(i % 2 == 0)
+		if (i % 2 == 0)
 		{
 			cout << endl;
 			cout << "\t\t";
 		}
 		cout << " ts" + to_string(i) + "{" + board[i].toString()\
-		+ "}";
+			+ "}";
 	}
 
 	cout << endl;
 
 	// Printing players info
 	cout << "\tplayers[] :" << endl;
-	for(size_t i = 0; i < players.size(); i++)
+	for (size_t i = 0; i < players.size(); i++)
 	{
 		players[i].printPlayer();
 		cout << endl;
