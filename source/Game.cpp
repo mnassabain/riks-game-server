@@ -185,7 +185,7 @@ int Game::putUnits(int territory, int units)
 		this->board[territory].units += units;
 		return 0;
 	}
-	else return -1;
+	else return -4;
 }
 
 CombatOutcome Game::solveCombat(int attackers, int defenders)
@@ -267,7 +267,11 @@ int Game::moveUnits(int source, int destination, int units) // The phase checks 
 
 int Game::setInitialReinforcement()
 {
-	int reinforcement = 20 + 5 * (this->map.getMaxPlayers() - this->nbPlayers); // 20 units + 5 for each missing player
+	// We can't take the Game's instance attribute of maxPlayer
+	// otherwise we would end up with 20 reinforcements for
+	// each player when playing in a 1v1 map for example
+	int maxPlayersRisk = 6;
+	int reinforcement = 20 + 5 * (maxPlayersRisk - this->nbPlayers); // 20 units + 5 for each missing player
 
 	for (int i = 0; i < this->nbPlayers; i++) {
 		players[i].addReinforcement(reinforcement);
@@ -362,6 +366,11 @@ bool Game::isFull() {
 	return (this->nbPlayers == this->maxPlayers);
 }
 
+bool Game::isActivePlayer(string name)
+{
+	return (getPlayerOrder(name) == activePlayer);
+}
+
 int Game::addPlayer(string name)
 {
 	if ((this->nbPlayers < this->maxPlayers) && (this->running == false))
@@ -387,6 +396,17 @@ int Game::removePlayer(string name)
 	return -1;
 }
 
+vector<int> Game::getPlayerTerritories(int player)
+{
+	vector<int> territories;
+	for(int i = 0; i < map.nbTerritories(); i++)
+	{
+		if(player == board[i].owner)
+			territories.push_back(i);
+	}
+	return territories;
+}
+
 // Will return -1 if the player isn't in this game/lobby
 int Game::getPlayerOrder(string name)
 {
@@ -408,9 +428,24 @@ int Game::getNbPlayers()
 	return this->nbPlayers;
 }
 
+int Game::getActivePlayer()
+{
+	return this->activePlayer;
+}
+
+vector<TerritoryState> Game::getGameBoard()
+{
+	return this->board;
+}
+
 string Game::getPassword()
 {
 	return this->password;
+}
+
+int Game::getPhase()
+{
+	return this->phase;
 }
 
 vector<Player> Game::getPlayers()
@@ -441,7 +476,7 @@ string Game::toString()
 		+ ", lastAttackedTerritory = " + to_string(lastAttackedTerritory)\
 		+ ", lastAttackCapture = " + to_string(lastAttackCapture);
 	// cout << "board = " << this -> board;
-	// cout << "players = " << this -> players;	
+	// cout << "players = " << this -> players;
 	return status;
 }
 
@@ -571,6 +606,11 @@ int Game::messageStart()
 
 // Allowed when isRunning()
 // Allowed in phase 0, 1, 2
+// returns : 0 -> ok
+//				  -1 -> not your turn
+//					-2 -> need to spend reinforcement
+//          -3 -> need to spend tokens
+//					-4 -> a combat is not finished
 int Game::messageEndPhase(int player)
 {
 	// Checking if the right player sent the message
@@ -579,17 +619,17 @@ int Game::messageEndPhase(int player)
 	// Checks in phase 0
 	if (phase == 0) {
 		// The active player must have spent all of their reinforcement
-		if (players[player].getReinforcement() > 0) return -1;
+		if (players[player].getReinforcement() > 0) return -2;
 
 		// The active player must have less than 5 tokens
-		if (players[player].countTokens() >= 5) return -1;
+		if (players[player].countTokens() >= 5) return -3;
 	}
 
 	// Checks in phase 1
 	if (phase == 1) {
 		// An unfinished combat has to be resolved
 		// combat.attackerId is always reset to -1 when no combat is taking place
-		if (combat.attackerId != -1) return -1;
+		if (combat.attackerId != -1) return -4;
 	}
 
 	// Always allowed in phase 2
@@ -605,6 +645,12 @@ int Game::messageEndPhase(int player)
 }
 
 // Allowed in phase -1, 0
+//returns : 0 -> ok
+//					1 -> ok + end of phase -1
+//				 -1 -> not active player or bad phase
+// 				 -2 -> units >1 (only in phase -1)
+//				 -3 -> not a free territory (only in phase -1 when freeTerritories > 0)
+//				 -4 -> not your territory (or not enough units in phase 0)
 int Game::messagePut(int player, int territory, int units)
 {
 	// Checking if the right player sent the message
@@ -614,27 +660,26 @@ int Game::messagePut(int player, int territory, int units)
 	if (phase == -1) {
 		// Currently no check needed on player available reinforcement, since the game will forcefull proceed to next phase once they're all out
 		// A player can only put one unit at a time in this phase
-		if (units != 1) return -1;
+		if (units != 1) return -2;
 
 		// If there are still free territories, they have to put their unit in one of them
 		if (freeTerritories > 0) {
-			if (board[territory].owner != -1) return -1;
+			if (board[territory].owner != -1) return -3;
 			else {
 				board[territory].owner = player;
 				board[territory].units = 1;
 
 				freeTerritories--;
 				players[player].spendReinforcement(1);
+				players[player].addTerritoriesOwned();
 			}
 		}
 
 		// If there are no more free territories, they have to put their unit in one of theirs
-		else {
-			if (freeTerritories == 0) {
-				if (board[territory].owner != player) return -1;
-				else {
-					putUnits(territory, 1);
-				}
+		else if (freeTerritories == 0) {
+			if (board[territory].owner != player) return -4;
+			else {
+				putUnits(territory, 1);
 			}
 		}
 
@@ -648,8 +693,11 @@ int Game::messagePut(int player, int territory, int units)
 		for (i = 0; i < max; i++) {
 			count += players[i].getReinforcement();
 		}
-		if (count == 0) nextPhase();
-
+		if (count == 0)
+		{
+			nextPhase();
+			return 1;
+		}
 		return 0;
 	}
 
@@ -678,23 +726,59 @@ int Game::messageUseTokens(int player, int token1, int token2, int token3)
 int Game::messageAttack(int player, int source, int destination, int units)
 {
 	// Checking if the right player sent the message
-	if (player != activePlayer) return -1;
+	if (player != activePlayer)
+	{
+		cerr << "MSG_ATT: It's not Player" + to_string(player) +\
+		"'s turn, exiting...";
+		 return -1;
+	}
 
 	// Phase check
-	if (phase != 1) return -1;
+	if (phase != 1)
+	{
+		cerr << "MSG_ATT: Phase check failed, exiting..." << endl;
+		return -1;
+	}
 	// Checking if units is a valid amount
-	if (units < 1 || units > 3) return -1;
+	if (units < 1 || units > 3)
+	{
+		cerr << "MSG_ATT: Units check failed, exiting..." << endl;
+		return -1;
+	}
 	// Checking if a combat is not currently taking place
-	if (combat.attackerId != -1) return -1;
+	if (combat.attackerId != -1)
+	{
+		cerr << "MSG_ATT: Combat already taking place, exiting..."\
+		<< endl;
+	 	return -1;
+	}
 	// Checking if the player owns the source
-	if (board[source].owner != player) return -1;
+	if (board[source].owner != player)
+	{
+		cerr << "MSG_ATT: Active player doesn't own the source, \
+		exiting..." << endl;
+		return -1;
+	}
 	// Checking if the players doesn't own the destination
-	if (board[destination].owner == player) return -1;
+	if (board[destination].owner == player)
+	{
+		cerr << "MSG_ATT: You can't attack your own territory, exiting..."\
+		<< endl;
+		return -1;
+	}
 	// Checking if the territories are adjacent
-	if (!areAdjacent(source, destination)) return -1;
+	if (!areAdjacent(source, destination))
+	{
+		cerr << "MSG_ATT: Territories aren't adjacent, exiting..." << endl;
+		return -1;
+	}
 	// Checking if the player has the required units
 	// <= since one unit must remain on the source
-	if (board[source].units <= units) return -1;
+	if (board[source].units <= units)
+	{
+		cerr << "MSG_ATT: One unit must remain on the source, exiting..." << endl;
+		return -1;
+	}
 
 	// All checks have been performed, the attack is thus allowed and waiting for the defender's response
 	combat.attackerId = player;
@@ -717,17 +801,36 @@ CombatOutcome Game::messageDefend(int player, int units)
 
 
 	// Checking if a combat requires solving
-	if (combat.attackerId == -1) return result;
+	if (combat.attackerId == -1)
+	{
+		cerr << "MSG_DEF: No combat requires solving, exiting..." << endl;
+		return result;
+	}
 
 	// Checking if the right player sent the message
-	if (player != combat.defenderId) return result;
+	if (player != combat.defenderId)
+	{
+		cerr << "MSG_DEF: The player is not the right defender, exiting..." << endl;
+		return result;
+	}
 	// Phase check
-	if (phase != 1) return result;
+	if (phase != 1)
+	{
+		cerr << "MSG_DEF: Phase check failed, exiting..." << endl;
+		return result;
+	}
 	// Checking if units is a valid amount
-	if (units < 1 || units > 2) return result;
+	if (units < 1 || units > 2){
+		cerr << "MSG_DEF: Units check failed, exiting..." << endl;
+	}
 	// Checking if the player has the required units
 	// < since the defender can use all of their units
-	if (board[combat.destination].units < units) return result;
+	if (board[combat.destination].units < units)
+	{
+		cerr << "MSG_DEF: Not enough units on the territory, exiting..."\
+		<< endl;
+		return result;
+	}
 
 	// All checks have been performed, the combat can now be solved
 	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
@@ -740,6 +843,12 @@ CombatOutcome Game::messageDefend(int player, int units)
 	// Updating turn variables
 	lastAttackingTerritory = combat.source;
 	lastAttackedTerritory = combat.destination;
+
+	// Updating unitsLost and unitsKilled
+	players[combat.attackerId].unitsKilled += result.defenderLoss;
+	players[combat.defenderId].unitsKilled += result.attackerLoss;
+	players[combat.attackerId].unitsLost += result.attackerLoss;
+	players[combat.defenderId].unitsLost += result.defenderLoss;
 
 	// Checking if the combat resulted in a capture
 	if (board[combat.destination].units == 0) {
@@ -758,6 +867,8 @@ CombatOutcome Game::messageDefend(int player, int units)
 		// Updating players involved
 		players[combat.attackerId].addTerritoriesOwned();
 		players[combat.defenderId].subTerritoriesOwned();
+		players[combat.attackerId].addTerritoriesCaptured();
+		players[combat.defenderId].addTerritoriesLost();
 
 		// Checking for player elimination
 		if (players[combat.defenderId].getTerritoriesOwned() == 0) {
@@ -821,4 +932,33 @@ int Game::messageMove(int player, int source, int destination, int units)
 
 	return -1;
 
+}
+
+
+string Game::toJson()
+{
+	string res="{\"name\":\""+name+"\",\"nbPlayers\":"+to_string(nbPlayers)+",";
+	res+= "\"players\":{";
+				for(size_t i = 0;i<players.size();i++)
+				{
+					res+=players.at(i).toJson();
+					if(i<players.size()-1)
+						res+=",";
+				}
+			res+="},";
+	res+="\"mapName\":\""+map.getName()+"\",";
+	res+="\"board\":{";
+				for(size_t i = 0; i<board.size();i++)
+				{
+					res+="{\"terId\":"+to_string(i)+",\"ownerId\":"+to_string(board.at(i).owner)+",\"nbUnits\":"+to_string(board.at(i).units)+"}";
+					if(i<board.size()-1)
+						res+=",";
+				}
+			res+="},";
+	res+="\"freeTerritories\":"+to_string(freeTerritories)+",";
+	res+="\"phase\":"+to_string(phase)+",";
+	res+="\"activePlayer\":"+to_string(activePlayer)+",";
+	res+="\"totalExchangedSets\":"+to_string(totalExchangedSets)+"}";
+
+	return res;
 }

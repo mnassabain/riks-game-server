@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <algorithm>
 #include "../header/Game.h"
 #include "../header/MessageCode.h"
 #include "../header/Client.h"
@@ -112,6 +113,15 @@ private:
 	 * @param message The message to send
 	 */
     static void errorResponse(json& response, MessageCode code, string message);
+
+  /**
+	 * @brief errorMessage : Constructs a json error message
+	 *
+	 * @param response The response structure to fill out
+	 * @param codeThatCausedError The message code that caused an error
+	 * @param errorDescription The descritpion of the error
+	 */
+    static void errorMessage(json& response, MessageCode codeThatCausedError, string errorDescription);
 
 
 public:

@@ -50,43 +50,36 @@ private:
 	// Methods
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	void start();
 
 	/**
 	 * @brief nextPlayer : Passes the turn to the next player
-	 * 
+	 *
 	 */
 	void nextPlayer();
 
 	/**
 	 * @brief nextPhase : Goes to the next phase
-	 * 
+	 *
 	 */
 	void nextPhase();
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	void chooseFirstPlayer();
 
 	/**
-	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to 
-	 * 	at the beginning of the turn
-	 * 
-	 */
-	void turnReinforcement();
-
-	/**
-	 * @brief 
-	 * 
-	 * @param tok1 
-	 * @param tok2 
-	 * @param tok3 
-	 * @return int 
+	 * @brief
+	 *
+	 * @param tok1
+	 * @param tok2
+	 * @param tok3
+	 * @return int
 	 */
 	int useSet(int tok1, int tok2, int tok3);
 
@@ -96,56 +89,56 @@ private:
 	int putUnits(int territory, int units);
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	CombatOutcome solveCombat(int attackers, int defenders);
 
 	/**
 	 * @brief moveUnits : Moving units from one territory to another
-	 * 
-	 * @param source 
-	 * @param destination 
-	 * @param units 
+	 *
+	 * @param source
+	 * @param destination
+	 * @param units
 	 */
 	int moveUnits(int source, int destination, int units);
 
 	/**
 	 * @brief Set the Initial Reinforcement object
-	 * 
+	 *
 	 */
 	int setInitialReinforcement();
 
 	/**
-	 * @brief 
-	 * 
+	 * @brief
+	 *
 	 */
 	void end();
 
 	/**
-	 * @brief 
-	 * 
-	 * @return int 
+	 * @brief
+	 *
+	 * @return int
 	 */
 	int updatePlayersStatsInDB();
 
 	/**
 	 * @brief areAdjacent : Checks if `a` and `b` are neighbors
-	 * 
-	 * @param a 
-	 * @param b 
-	 * @return true 
-	 * @return false 
+	 *
+	 * @param a
+	 * @param b
+	 * @return true
+	 * @return false
 	 */
 	bool areAdjacent(int a, int b);
 
 	/**
 	 * @brief continentOwner : Checks if the continent is dominated by the player
-	 * 
+	 *
 	 * @param id
-	 * @param idPlayer 
-	 * @return true 
-	 * @return false 
+	 * @param idPlayer
+	 * @return true
+	 * @return false
 	 */
 	int continentOwner(int idContinent);
 
@@ -160,75 +153,119 @@ public:
 	// Methods
 
 	/**
-	 * @brief toJSON: Gives information about the game instance in json 
-	 * 
-	 * @return json 
+	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to
+	 * 	at the beginning of the turn
+	 *
+	 */
+	void turnReinforcement();
+
+	/**
+	 * @brief toJSON: Gives information about the game instance in json
+	 *
+	 * @return json
 	 */
 	json toJSON();
 
 	/**
-	 * @brief 
-	 * 
-	 * @return true 
-	 * @return false 
+	 * @brief
+	 *
+	 * @return true
+	 * @return false
 	 */
 	bool isRunning();
 
 	/**
 	 * @brief isFull : tells if the Gameroom is full or not
-	 * 
-	 * @return true 
-	 * @return false 
+	 *
+	 * @return true
+	 * @return false
 	 */
 	bool isFull();
 
 	/**
-	 * @brief 
-	 * 
-	 * @param name 
+	 * @brief
+	 *
+	 * @return true
+	 * @return false
+	 */
+	bool isActivePlayer(string name);
+
+	/**
+	 * @brief
+	 *
+	 * @param name
 	 */
 	int addPlayer(string name);
 
 	/**
-	 * @brief 
-	 * 
-	 * @param name 
+	 * @brief
+	 *
+	 * @param name
 	 */
 	int removePlayer(string name);
 
 	/**
+	 * @brief Get the player's owned territories
+	 *
+	 * @param name
+	 * @return int
+	 */
+	vector<int> getPlayerTerritories(int player);
+
+	/**
 	 * @brief Get the player's turn order
-	 * 
-	 * @param name 
-	 * @return int 
+	 *
+	 * @param name
+	 * @return int
 	 */
 	int getPlayerOrder(string name);
 
 	/**
 	 * @brief Get the Id attribute
-	 * 
-	 * @return int 
+	 *
+	 * @return int
 	 */
 	int getId();
 
 	/**
 	 * @brief Get the nbPlayers attribute
-	 * 
-	 * @return int 
+	 *
+	 * @return int
 	 */
 	int getNbPlayers();
 
 	/**
+	 * @brief Get the activePlayer attribute
+	 *
+	 * @return int
+	 */
+	int getActivePlayer();
+
+	/**
+	 * @brief Get the board attribute
+	 *
+	 * @return vector<TerritoryState>
+	 */
+	vector<TerritoryState> getGameBoard();
+
+	/**
 	 * @brief Get the Password attribute
-	 * 
-	 * @return string 
+	 *
+	 * @return string
 	 */
 	string getPassword();
 
 	/**
+	 * @brief getPḧase : getter on phase
+	 *
+	 * @return current phase
+	 */
+	int getPhase();
+
+	/**
 	 * @brief Get the players attribute
-	 * 
-	 * @return vector<Player> 
+	 *
+	 * @return vector<Player>
 	 */
 	vector<Player> getPlayers();
 
@@ -241,24 +278,30 @@ public:
 
 	/**
 	 * @brief Puts information about the game in a string
-	 * 
+	 *
 	 */
 	string toString();
 
 	/**
 	 * @brief Prints the status of the game
-	 * 
+	 *
 	 */
 	void printGame();
+
+	/**
+	 * @brief toJson : return a json formated string of the game
+	 * @return json formated string of the game
+	 */
+	string toJson();
 
 	// Constructors
 
 	/**
 	 * @brief Construct a new Game object
-	 * 
-	 * @param mapName 
-	 * @param creatorId 
-	 * @param maxPlayers 
+	 *
+	 * @param mapName
+	 * @param creatorId
+	 * @param maxPlayers
 	 */
 	Game(string mapName, string creatorId, int maxPlayers);
 	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation

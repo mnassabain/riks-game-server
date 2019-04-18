@@ -418,12 +418,6 @@ string GameServer::treatMessage(string message, Connection connection)
             response["data"]["response"] = "Success";
             break;
 
-        case CODE_ERROR:
-
-            /* ? */
-            errorResponse(response, CODE_ERROR, "Error");
-
-            break;
 
         case CODE_CREATE_LOBBY:
 
@@ -812,11 +806,335 @@ string GameServer::treatMessage(string message, Connection connection)
 
             break;
 
-		// Messages treated by Game object // Verifications to add
 		case CODE_START_GAME:
-			break;
+    /* check if user is connected */
+    {
+        ClientIterator client;
+        client = clients.find(connection.lock().get());
+
+        if (client == clients.end())
+        {
+            errorResponse(response, CODE_START_GAME,
+                "START_GAME: User not connected");
+            break;
+        }
+
+        GameIterator game;
+        game = games.find(client->second.getGameID());
+
+        /* if we don't find the lobby we send an error */
+        if (game == games.end())
+        {
+            errorResponse(response, CODE_START_GAME,
+                "START_GAME: Lobby not found");
+            break;
+        }
+
+        //check if the message is sent by the game owner
+        if(game->second.getPlayers().at(0).getName() != client->second.getName())
+        {
+          errorResponse(response, CODE_START_GAME,
+              "START_GAME: You are not the owner of the game");
+          break;
+        }
+
+        //Starting the game
+        if(game->second.messageStart()==-1)
+        {
+          errorResponse(response, CODE_START_GAME,
+              "START_GAME: The game is already started");
+          break;
+        }
+
+        //Sending START_GAME and GAME_STATUS to all clients in this game
+        json start;
+        start["type"]=CODE_START_GAME;
+        string status ="{\"type\":"+to_string(CODE_GAME_STATUS)+",\"data\":"+game->second.toJson()+"}";
+        vector<Player> players = game->second.getPlayers();
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            ClientIterator player;
+
+            for (player = clients.begin(); player != clients.end();
+                player++)
+            {
+                if (player->second.getName() == players[i].getName())
+                {
+                    Connection c = player->second.getConnection();
+                    endpoint.send(c, start.dump(),
+                        websocketpp::frame::opcode::text);//sending start
+                    endpoint.send(c, status,
+                        websocketpp::frame::opcode::text);//sending status
+                }
+            }
+
+        }
+
+    }
+
+    /* construct the response */
+    response["type"] = CODE_START_GAME;
+
+		break;
+
+    case CODE_GAME_STATUS:
+    {
+        ClientIterator client;
+        client = clients.find(connection.lock().get());
+
+        if (client == clients.end())
+        {
+            errorResponse(response, CODE_GAME_STATUS,
+                "GAME_STATUS: User not connected");
+            break;
+        }
+
+        GameIterator game;
+        game = games.find(client->second.getGameID());
+
+        /* if we don't find the game we send an error */
+        if (game == games.end())
+        {
+            errorResponse(response, CODE_GAME_STATUS,
+                "GAME_STATUS: Game not found");
+            break;
+        }
+
+        //If the game has not been started
+        if(!game->second.isRunning())
+        {
+          errorResponse(response, CODE_GAME_STATUS,
+              "GAME_STATUS: The game is not running yet");
+          break;
+        }
+
+        //Sending GAME_STATUS to the client
+        return "{\"type\":"+to_string(CODE_GAME_STATUS)+",\"data\":"+game->second.toJson()+"}";
+
+    }
+    break;
+
 		case CODE_END_PHASE:
+    {
+        ClientIterator client;
+        client = clients.find(connection.lock().get());
+
+        if (client == clients.end())
+        {
+            errorMessage(response, CODE_END_PHASE,
+                "END_PHASE: User not connected");
+            break;
+        }
+
+        GameIterator game;
+        game = games.find(client->second.getGameID());
+
+        /* if we don't find the game we send an error */
+        if (game == games.end())
+        {
+            errorMessage(response, CODE_END_PHASE,
+                "END_PHASE: Game not found");
+            break;
+        }
+
+        if(!game->second.isActivePlayer(client->second.getName()))
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: It's not your turn");
+          break;
+        }
+
+        if(game->second.getPhase() == -1)
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: Message not alowed in phase -1");
+          break;
+        }
+
+        int gameReturn = game->second.messageEndPhase(game->second.getPlayerOrder(client->second.getName()));
+        if(gameReturn == -1)//not your turn
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: It's not your turn");
+          break;
+        }
+        if(gameReturn == -2)//reinforcements > 0 in phase 0
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: You need to spend your reinforcements");
+          break;
+        }
+        if(gameReturn == -3)//tokens >= 5 in phase 0
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: You need to spend a set of tokens");
+          break;
+        }
+        if(gameReturn == -4)//unfinished combat in phase 1
+        {
+          errorMessage(response, CODE_END_PHASE,
+              "END_PHASE: Your combat is unfinished");
+          break;
+        }
+        json end;
+        end["type"]=CODE_CURRENT_PHASE;
+        end["data"]["phase"]=game->second.getPhase();
+        vector<Player> players = game->second.getPlayers();
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            ClientIterator player;
+
+            for (player = clients.begin(); player != clients.end();
+                player++)
+            {
+                if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+                {//sending to everyone but sender
+                    Connection c = player->second.getConnection();
+                    endpoint.send(c,end.dump(),
+                        websocketpp::frame::opcode::text);//sending current_phase
+                }
+            }
+
+        }
+        response["type"]=CODE_CURRENT_PHASE;
+        response["data"]["phase"]= game->second.getPhase();
+
+
+    }
+    break;
 		case CODE_PUT:
+    {
+        /* we check if the message has a data field */
+        if (!jmessage.count("data"))
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: Invalid message format");
+
+            break;
+        }
+
+        /* we check the data field type */
+        if (!jmessage["data"].is_object())
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: Invalid message format");
+
+            break;
+        }
+
+        /* we check if the data field contains the necessary info */
+        if (!jmessage["data"].count("territory") ||
+            !jmessage["data"].count("units")
+            )
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: Invalid message format, bad parameters");
+
+            break;
+        }
+
+        /* we check if the info has the correct type */
+        if (!jmessage["data"]["territory"].is_number() ||
+            !jmessage["data"]["units"].is_number())
+        {
+            errorMessage(response, CODE_PUT,
+                "PUT: Invalid message format, bad parameters");
+
+            break;
+        }
+
+        //check if user is connected
+        ClientIterator client;
+        client = clients.find(connection.lock().get());
+
+        if (client == clients.end())
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: You are not connected");
+            break;
+        }
+
+        GameIterator game;
+        game = games.find(client->second.getGameID());
+
+        /* if we don't find the game we send an error */
+        if (game == games.end())
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: You are not in a game");
+            break;
+        }
+
+        int gameReturn = game->second.messagePut(game->second.getPlayerOrder(client->second.getName()),jmessage["data"]["territory"],jmessage["data"]["units"]);
+        if(gameReturn == -1)//Not your turn or bad phase
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: You cannot put units now");
+            break;
+        }
+        if(gameReturn == -2)//units > 1 in phase -1
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: You can only put one unit initialisation phase");
+            break;
+        }
+        if(gameReturn == -3)//Not on free territory and free territories > 0
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: You have to put the unit on a free territory");
+            break;
+        }
+        if(gameReturn == -4)//Not your turn or bad phase
+        {
+          errorMessage(response, CODE_PUT,
+              "PUT: You don't own this territory AND/OR don't have enough units");
+            break;
+        }
+
+        //gameReturn == 0 || gameReturn == 1
+        json put,end;
+        put["type"]=CODE_PUT;
+        put["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
+        put["data"]["territory"]=jmessage["data"]["territory"];
+        put["data"]["units"]=jmessage["data"]["units"];
+
+        if(gameReturn == 1)//end of phase -1
+        {
+          end["type"]=CODE_CURRENT_PHASE;
+          end["data"]["phase"]=game->second.getPhase();
+        }
+
+        vector<Player> players = game->second.getPlayers();
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            ClientIterator player;
+
+            for (player = clients.begin(); player != clients.end();
+                player++)
+            {
+                if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+                {//sending to everyone but sender
+                    Connection c = player->second.getConnection();
+                    endpoint.send(c,put.dump(),
+                        websocketpp::frame::opcode::text);//sending put
+                    if(gameReturn == 1)
+                        endpoint.send(c,end.dump(),websocketpp::frame::opcode::text);//sending current_phase
+                }
+            }
+
+        }
+        response["type"]=CODE_PUT;
+        response["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
+        response["data"]["territory"]=jmessage["data"]["territory"];
+        response["data"]["units"]=jmessage["data"]["units"];
+        if(gameReturn == 1)
+        {
+            Connection c = client->second.getConnection();
+            endpoint.send(c,end.dump(),websocketpp::frame::opcode::text);//sending current_phase to sender
+        }
+
+    }
+    break;
 		case CODE_USE_TOKENS:
 		case CODE_ATTACK:
 		case CODE_DEFEND:
@@ -1114,6 +1432,13 @@ void GameServer::errorResponse(json& response, MessageCode code, string message)
     response["type"] = code;
     response["data"]["error"] = true;
     response["data"]["response"] = message;
+}
+
+void GameServer::errorMessage(json& response, MessageCode codeThatCausedError, string errorDescription)
+{
+    response["type"] = CODE_ERROR;
+    response["data"]["errType"]= codeThatCausedError;
+    response["data"]["message"]=errorDescription;
 }
 
 
