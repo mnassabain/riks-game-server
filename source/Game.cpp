@@ -62,6 +62,8 @@ void Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this->phase = (this->phase + 1) % 3;
+	if(this->phase == 0)
+		turnReinforcement();
 }
 
 void Game::chooseFirstPlayer()
