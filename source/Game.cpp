@@ -736,6 +736,7 @@ int Game::messagePut(int player, int territory, int units)
 //				  -1 -> not your turn
 //				  -2 -> wrong phase
 //                -3 -> player doesn't have set
+//                -4 -> set is not valid
 int Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
 	// Checking if the right player sent the message
@@ -743,6 +744,9 @@ int Game::messageUseTokens(int player, int token1, int token2, int token3)
 
 	// Phase check
 	if (phase != 0) return -2;
+
+	// Set validity check
+	if (!isValidSet(token1, token2, token3)) return -4;
 
 	// Treatment
 	return useSet(token1, token2, token3);
