@@ -15,6 +15,7 @@ void Game::start()
 	this->tokens[2] = 14;
 	this->tokens[3] = 14;
 	this->totalExchangedSets = 0;
+	this->deathCount = 0;
 	// Initialization of turn variables
 	resetTurnVariables();
 	// Initialization of combat handler
@@ -210,6 +211,10 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	CombatOutcome result;
 	result.attackerLoss = 0;
 	result.defenderLoss = 0;
+
+	result.outcomeType = 0;
+	result.source = -1;
+	result.destination = -1;
 
 	int limit = pow(6, attackers + defenders);
 	int roll = rand() % limit; // Effective range : 0 to limit-1
@@ -821,19 +826,32 @@ int Game::messageAttack(int player, int source, int destination, int units)
 
 }
 
-// if any of the CombatOutcome returned values is -1, the meaning is the same as an int -1 returned value
+// Check combatOutcome.outcomeType for return values
 // Allowed in phase 1
+// returns : 0 -> ok // Unit loss and territories involved are available
+//			 1 -> ok, and player elimination // Tokens transferred are available too
+//			 2 -> ok, and game end
+//
+//			 -1 -> not your turn
+//           -2 -> no combat is taking place
+//			 -3 -> wrong phase
+//			 -4 -> invalid range of units
+//			 -5 -> not enough available units
 CombatOutcome Game::messageDefend(int player, int units)
 {
 	CombatOutcome result;
+	result.outcomeType = -1;
 	result.attackerLoss = -1;
 	result.defenderLoss = -1;
+	result.source = -1;
+	result.destination = -1;
 
 
 	// Checking if a combat requires solving
 	if (combat.attackerId == -1)
 	{
 		cerr << "MSG_DEF: No combat requires solving, exiting..." << endl;
+		result.outcomeType = -2;
 		return result;
 	}
 
@@ -841,17 +859,21 @@ CombatOutcome Game::messageDefend(int player, int units)
 	if (player != combat.defenderId)
 	{
 		cerr << "MSG_DEF: The player is not the right defender, exiting..." << endl;
+		result.outcomeType = -1;
 		return result;
 	}
 	// Phase check
 	if (phase != 1)
 	{
 		cerr << "MSG_DEF: Phase check failed, exiting..." << endl;
+		result.outcomeType = -3;
 		return result;
 	}
 	// Checking if units is a valid amount
 	if (units < 1 || units > 2){
 		cerr << "MSG_DEF: Units check failed, exiting..." << endl;
+		result.outcomeType = -4;
+		return result;
 	}
 	// Checking if the player has the required units
 	// < since the defender can use all of their units
@@ -859,12 +881,18 @@ CombatOutcome Game::messageDefend(int player, int units)
 	{
 		cerr << "MSG_DEF: Not enough units on the territory, exiting..."\
 		<< endl;
+		result.outcomeType = -5;
 		return result;
 	}
 
 	// All checks have been performed, the combat can now be solved
 	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
 	result = solveCombat(combat.attackerUnits, combat.defenderUnits);
+
+	// Updating result
+	result.outcomeType = 0;
+	result.source = combat.source;
+	result.destination = combat.destination;
 
 	// Updating the unit count on both territories
 	board[combat.source].units -= result.attackerLoss;
@@ -904,17 +932,21 @@ CombatOutcome Game::messageDefend(int player, int units)
 		if (players[combat.defenderId].getTerritoriesOwned() == 0) {
 			players[combat.defenderId].die();
 
+			// Updating result
+			result.outcomeType = 1;
+
 			// Token transfer between defender and attacker
-			// Temporary crude method // will also require external update
-			int transfer[4];
-			transfer[0] = players[combat.defenderId].countTokensOfType(0);
-			transfer[1] = players[combat.defenderId].countTokensOfType(1);
-			transfer[2] = players[combat.defenderId].countTokensOfType(2);
-			transfer[3] = players[combat.defenderId].countTokensOfType(3);
+			// Temporary crude method
+			result.tokens[0] = players[combat.defenderId].countTokensOfType(0);
+			result.tokens[1] = players[combat.defenderId].countTokensOfType(1);
+			result.tokens[2] = players[combat.defenderId].countTokensOfType(2);
+			result.tokens[3] = players[combat.defenderId].countTokensOfType(3);
 
-			players[combat.defenderId].receiveTokens(transfer);
+			players[combat.defenderId].receiveTokens(result.tokens);
 
-			// Checking for victory, currently done in nextPlayer(), but should be done right away
+			// Updating deathCount and checking for victory
+			deathCount++;
+			if (deathCount >= nbPlayers - 1) result.outcomeType = 2;
 		}
 
 		// Updating lastAttackCapture
@@ -926,7 +958,6 @@ CombatOutcome Game::messageDefend(int player, int units)
 	// Resetting the CombatHandler
 	resetCombat();
 	return result;
-
 }
 
 // Allowed in phase 1, 2

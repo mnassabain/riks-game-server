@@ -41,8 +41,19 @@ typedef struct TerritoryState TerritoryState;
 //CombatOutcome
 struct CombatOutcome
 {
+	// Outcome Type
+	int outcomeType;
+
+	// Unit loss
 	int attackerLoss;
 	int defenderLoss;
+
+	// Territories involved
+	int source;
+	int destination;
+
+	// Tokens transferred in the case of a player elimination
+	int tokens[4];
 };
 typedef struct CombatOutcome CombatOutcome;
 

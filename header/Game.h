@@ -33,6 +33,7 @@ private:
 	// Game variables - Only available when Game is running
 	vector <TerritoryState> board;
 	int freeTerritories;
+	int deathCount;
 
 	int phase;
 	int activePlayer;
