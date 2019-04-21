@@ -1104,14 +1104,14 @@ string GameServer::treatMessage(string message, Connection connection)
             break;
         }
 
-        //gameReturn == 0 || gameReturn == 1
+        //gameReturn == 0 || gameReturn >0
         json put,end,rein;
         put["type"]=CODE_PUT;
         put["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
         put["data"]["territory"]=jmessage["data"]["territory"];
         put["data"]["units"]=jmessage["data"]["units"];
 
-        if(gameReturn == 1)//end of phase -1
+        if(gameReturn >0)//end of phase -1
         {
           end["type"]=CODE_CURRENT_PHASE;
           end["data"]["phase"]=game->second.getPhase();
@@ -1133,7 +1133,7 @@ string GameServer::treatMessage(string message, Connection connection)
                     Connection c = player->second.getConnection();
                     endpoint.send(c,put.dump(),
                         websocketpp::frame::opcode::text);//sending put
-                    if(gameReturn == 1)
+                    if(gameReturn >0)
                     {
                         endpoint.send(c,end.dump(),websocketpp::frame::opcode::text);//sending current_phase
                         endpoint.send(c,rein.dump(),websocketpp::frame::opcode::text);//sending reinforcement
@@ -1146,7 +1146,7 @@ string GameServer::treatMessage(string message, Connection connection)
         response["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
         response["data"]["territory"]=jmessage["data"]["territory"];
         response["data"]["units"]=jmessage["data"]["units"];
-        if(gameReturn == 1)
+        if(gameReturn >0)
         {
             Connection c = client->second.getConnection();
             endpoint.send(c,end.dump(),websocketpp::frame::opcode::text);//sending current_phase to sender
