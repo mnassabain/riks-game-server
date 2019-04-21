@@ -35,7 +35,8 @@ void Game::start()
 	this->running = true;
 }
 
-void Game::nextPlayer()
+// Returns new activePlayer
+int Game::nextPlayer()
 {
 	// considering that `activePlayer` can go from 0 to `nbPlayers - 1`
 	int idPlayer = (this->activePlayer + 1) % this->nbPlayers;
@@ -56,14 +57,21 @@ void Game::nextPlayer()
 
 	// Resetting the turn related variables
 	resetTurnVariables();
+
+	return activePlayer;
 }
 
-void Game::nextPhase()
+// activePlayer must be correct before calling nextPhase
+// returns reinforcement received by the player in phase 0 (Always >= 3)
+// returns 0 if ok
+// returns new current phase if not phase 0 (1 or 2) // currently ignored
+int Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this->phase = (this->phase + 1) % 3;
-	if(this->phase == 0)
-		turnReinforcement();
+	if (this->phase == 0) returns turnReinforcement();
+	// else return this->phase;
+	else return 0;
 }
 
 void Game::chooseFirstPlayer()
@@ -71,7 +79,7 @@ void Game::chooseFirstPlayer()
 	this->activePlayer = rand() % (this->nbPlayers);
 }
 
-void Game::turnReinforcement()
+int Game::turnReinforcement()
 {
 	int reinforcement = 0;
 	int nbContinents = map.nbContinents();
@@ -87,12 +95,16 @@ void Game::turnReinforcement()
 	}
 
 	players[activePlayer].addReinforcement(reinforcement);
+
+	return reinforcement;
 }
 
 
+// Return > 0 : Number of reinforcement given
 // Return -3 : player doesn't have set
 int Game::useSet(int tok1, int tok2, int tok3)
 {
+	int result;
 	if (players[this->activePlayer].hasSet(tok1, tok2, tok3)) {
 		// Removing tokens from player
 		players[this->activePlayer].removeToken(tok1);
@@ -103,13 +115,14 @@ int Game::useSet(int tok1, int tok2, int tok3)
 		this->tokens[tok2]++;
 		this->tokens[tok3]++;
 		// Adding reinforcement to the active player
-		this->players[this->activePlayer].addReinforcement(currentSetValue());
+		result = currentSetValue();
+		this->players[this->activePlayer].addReinforcement(result);
 		// Incrementing totalExchangedSets
 		this->totalExchangedSets++;
 	}
 	else return -3;
 
-	return 0;
+	return result;
 }
 
 int Game::currentSetValue()
@@ -611,7 +624,8 @@ int Game::messageStart()
 
 // Allowed when isRunning()
 // Allowed in phase 0, 1, 2
-// returns : 0 -> ok
+// returns : 0 -> ok (new phase)
+//           >0 Number of reinforcement given to new activePlayer (phase 0)
 //				  -1 -> not your turn
 //					-2 -> need to spend reinforcement
 //          -3 -> need to spend tokens
@@ -643,15 +657,14 @@ int Game::messageEndPhase(int player)
 	if (phase == 2) {
 		nextPlayer();
 	}
-	nextPhase();
 
-	return 0;
-
+	// Returns 0 if ok or number of reinforcement if applicable
+	return nextPhase();
 }
 
 // Allowed in phase -1, 0
 //returns : 0 -> ok
-//					1 -> ok + end of phase -1
+//				 >0 -> ok + end of phase -1 and reinforcement of first player
 //				 -1 -> not active player or bad phase
 // 				 -2 -> units >1 (only in phase -1)
 //				 -3 -> not a free territory (only in phase -1 when freeTerritories > 0)
@@ -700,8 +713,7 @@ int Game::messagePut(int player, int territory, int units)
 		}
 		if (count == 0)
 		{
-			nextPhase();
-			return 1;
+			return nextPhase();
 		}
 		return 0;
 	}
@@ -715,7 +727,7 @@ int Game::messagePut(int player, int territory, int units)
 }
 
 // Allowed in phase 0
-// returns : 0 -> ok
+// returns the received reinforcement or
 //				  -1 -> not your turn
 //				  -2 -> wrong phase
 //                -3 -> player doesn't have set
@@ -724,11 +736,11 @@ int Game::messageUseTokens(int player, int token1, int token2, int token3)
 	// Checking if the right player sent the message
 	if (player != activePlayer) return -1;
 
-	// Treatment
+	// Phase check
 	if (phase != 0) return -2;
-	return useSet(token1, token2, token3);
 
-	return 0;
+	// Treatment
+	return useSet(token1, token2, token3);
 }
 
 // Allowed in phase 1
