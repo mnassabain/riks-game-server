@@ -69,7 +69,7 @@ int Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this->phase = (this->phase + 1) % 3;
-	if (this->phase == 0) returns turnReinforcement();
+	if (this->phase == 0) return turnReinforcement();
 	// else return this->phase;
 	else return 0;
 }
