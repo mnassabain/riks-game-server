@@ -59,13 +59,13 @@ private:
 	 * @brief nextPlayer : Passes the turn to the next player
 	 *
 	 */
-	void nextPlayer();
+	int nextPlayer();
 
 	/**
 	 * @brief nextPhase : Goes to the next phase
 	 *
 	 */
-	void nextPhase();
+	int nextPhase();
 
 	/**
 	 * @brief
@@ -157,7 +157,7 @@ public:
 	 * 	at the beginning of the turn
 	 *
 	 */
-	void turnReinforcement();
+	int turnReinforcement();
 
 	/**
 	 * @brief toJSON: Gives information about the game instance in json
