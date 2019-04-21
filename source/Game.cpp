@@ -62,6 +62,8 @@ void Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this->phase = (this->phase + 1) % 3;
+	if(this->phase == 0)
+		turnReinforcement();
 }
 
 void Game::chooseFirstPlayer()
@@ -938,23 +940,23 @@ int Game::messageMove(int player, int source, int destination, int units)
 string Game::toJson()
 {
 	string res="{\"name\":\""+name+"\",\"nbPlayers\":"+to_string(nbPlayers)+",";
-	res+= "\"players\":{";
+	res+= "\"players\":[";
 				for(size_t i = 0;i<players.size();i++)
 				{
 					res+=players.at(i).toJson();
 					if(i<players.size()-1)
 						res+=",";
 				}
-			res+="},";
+			res+="],";
 	res+="\"mapName\":\""+map.getName()+"\",";
-	res+="\"board\":{";
+	res+="\"board\":[";
 				for(size_t i = 0; i<board.size();i++)
 				{
 					res+="{\"terId\":"+to_string(i)+",\"ownerId\":"+to_string(board.at(i).owner)+",\"nbUnits\":"+to_string(board.at(i).units)+"}";
 					if(i<board.size()-1)
 						res+=",";
 				}
-			res+="},";
+			res+="],";
 	res+="\"freeTerritories\":"+to_string(freeTerritories)+",";
 	res+="\"phase\":"+to_string(phase)+",";
 	res+="\"activePlayer\":"+to_string(activePlayer)+",";

@@ -976,9 +976,15 @@ string GameServer::treatMessage(string message, Connection connection)
               "END_PHASE: Your combat is unfinished");
           break;
         }
-        json end;
+        json end,rein;
         end["type"]=CODE_CURRENT_PHASE;
         end["data"]["phase"]=game->second.getPhase();
+        if(game->second.getPhase() == 0)//if beginning of a new turn
+        {
+          rein["type"]=CODE_REINFORCEMENT;
+          rein["data"]["player"]=game->second.getActivePlayer();
+          rein["data"]["units"]=game->second.getPlayers().at(game->second.getActivePlayer()).getReinforcement();
+        }
         vector<Player> players = game->second.getPlayers();
         for (unsigned int i = 0; i < players.size(); i++)
         {
@@ -992,9 +998,16 @@ string GameServer::treatMessage(string message, Connection connection)
                     Connection c = player->second.getConnection();
                     endpoint.send(c,end.dump(),
                         websocketpp::frame::opcode::text);//sending current_phase
+                    if(game->second.getPhase() == 0)//if beginning of a new turn
+                      endpoint.send(c,rein.dump(),websocketpp::frame::opcode::text);//sending reinforcement
                 }
             }
 
+        }
+        if(game->second.getPhase() == 0)//if beginning of a new turn
+        {
+          Connection c = client->second.getConnection();
+          endpoint.send(c,rein.dump(),websocketpp::frame::opcode::text);//sending reinforcement to sender
         }
         response["type"]=CODE_CURRENT_PHASE;
         response["data"]["phase"]= game->second.getPhase();
@@ -1092,7 +1105,7 @@ string GameServer::treatMessage(string message, Connection connection)
         }
 
         //gameReturn == 0 || gameReturn == 1
-        json put,end;
+        json put,end,rein;
         put["type"]=CODE_PUT;
         put["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
         put["data"]["territory"]=jmessage["data"]["territory"];
@@ -1102,6 +1115,9 @@ string GameServer::treatMessage(string message, Connection connection)
         {
           end["type"]=CODE_CURRENT_PHASE;
           end["data"]["phase"]=game->second.getPhase();
+          rein["type"]=CODE_REINFORCEMENT;
+          rein["data"]["player"]=game->second.getActivePlayer();
+          rein["data"]["units"]=game->second.getPlayers().at(game->second.getActivePlayer()).getReinforcement();
         }
 
         vector<Player> players = game->second.getPlayers();
@@ -1118,7 +1134,10 @@ string GameServer::treatMessage(string message, Connection connection)
                     endpoint.send(c,put.dump(),
                         websocketpp::frame::opcode::text);//sending put
                     if(gameReturn == 1)
+                    {
                         endpoint.send(c,end.dump(),websocketpp::frame::opcode::text);//sending current_phase
+                        endpoint.send(c,rein.dump(),websocketpp::frame::opcode::text);//sending reinforcement
+                    }
                 }
             }
 
@@ -1131,6 +1150,7 @@ string GameServer::treatMessage(string message, Connection connection)
         {
             Connection c = client->second.getConnection();
             endpoint.send(c,end.dump(),websocketpp::frame::opcode::text);//sending current_phase to sender
+            endpoint.send(c,rein.dump(),websocketpp::frame::opcode::text);//sending reinforcement to sender
         }
 
     }
