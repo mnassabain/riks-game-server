@@ -31,7 +31,11 @@ void Game::start()
 	for (int i = 0; i < limit; i++) {
 		this->board.push_back(blank);
 	}
-
+	if(name=="riksForever")//REMOVE_AFTER_DEBUG
+	{
+		int tmp[4]={2,4,3,0};//REMOVE_AFTER_DEBUG
+		players.at(0).receiveTokens(tmp);//REMOVE_AFTER_DEBUG
+	}
 	// Everything is ready to start the game, the lobby now becomes a running game
 	this->running = true;
 }
@@ -295,6 +299,8 @@ int Game::setInitialReinforcement()
 	// each player when playing in a 1v1 map for example
 	int maxPlayersRisk = 6;
 	int reinforcement = 20 + 5 * (maxPlayersRisk - this->nbPlayers); // 20 units + 5 for each missing player
+	if(map.getName()=="1v1test")//REMOVE_AFTER_DEBUG
+		reinforcement=5;//REMOVE_AFTER_DEBUG
 
 	for (int i = 0; i < this->nbPlayers; i++) {
 		players[i].addReinforcement(reinforcement);

@@ -951,6 +951,7 @@ string GameServer::treatMessage(string message, Connection connection)
           break;
         }
 
+        //Message action
         int gameReturn = game->second.messageEndPhase(game->second.getPlayerOrder(client->second.getName()));
         if(gameReturn == -1)//not your turn
         {
@@ -1078,6 +1079,8 @@ string GameServer::treatMessage(string message, Connection connection)
             break;
         }
 
+        //Message action
+
         int gameReturn = game->second.messagePut(game->second.getPlayerOrder(client->second.getName()),jmessage["data"]["territory"],jmessage["data"]["units"]);
         if(gameReturn == -1)//Not your turn or bad phase
         {
@@ -1156,10 +1159,140 @@ string GameServer::treatMessage(string message, Connection connection)
     }
     break;
 		case CODE_USE_TOKENS:
+    {
+      /* we check if the message has a data field */
+      if (!jmessage.count("data"))
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: Invalid message format");
+
+          break;
+      }
+
+      /* we check the data field type */
+      if (!jmessage["data"].is_object())
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: Invalid message format");
+
+          break;
+      }
+
+      /* we check if the data field contains the necessary info */
+      if (!jmessage["data"].count("token1") ||
+          !jmessage["data"].count("token2") ||
+          !jmessage["data"].count("token3")
+          )
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      /* we check if the info has the correct type */
+      if (!jmessage["data"]["token1"].is_number() ||
+          !jmessage["data"]["token2"].is_number() ||
+          !jmessage["data"]["token3"].is_number()
+         )
+      {
+          errorMessage(response, CODE_USE_TOKENS,
+              "USE_TOKENS: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      //check if user is connected
+      ClientIterator client;
+      client = clients.find(connection.lock().get());
+
+      if (client == clients.end())
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: You are not connected");
+          break;
+      }
+
+      GameIterator game;
+      game = games.find(client->second.getGameID());
+
+      /* if we don't find the game we send an error */
+      if (game == games.end())
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: You are not in a game");
+          break;
+      }
+
+      //Message action
+      int gameReturn = game->second.messageUseTokens(game->second.getPlayerOrder(client->second.getName()),jmessage["data"]["token1"],jmessage["data"]["token2"],jmessage["data"]["token3"]);
+      if(gameReturn == -1)//not your turn
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: It's not your turn");
+          break;
+      }
+      if(gameReturn == -2)//wrong phase
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: You cannont use tokens now");
+          break;
+      }
+      if(gameReturn == -3)//don't have these tokens
+      {
+        errorMessage(response, CODE_USE_TOKENS,
+            "USE_TOKENS: You don't have this set of tokens");
+          break;
+      }
+      if(gameReturn == -4)//The set isn't valid
+      {
+          errorMessage(response, CODE_USE_TOKENS,
+              "USE_TOKENS: This set of tokens is not valid");
+            break;
+      }
+
+      //else ok and gameReturn contains the number of reinforcements granted
+      json usetoks, rein;
+      usetoks["type"]=CODE_USE_TOKENS;
+      usetoks["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
+      usetoks["data"]["token1"]=jmessage["data"]["token1"];
+      usetoks["data"]["token2"]=jmessage["data"]["token2"];
+      usetoks["data"]["token3"]=jmessage["data"]["token3"];
+      rein["type"]=CODE_REINFORCEMENT;
+      rein["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
+      rein["data"]["units"]=gameReturn;
+      vector<Player> players = game->second.getPlayers();
+      for (unsigned int i = 0; i < players.size(); i++)
+      {
+          ClientIterator player;
+
+          for (player = clients.begin(); player != clients.end();
+              player++)
+          {
+              if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+              {//sending to everyone but sender
+                  Connection c = player->second.getConnection();
+                  endpoint.send(c,usetoks.dump(),
+                      websocketpp::frame::opcode::text);//sending use_tokens
+                      endpoint.send(c,rein.dump(),websocketpp::frame::opcode::text);//sending reinforcement
+              }
+          }
+
+      }
+      response["type"]=CODE_USE_TOKENS;
+      response["data"]["player"]=game->second.getPlayerOrder(client->second.getName());
+      response["data"]["token1"]=jmessage["data"]["token1"];
+      response["data"]["token2"]=jmessage["data"]["token2"];
+      response["data"]["token3"]=jmessage["data"]["token3"];
+          Connection c = client->second.getConnection();
+          endpoint.send(c,rein.dump(),websocketpp::frame::opcode::text);//sending reinforcement to sender
+
+    }
+    break;
 		case CODE_ATTACK:
 		case CODE_DEFEND:
 		case CODE_MOVE:
-			// Check in what game the sender is and if the game is isRunning, in which case you invoke that game's message(jmessage), which will return a vector<json>
+
 			break;
 
 
