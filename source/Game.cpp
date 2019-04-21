@@ -89,6 +89,8 @@ void Game::turnReinforcement()
 	players[activePlayer].addReinforcement(reinforcement);
 }
 
+
+// Return -3 : player doesn't have set
 int Game::useSet(int tok1, int tok2, int tok3)
 {
 	if (players[this->activePlayer].hasSet(tok1, tok2, tok3)) {
@@ -105,7 +107,7 @@ int Game::useSet(int tok1, int tok2, int tok3)
 		// Incrementing totalExchangedSets
 		this->totalExchangedSets++;
 	}
-	else return -1;
+	else return -3;
 
 	return 0;
 }
@@ -252,6 +254,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	return result;
 }
 
+// -6 invalid move
 int Game::moveUnits(int source, int destination, int units) // The phase checks will be performed outside, while treating messages
 {
 	// checking the requirements of moving units
@@ -262,7 +265,7 @@ int Game::moveUnits(int source, int destination, int units) // The phase checks 
 		this->board[source].units -= units;
 		this->board[destination].units += units;
 	}
-	else return -1;
+	else return -6;
 
 	return 0;
 }
@@ -712,19 +715,32 @@ int Game::messagePut(int player, int territory, int units)
 }
 
 // Allowed in phase 0
+// returns : 0 -> ok
+//				  -1 -> not your turn
+//				  -2 -> wrong phase
+//                -3 -> player doesn't have set
 int Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
 	// Checking if the right player sent the message
 	if (player != activePlayer) return -1;
 
 	// Treatment
-	if (phase != 0) return -1;
+	if (phase != 0) return -2;
 	return useSet(token1, token2, token3);
 
 	return 0;
 }
 
 // Allowed in phase 1
+// returns : 0 -> ok
+//			 -1 -> not your turn
+//			 -2 -> wrong phase
+//           -3 -> invalid range of units
+//			 -4 -> combat already taking place, defender turn
+//			 -5 -> player doesn't own attacking territory
+//			 -6 -> player owns the territory they're trying to attack
+//			 -7 -> territories are not adjacent
+//			 -8 -> not enough available units
 int Game::messageAttack(int player, int source, int destination, int units)
 {
 	// Checking if the right player sent the message
@@ -739,47 +755,47 @@ int Game::messageAttack(int player, int source, int destination, int units)
 	if (phase != 1)
 	{
 		cerr << "MSG_ATT: Phase check failed, exiting..." << endl;
-		return -1;
+		return -2;
 	}
 	// Checking if units is a valid amount
 	if (units < 1 || units > 3)
 	{
 		cerr << "MSG_ATT: Units check failed, exiting..." << endl;
-		return -1;
+		return -3;
 	}
 	// Checking if a combat is not currently taking place
 	if (combat.attackerId != -1)
 	{
 		cerr << "MSG_ATT: Combat already taking place, exiting..."\
 		<< endl;
-	 	return -1;
+	 	return -4;
 	}
 	// Checking if the player owns the source
 	if (board[source].owner != player)
 	{
 		cerr << "MSG_ATT: Active player doesn't own the source, \
 		exiting..." << endl;
-		return -1;
+		return -5;
 	}
 	// Checking if the players doesn't own the destination
 	if (board[destination].owner == player)
 	{
 		cerr << "MSG_ATT: You can't attack your own territory, exiting..."\
 		<< endl;
-		return -1;
+		return -6;
 	}
 	// Checking if the territories are adjacent
 	if (!areAdjacent(source, destination))
 	{
 		cerr << "MSG_ATT: Territories aren't adjacent, exiting..." << endl;
-		return -1;
+		return -7;
 	}
 	// Checking if the player has the required units
 	// <= since one unit must remain on the source
 	if (board[source].units <= units)
 	{
 		cerr << "MSG_ATT: One unit must remain on the source, exiting..." << endl;
-		return -1;
+		return -8;
 	}
 
 	// All checks have been performed, the attack is thus allowed and waiting for the defender's response
@@ -902,6 +918,13 @@ CombatOutcome Game::messageDefend(int player, int units)
 }
 
 // Allowed in phase 1, 2
+// returns : 0 -> ok
+//			 -1 -> not your turn
+//			 -2 -> wrong phase
+//           -3 -> last attack wasn't a capture
+//			 -4 -> territories were not involved in the last capture
+//			 -5 -> player already used his free move
+//			 -6 -> invalid move
 int Game::messageMove(int player, int source, int destination, int units)
 {
 	// Checking if the right player sent the message
@@ -910,10 +933,10 @@ int Game::messageMove(int player, int source, int destination, int units)
 	// Treatment in phase 1
 	if (phase == 1) {
 		// Checking if the last attack resulted in a capture
-		if (!lastAttackCapture) return -1;
+		if (!lastAttackCapture) return -3;
 		// Checking if the territories are the ones involved in the last combat
-		if (lastAttackingTerritory != source) return -1;
-		if (lastAttackedTerritory != destination) return -1;
+		if (lastAttackingTerritory != source) return -4;
+		if (lastAttackedTerritory != destination) return -4;
 
 		// Proceeding with the move
 		return moveUnits(source, destination, units);
@@ -927,9 +950,9 @@ int Game::messageMove(int player, int source, int destination, int units)
 				moved = true; // Putting this in moveUnits() would generate conflicts with phase 1 moves or require extra manual resets
 				return 0;
 			}
-			else return -1;
+			else return -6;
 		}
-		else return -1;
+		else return -5;
 	}
 
 	return -1;
