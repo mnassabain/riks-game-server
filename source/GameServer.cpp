@@ -1785,6 +1785,97 @@ string GameServer::treatMessage(string message, Connection connection)
 
     }
     break;
+    case CODE_CHAT:
+    {
+      /* we check if the message has a data field */
+      if (!jmessage.count("data"))
+      {
+        errorMessage(response, CODE_CHAT,
+            "CHAT: Invalid message format");
+
+          break;
+      }
+
+      /* we check the data field type */
+      if (!jmessage["data"].is_object())
+      {
+        errorMessage(response, CODE_CHAT,
+            "CHAT: Invalid message format");
+
+          break;
+      }
+
+      /* we check if the data field contains the necessary info */
+      if (!jmessage["data"].count("message"))
+      {
+        errorMessage(response, CODE_CHAT,
+            "CHAT: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      /* we check if the info has the correct type */
+      if (!jmessage["data"]["message"].is_string())
+      {
+          errorMessage(response, CODE_CHAT,
+              "CHAT: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      //check if user is connected
+      ClientIterator client;
+      client = clients.find(connection.lock().get());
+
+      if (client == clients.end())
+      {
+        errorMessage(response, CODE_CHAT,
+            "CHAT: You are not connected");
+          break;
+      }
+
+      GameIterator game;
+      game = games.find(client->second.getGameID());
+
+      /* if we don't find the game we send an error */
+      if (game == games.end())
+      {
+        errorMessage(response, CODE_CHAT,
+            "CHAT: You are not in a lobby/game");
+          break;
+      }
+
+      vector<Player> players = game->second.getPlayers();
+      json msg;
+      msg["type"]=CODE_CHAT;
+      msg["data"]["name"]=client->second.getName();
+      msg["data"]["message"]=jmessage["data"]["message"];
+
+      for (unsigned int i = 0; i < players.size(); i++)
+      {
+          ClientIterator player;
+
+          for (player = clients.begin(); player != clients.end();
+              player++)
+          {
+              if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+              {//sending to everyone but sender
+                  Connection c = player->second.getConnection();
+                  endpoint.send(c,msg.dump(),
+                      websocketpp::frame::opcode::text);//sending chat
+              }
+          }
+
+      }
+
+      //Resending chat to sender to confirm the broadcasting of his message
+      response["type"]=CODE_CHAT;
+      response["data"]["name"]=client->second.getName();
+      response["data"]["message"]=jmessage["data"]["message"];
+
+
+    }
+    break;
 
 
         default:
