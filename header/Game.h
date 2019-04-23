@@ -86,7 +86,7 @@ private:
 
 	int currentSetValue();
 	bool isValidSet(int tok1, int tok2, int tok3);
-	void grantToken();
+	int grantToken();
 	int putUnits(int territory, int units);
 
 	/**
@@ -294,6 +294,12 @@ public:
 	 * @return json formated string of the game
 	 */
 	string toJson();
+
+	/**
+	 * @brief getCombat : getter on the CombatHandler
+	 * @return the CombatHandler;
+	 */
+	CombatHandler getCombat();
 
 	// Constructors
 

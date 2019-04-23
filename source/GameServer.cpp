@@ -838,6 +838,14 @@ string GameServer::treatMessage(string message, Connection connection)
           break;
         }
 
+        //check if there is more than one player
+        if(game->second.getPlayers().size() <2)
+        {
+          errorResponse(response, CODE_START_GAME,
+              "START_GAME: You cannot start a game alone");
+          break;
+        }
+
         //Starting the game
         if(game->second.messageStart()==-1)
         {
@@ -858,7 +866,7 @@ string GameServer::treatMessage(string message, Connection connection)
             for (player = clients.begin(); player != clients.end();
                 player++)
             {
-                if (player->second.getName() == players[i].getName())
+                if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
                 {
                     Connection c = player->second.getConnection();
                     endpoint.send(c, start.dump(),
@@ -870,10 +878,12 @@ string GameServer::treatMessage(string message, Connection connection)
 
         }
 
-    }
+        response["type"] = CODE_START_GAME;
+        Connection c = client->second.getConnection();
+        endpoint.send(c, status,
+            websocketpp::frame::opcode::text);//sending status to sender
 
-    /* construct the response */
-    response["type"] = CODE_START_GAME;
+    }
 
 		break;
 
@@ -1290,7 +1300,354 @@ string GameServer::treatMessage(string message, Connection connection)
     }
     break;
 		case CODE_ATTACK:
+    {
+      /* we check if the message has a data field */
+      if (!jmessage.count("data"))
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: Invalid message format");
+
+          break;
+      }
+
+      /* we check the data field type */
+      if (!jmessage["data"].is_object())
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: Invalid message format");
+
+          break;
+      }
+
+      /* we check if the data field contains the necessary info */
+      if (!jmessage["data"].count("source") ||
+          !jmessage["data"].count("destination") ||
+          !jmessage["data"].count("units")
+          )
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      /* we check if the info has the correct type */
+      if (!jmessage["data"]["source"].is_number() ||
+          !jmessage["data"]["destination"].is_number() ||
+          !jmessage["data"]["units"].is_number()
+         )
+      {
+          errorMessage(response, CODE_ATTACK,
+              "ATTACK: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      //check if user is connected
+      ClientIterator client;
+      client = clients.find(connection.lock().get());
+
+      if (client == clients.end())
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: You are not connected");
+          break;
+      }
+
+      GameIterator game;
+      game = games.find(client->second.getGameID());
+
+      /* if we don't find the game we send an error */
+      if (game == games.end())
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: You are not in a game");
+          break;
+      }
+
+      //Message action
+      int gameReturn = game->second.messageAttack(game->second.getPlayerOrder(client->second.getName()),jmessage["data"]["source"],jmessage["data"]["destination"],jmessage["data"]["units"]);
+      if(gameReturn == -1)//Not your turn
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: It's not your turn");
+          break;
+      }
+      if(gameReturn == -2)//Wrong phase
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: You cannot attack now");
+          break;
+      }
+      if(gameReturn == -3)//units <1 or units >3
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: You can only attack with 1, 2 or 3 units");
+          break;
+      }
+      if(gameReturn == -4)//combat already taking place
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: A combat is already taking place, please wait the defender's response");
+          break;
+      }
+      if(gameReturn == -5)//you don't own the source territory
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: You don't own the source territory");
+          break;
+      }
+      if(gameReturn == -6)//you own the destination
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: You cannot attack one of your terrirories");
+          break;
+      }
+      if(gameReturn == -7)//territories not adjacent
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: The two territories aren't adjacent");
+          break;
+      }
+      if(gameReturn == -8)//have to leave 1 unit on source at least
+      {
+        errorMessage(response, CODE_ATTACK,
+            "ATTACK: You have to leave at least 1 unit on your source territory");
+          break;
+      }
+
+      //else gameReturn == 0 -> ok
+      vector<Player> players = game->second.getPlayers();
+      json atk, ated;
+      atk["type"]=CODE_ATTACK;
+      atk["data"]["attackerName"]=client->second.getName();
+      atk["data"]["defenderName"]=players.at(game->second.getGameBoard().at(jmessage["data"]["destination"]).owner).getName();
+      atk["data"]["source"]=jmessage["data"]["source"];
+      atk["data"]["destination"]=jmessage["data"]["destination"];
+      atk["data"]["units"]=jmessage["data"]["units"];
+
+      ated["type"]=CODE_ATTACKED;
+      ated["data"]["targetedTerritory"]=jmessage["data"]["destination"];
+      ated["data"]["units"]=jmessage["data"]["units"];
+      for (unsigned int i = 0; i < players.size(); i++)
+      {
+          ClientIterator player;
+
+          for (player = clients.begin(); player != clients.end();
+              player++)
+          {
+              if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+              {//sending to everyone but sender
+                  Connection c = player->second.getConnection();
+                  endpoint.send(c,atk.dump(),
+                      websocketpp::frame::opcode::text);//sending attack
+                  if((int)i == game->second.getGameBoard().at(jmessage["data"]["destination"]).owner) //if it's the attacked player
+                      endpoint.send(c,ated.dump(),websocketpp::frame::opcode::text);//sending attacked
+              }
+          }
+
+      }
+
+      response["type"]=CODE_ATTACK;
+      response["data"]["attackerName"]=client->second.getName();
+      response["data"]["defenderName"]=players.at(game->second.getGameBoard().at(jmessage["data"]["destination"]).owner).getName();
+      response["data"]["source"]=jmessage["data"]["source"];
+      response["data"]["destination"]=jmessage["data"]["destination"];
+      response["data"]["units"]=jmessage["data"]["units"];
+    }
+    break;
 		case CODE_DEFEND:
+    {
+      /* we check if the message has a data field */
+      if (!jmessage.count("data"))
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: Invalid message format");
+
+          break;
+      }
+
+      /* we check the data field type */
+      if (!jmessage["data"].is_object())
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: Invalid message format");
+
+          break;
+      }
+
+      /* we check if the data field contains the necessary info */
+      if (!jmessage["data"].count("units"))
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      /* we check if the info has the correct type */
+      if (!jmessage["data"]["units"].is_number())
+      {
+          errorMessage(response, CODE_DEFEND,
+              "DEFEND: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      //check if user is connected
+      ClientIterator client;
+      client = clients.find(connection.lock().get());
+
+      if (client == clients.end())
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: You are not connected");
+          break;
+      }
+
+      GameIterator game;
+      game = games.find(client->second.getGameID());
+
+      /* if we don't find the game we send an error */
+      if (game == games.end())
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: You are not in a game");
+          break;
+      }
+
+      //Message action
+      CombatHandler combat = game->second.getCombat(); //saving combat state before solving/resetting
+      CombatOutcome gameReturn = game->second.messageDefend(game->second.getPlayerOrder(client->second.getName()),jmessage["data"]["units"]);
+      if(gameReturn.outcomeType == -1)//not your turn to defend
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: You are not attacked");
+          break;
+      }
+      if(gameReturn.outcomeType == -2)//no combat
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: No combat is currently taking place");
+          break;
+      }
+      if(gameReturn.outcomeType == -3)//wrong phase
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: It's not combat phase");
+          break;
+      }
+      if(gameReturn.outcomeType == -4)//units != 1 or 2
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: You can only defend with 1 or 2 units");
+          break;
+      }
+      if(gameReturn.outcomeType == -5)//not enough units
+      {
+        errorMessage(response, CODE_DEFEND,
+            "DEFEND: You don't have enough units on the attacked territory");
+          break;
+      }
+
+      //else gameReturn >= 0   -> ok
+      vector<Player> players = game->second.getPlayers();
+      json def, combRes, tokenCap, tokenElim, die, gameOver;
+      def["type"]=CODE_DEFEND;
+      def["data"]["defenderName"]=client->second.getName();
+      def["data"]["units"]=jmessage["data"]["units"];
+
+      combRes["type"]=CODE_COMBAT_RESULTS;
+      combRes["data"]["source"]=gameReturn.source;
+      combRes["data"]["destination"]=gameReturn.destination;
+      combRes["data"]["attackerLoss"]=gameReturn.attackerLoss;
+      combRes["data"]["defenderLoss"]=gameReturn.defenderLoss;
+
+      if(gameReturn.capToken > -1)//Attacker gets the token of first capture
+      {
+        tokenCap["type"]=CODE_GIVE_TOKENS;
+        tokenCap["data"]["player"]=combat.attackerId;
+        tokenCap["data"]["token1"] = 0;
+        tokenCap["data"]["token2"] = 0;
+        tokenCap["data"]["token3"] = 0;
+        tokenCap["data"]["token4"] = 0;
+        switch (gameReturn.capToken) {
+          case 0:
+          tokenCap["data"]["token1"]=1;
+          break;
+          case 1:
+          tokenCap["data"]["token2"]=1;
+          break;
+          case 2:
+          tokenCap["data"]["token3"]=1;
+          break;
+          case 3:
+          tokenCap["data"]["token4"]=1;
+          break;
+        }
+      }
+      if(gameReturn.outcomeType >= 1)//If the defender dies
+      {
+        die["type"]=CODE_DIE;
+        die["data"]["player"]=combat.defenderId;
+
+        tokenElim["type"]=CODE_GIVE_TOKENS;
+        tokenElim["data"]["player"]=combat.attackerId;
+        tokenElim["data"]["token1"]=gameReturn.tokens[0];
+        tokenElim["data"]["token2"]=gameReturn.tokens[1];
+        tokenElim["data"]["token3"]=gameReturn.tokens[2];
+        tokenElim["data"]["token4"]=gameReturn.tokens[3];
+      }
+      if(gameReturn.outcomeType == 2)//Game over
+      {
+        gameOver["type"]=CODE_GAME_OVER;
+        gameOver["data"]["winner"]=combat.attackerId;
+      }
+
+      for (unsigned int i = 0; i < players.size(); i++)
+      {
+          ClientIterator player;
+
+          for (player = clients.begin(); player != clients.end();
+              player++)
+          {
+              if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+              {//sending to everyone but sender
+                  Connection c = player->second.getConnection();
+                  endpoint.send(c,def.dump(),
+                      websocketpp::frame::opcode::text);//sending defend
+                      endpoint.send(c,combRes.dump(),websocketpp::frame::opcode::text);//sending combat_result
+                    if(gameReturn.capToken > -1)
+                      endpoint.send(c,tokenCap.dump(),websocketpp::frame::opcode::text);//sending receive_tokens for first capture
+                    if(gameReturn.outcomeType >= 1)
+                    {
+                      endpoint.send(c,die.dump(),websocketpp::frame::opcode::text);//sending die
+                      endpoint.send(c,tokenElim.dump(),websocketpp::frame::opcode::text);//sending receive_tokens for elimination
+                      if(gameReturn.outcomeType == 2)
+                        endpoint.send(c,gameOver.dump(),websocketpp::frame::opcode::text);//sending game_over
+                    }
+              }
+            }
+
+      }
+
+      Connection c  = client->second.getConnection();
+      endpoint.send(c,combRes.dump(),websocketpp::frame::opcode::text);//sending combat_result to sender
+      if(gameReturn.capToken > -1)
+        endpoint.send(c,tokenCap.dump(),websocketpp::frame::opcode::text);//sending receive_tokens for first capture to sender
+      if(gameReturn.outcomeType >= 1)
+      {
+        endpoint.send(c,die.dump(),websocketpp::frame::opcode::text);//sending die to sender
+        endpoint.send(c,tokenElim.dump(),websocketpp::frame::opcode::text);//sending receive_tokens for elimination to sender
+        if(gameReturn.outcomeType == 2)
+          endpoint.send(c,gameOver.dump(),websocketpp::frame::opcode::text);//sending game_over to sender
+      }
+      response["type"]=CODE_DEFEND;
+      response["data"]["defenderName"]=client->second.getName();
+      response["data"]["units"]=jmessage["data"]["units"];
+
+    }
+    break;
 		case CODE_MOVE:
 
 			break;

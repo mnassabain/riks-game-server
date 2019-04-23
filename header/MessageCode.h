@@ -58,6 +58,7 @@ typedef enum
 
     CODE_HOVER,
     CODE_SELECT_TOKEN,
+    CODE_DIE, //To facilitate client gestion of deaths
 
 } MessageCode;
 

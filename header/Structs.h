@@ -52,6 +52,9 @@ struct CombatOutcome
 	int source;
 	int destination;
 
+  //Capture token (-1 if not)
+  int capToken;
+
 	// Tokens transferred in the case of a player elimination
 	int tokens[4];
 };

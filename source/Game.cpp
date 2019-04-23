@@ -170,7 +170,7 @@ bool Game::isValidSet(int tok1, int tok2, int tok3)
 	return true;
 }
 
-void Game::grantToken()
+int Game::grantToken()
 {
 	// Calculating the total number of tokens available
 	int total = 0;
@@ -178,10 +178,11 @@ void Game::grantToken()
 	total += tokens[1];
 	total += tokens[2];
 	total += tokens[3];
+	int token = -1 ;
 	// Granting a random token to the player
 	if (total > 0) {
 		int roll = rand() % total;
-		int token;
+
 		// Determining what token the roll refers to
 		if (roll < tokens[0]) {
 			token = 0;
@@ -198,6 +199,7 @@ void Game::grantToken()
 		tokens[token]--;
 		players[activePlayer].receiveToken(token);
 	}
+	return token;
 }
 
 int Game::putUnits(int territory, int units)
@@ -856,6 +858,13 @@ CombatOutcome Game::messageDefend(int player, int units)
 	result.source = -1;
 	result.destination = -1;
 
+	// Phase check
+	if (phase != 1)
+	{
+		cerr << "MSG_DEF: Phase check failed, exiting..." << endl;
+		result.outcomeType = -3;
+		return result;
+	}
 
 	// Checking if a combat requires solving
 	if (combat.attackerId == -1)
@@ -872,13 +881,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 		result.outcomeType = -1;
 		return result;
 	}
-	// Phase check
-	if (phase != 1)
-	{
-		cerr << "MSG_DEF: Phase check failed, exiting..." << endl;
-		result.outcomeType = -3;
-		return result;
-	}
+
 	// Checking if units is a valid amount
 	if (units < 1 || units > 2){
 		cerr << "MSG_DEF: Units check failed, exiting..." << endl;
@@ -898,6 +901,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 	// All checks have been performed, the combat can now be solved
 	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
 	result = solveCombat(combat.attackerUnits, combat.defenderUnits);
+	result.capToken = -1;
 
 	// Updating result
 	result.outcomeType = 0;
@@ -922,7 +926,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 	if (board[combat.destination].units == 0) {
 		// Check for granting a token to the attacker
 		if (!territoryCapture) {
-			grantToken(); // Will require external update
+			result.capToken = grantToken();
 			territoryCapture = true;
 		}
 
@@ -1008,7 +1012,7 @@ int Game::messageMove(int player, int source, int destination, int units)
 		else return -5;
 	}
 
-	return -1;
+	return -2;
 
 }
 
@@ -1039,4 +1043,9 @@ string Game::toJson()
 	res+="\"totalExchangedSets\":"+to_string(totalExchangedSets)+"}";
 
 	return res;
+}
+
+CombatHandler Game::getCombat()
+{
+	return combat;
 }
