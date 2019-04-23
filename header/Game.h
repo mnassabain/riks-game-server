@@ -86,7 +86,7 @@ private:
 
 	int currentSetValue();
 	bool isValidSet(int tok1, int tok2, int tok3);
-	void grantToken();
+	int grantToken();
 	int putUnits(int territory, int units);
 
 	/**
