@@ -1008,7 +1008,7 @@ int Game::messageMove(int player, int source, int destination, int units)
 		else return -5;
 	}
 
-	return -1;
+	return -2;
 
 }
 
