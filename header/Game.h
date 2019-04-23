@@ -295,6 +295,12 @@ public:
 	 */
 	string toJson();
 
+	/**
+	 * @brief getCombat : getter on the CombatHandler
+	 * @return the CombatHandler;
+	 */
+	CombatHandler getCombat();
+
 	// Constructors
 
 	/**

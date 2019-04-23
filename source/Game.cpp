@@ -1044,3 +1044,8 @@ string Game::toJson()
 
 	return res;
 }
+
+CombatHandler Game::getCombat()
+{
+	return combat;
+}
