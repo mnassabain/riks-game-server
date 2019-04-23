@@ -857,7 +857,6 @@ CombatOutcome Game::messageDefend(int player, int units)
 	result.defenderLoss = -1;
 	result.source = -1;
 	result.destination = -1;
-	result.capToken = -1;
 
 	// Phase check
 	if (phase != 1)
@@ -902,6 +901,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 	// All checks have been performed, the combat can now be solved
 	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
 	result = solveCombat(combat.attackerUnits, combat.defenderUnits);
+	result.capToken = -1;
 
 	// Updating result
 	result.outcomeType = 0;
