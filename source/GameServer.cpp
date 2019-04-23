@@ -1649,8 +1649,142 @@ string GameServer::treatMessage(string message, Connection connection)
     }
     break;
 		case CODE_MOVE:
+    {
+      /* we check if the message has a data field */
+      if (!jmessage.count("data"))
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: Invalid message format");
 
-			break;
+          break;
+      }
+
+      /* we check the data field type */
+      if (!jmessage["data"].is_object())
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: Invalid message format");
+
+          break;
+      }
+
+      /* we check if the data field contains the necessary info */
+      if (!jmessage["data"].count("source") ||
+          !jmessage["data"].count("destination") ||
+          !jmessage["data"].count("units")
+          )
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      /* we check if the info has the correct type */
+      if (!jmessage["data"]["source"].is_number() ||
+          !jmessage["data"]["destination"].is_number() ||
+          !jmessage["data"]["units"].is_number()
+         )
+      {
+          errorMessage(response, CODE_MOVE,
+              "MOVE: Invalid message format, bad parameters");
+
+          break;
+      }
+
+      //check if user is connected
+      ClientIterator client;
+      client = clients.find(connection.lock().get());
+
+      if (client == clients.end())
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: You are not connected");
+          break;
+      }
+
+      GameIterator game;
+      game = games.find(client->second.getGameID());
+
+      /* if we don't find the game we send an error */
+      if (game == games.end())
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: You are not in a game");
+          break;
+      }
+
+      //Message action
+      int gameReturn = game->second.messageMove(game->second.getPlayerOrder(client->second.getName()),jmessage["data"]["source"],jmessage["data"]["destination"],jmessage["data"]["units"]);
+      if(gameReturn ==-1)//not your turn
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: It's not your turn");
+          break;
+      }
+      if(gameReturn ==-2)//wrong phase
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: You cannot move units now");
+          break;
+      }
+      if(gameReturn ==-3)//last attack wasn't a capture (phase 1)
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: You didn't capture a territory during your last attack");
+          break;
+      }
+      if(gameReturn ==-4)//last capture wasn't with these territories
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: Source and/or destination wasn't involved in your last combat");
+          break;
+      }
+      if(gameReturn ==-5)//already used free move (phase 2)
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: You have already used your free move this turn");
+          break;
+      }
+      if(gameReturn ==-6)//invalid move
+      {
+        errorMessage(response, CODE_MOVE,
+            "MOVE: Invalid move, make sure you own both territories, they are adjacent, and you leave at least 1 unit on source territory");
+          break;
+      }
+
+      //else gameReturn == 0 -> ok
+      vector<Player> players = game->second.getPlayers();
+      json mv;
+      mv["type"]=CODE_MOVE;
+      mv["data"]["source"]=jmessage["data"]["source"];
+      mv["data"]["destination"]=jmessage["data"]["destination"];
+      mv["data"]["units"]=jmessage["data"]["units"];
+
+      for (unsigned int i = 0; i < players.size(); i++)
+      {
+          ClientIterator player;
+
+          for (player = clients.begin(); player != clients.end();
+              player++)
+          {
+              if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+              {//sending to everyone but sender
+                  Connection c = player->second.getConnection();
+                  endpoint.send(c,mv.dump(),
+                      websocketpp::frame::opcode::text);//sending move
+              }
+          }
+
+      }
+
+      response["type"]=CODE_MOVE;
+      response["data"]["source"]=jmessage["data"]["source"];
+      response["data"]["destination"]=jmessage["data"]["destination"];
+      response["data"]["units"]=jmessage["data"]["units"];
+
+    }
+    break;
 
 
         default:
