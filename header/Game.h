@@ -114,8 +114,7 @@ private:
 	int nextPhase();
 
 	/**
-	 * @brief Randomly chooses the first player of the game
-	 * amongst the present players
+	 * @brief Randomly chooses the first player of the game amongst the present players
 	 *
 	 */
 	void chooseFirstPlayer();
@@ -231,9 +230,9 @@ private:
 	// Constructors
 
 public:
-	// Attributes
+    /* == Attributes == */
 
-	// Methods
+    /* == Methods == */
 
 	/**
 	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to at the beginning of the turn
@@ -306,21 +305,21 @@ public:
 	/**
 	 * @brief Get the Id attribute
 	 *
-	 * @return int
+	 * @return ID of the game
 	 */
 	int getId();
 
 	/**
 	 * @brief Get the nbPlayers attribute
 	 *
-	 * @return int
+	 * @return Number of players in the game
 	 */
 	int getNbPlayers();
 
 	/**
 	 * @brief Get the activePlayer attribute
 	 *
-	 * @return int
+	 * @return ID of the active player
 	 */
 	int getActivePlayer();
 
@@ -334,7 +333,7 @@ public:
 	/**
 	 * @brief Get the Password attribute
 	 *
-	 * @return string
+	 * @return Password of the game
 	 */
 	string getPassword();
 
@@ -383,7 +382,7 @@ public:
 	 */
 	CombatHandler getCombat();
 
-	// Constructors
+    /* == Constructors == */	
 
 	/**
 	 * @brief Construct a new Game object
