@@ -19,36 +19,81 @@ using json = nlohmann::json;
 
 class Game {
 private:
-	// Attributes
-	// Lobby variables
+    /* == Attributes == */
+	
+	/* Lobby variables */
+
+	// id of the next game
 	static int nextId;
+
+	// id of the game
 	int id;
+
+	// name of the game room
 	string name;
+
+	// password of the game
 	string password;
+
+	// game capacity
 	int maxPlayers;
+
+	// number of players in the game
 	int nbPlayers;
+
+	// vector of all the players present
 	vector <Player> players;
+
+	// boolean witnessing if the game is running
 	bool running;
+
+	// map of the game
 	Map map;
-	// Game variables - Only available when Game is running
+
+	/* Game variables - Only available when Game is running */
+
+	// vector of all the territories of the map
 	vector <TerritoryState> board;
+
+	// number of free territories left
 	int freeTerritories;
+
+	// number of death counts 
 	int deathCount;
 
+	// actual game phase
 	int phase;
+
+	// id of the active player
 	int activePlayer;
+
+	// array of tokens available
 	int tokens[4];
+
+	// Number of total exchanged sets
 	int totalExchangedSets;
-	// Turn variables - Reset after each turn
-	bool territoryCapture; // Used for granting tokens
+
+	/* Turn variables - Reset after each turn */
+
+	// bool witnessing if a territory has been captured this turn for granting tokens
+	bool territoryCapture; 
+
+	// id of the last attacking territory
 	int lastAttackingTerritory;
+
+	// id of the last attacked territory
 	int lastAttackedTerritory;
+
+	// bool witnessing if the last attack resulted in a capture
 	bool lastAttackCapture;
+
+	// bool witnessing if the player moved its units
 	bool moved;
+
 	// Combat handler - Used to save combat context between messages, to handle combat properly - Has to be reset after each combat is done
 	CombatHandler combat;
 
-	// Methods
+	/* == Methods == */
 
 	/**
 	 * @brief
