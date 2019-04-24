@@ -102,19 +102,20 @@ private:
 	void start();
 
 	/**
-	 * @brief nextPlayer : Passes the turn to the next player
+	 * @brief Passes the turn to the next player
 	 *
 	 */
 	int nextPlayer();
 
 	/**
-	 * @brief nextPhase : Goes to the next phase
+	 * @brief Goes to the next phase
 	 *
 	 */
 	int nextPhase();
 
 	/**
-	 * @brief
+	 * @brief Randomly chooses the first player of the game
+	 * amongst the present players
 	 *
 	 */
 	void chooseFirstPlayer();
@@ -129,9 +130,38 @@ private:
 	 */
 	int useSet(int tok1, int tok2, int tok3);
 
+	/**
+	 * @brief 
+	 * 
+	 * @return int 
+	 */
 	int currentSetValue();
+
+	/**
+	 * @brief 
+	 * 
+	 * @param tok1 
+	 * @param tok2 
+	 * @param tok3 
+	 * @return true 
+	 * @return false 
+	 */
 	bool isValidSet(int tok1, int tok2, int tok3);
+
+	/**
+	 * @brief 
+	 * 
+	 * @return int 
+	 */
 	int grantToken();
+
+	/**
+	 * @brief 
+	 * 
+	 * @param territory 
+	 * @param units 
+	 * @return int 
+	 */
 	int putUnits(int territory, int units);
 
 	/**
@@ -143,14 +173,14 @@ private:
 	/**
 	 * @brief moveUnits : Moving units from one territory to another
 	 *
-	 * @param source
-	 * @param destination
-	 * @param units
+	 * @param Territory ID of the source
+	 * @param Territory ID of the destination
+	 * @param Number of units
 	 */
 	int moveUnits(int source, int destination, int units);
 
 	/**
-	 * @brief Set the Initial Reinforcement object
+	 * @brief
 	 *
 	 */
 	int setInitialReinforcement();
@@ -169,26 +199,33 @@ private:
 	int updatePlayersStatsInDB();
 
 	/**
-	 * @brief areAdjacent : Checks if `a` and `b` are neighbors
+	 * @brief Checks if territories `a` and `b` are neighbors
 	 *
-	 * @param a
-	 * @param b
-	 * @return true
-	 * @return false
+	 * @param Territory ID a
+	 * @param Territory ID b
+	 * @return true, `a` and `b` are adjacent
+	 * @return false, `a` and `b` aren't adjacent
 	 */
 	bool areAdjacent(int a, int b);
 
 	/**
-	 * @brief continentOwner : Checks if the continent is dominated by the player
+	 * @brief Returns the ID of the owner of the continent `idContinent`
 	 *
-	 * @param id
-	 * @param idPlayer
-	 * @return true
-	 * @return false
+	 * @param idContinent
+	 * @return ID of the player if a owner exists, -1 if nobody owns the continents
 	 */
 	int continentOwner(int idContinent);
 
+	/**
+	 * @brief 
+	 * 
+	 */
 	void resetCombat();
+
+	/**
+	 * @brief 
+	 * 
+	 */
 	void resetTurnVariables();
 
 	// Constructors
@@ -199,9 +236,9 @@ public:
 	// Methods
 
 	/**
-	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to
-	 * 	at the beginning of the turn
-	 *
+	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to at the beginning of the turn
+	 * 
+	 * @return the number of reinforcements granted
 	 */
 	int turnReinforcement();
 
@@ -237,9 +274,9 @@ public:
 	bool isActivePlayer(string name);
 
 	/**
-	 * @brief
+	 * @brief addPlayer: adds the player to the game
 	 *
-	 * @param name
+	 * @param name of the player
 	 */
 	int addPlayer(string name);
 
@@ -253,8 +290,8 @@ public:
 	/**
 	 * @brief Get the player's owned territories
 	 *
-	 * @param name
-	 * @return int
+	 * @param int player ID
+	 * @return vector of the player's territories
 	 */
 	vector<int> getPlayerTerritories(int player);
 
