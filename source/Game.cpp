@@ -66,17 +66,12 @@ int Game::nextPlayer()
 	return activePlayer;
 }
 
-// activePlayer must be correct before calling nextPhase
-// returns reinforcement received by the player in phase 0 (Always >= 3)
-// returns 0 if ok
-// returns new current phase if not phase 0 (1 or 2) // currently ignored
 int Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this->phase = (this->phase + 1) % 3;
-	if (this->phase == 0) return turnReinforcement();
-	// else return this->phase;
-	else return 0;
+	
+	return this->phase;
 }
 
 void Game::chooseFirstPlayer()
@@ -668,8 +663,9 @@ int Game::messageEndPhase(int player)
 		nextPlayer();
 	}
 
-	// Returns 0 if ok or number of reinforcement if applicable
-	return nextPhase();
+	// Returns 0 if ok or number of reinforcement when applicable
+	if (nextPhase() == 0) return turnReinforcement;
+	else return 0;
 }
 
 // Allowed in phase -1, 0
@@ -723,7 +719,8 @@ int Game::messagePut(int player, int territory, int units)
 		}
 		if (count == 0)
 		{
-			return nextPhase();
+			if (nextPhase() == 0) return turnReinforcement();
+			else return 0;
 		}
 		return 0;
 	}

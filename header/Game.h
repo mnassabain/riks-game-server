@@ -109,11 +109,11 @@ private:
 	int nextPlayer();
 
 	/**
-	 * @brief Goes to the next phase
+	 * @brief Proceeds to the next phase
 	 *
-	 * @return Number of reinforcement for phase 0, 0 otherwise
+	 * @return int : ID of new phase
 	 */
-	int nextPhase(); // activePlayer must be properly set before a call
+	int nextPhase();
 
 	/**
 	 * @brief Randomly chooses the first player of the game amongst the available players
@@ -250,9 +250,9 @@ public:
     /* == Methods == */
 
 	/**
-	 * @brief turnReinforcement() : gives the reinforcements that the player is entitled to at the beginning of the turn
+	 * @brief Calculates and grants turn reinforcement to activePlayer, which has to be set properly before calling this method
 	 * 
-	 * @return the number of reinforcements granted
+	 * @return int : Amount of reinforcement granted
 	 */
 	int turnReinforcement();
 
