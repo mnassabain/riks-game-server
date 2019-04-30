@@ -52,8 +52,8 @@ struct CombatOutcome
 	int source;
 	int destination;
 
-  //Capture token (-1 if not)
-  int capToken;
+   // Token granted in the case of the first capture of a turn (-1 if not applicable)
+   int capToken;
 
 	// Tokens transferred in the case of a player elimination
 	int tokens[4];

@@ -122,6 +122,13 @@ private:
 	void chooseFirstPlayer();
 
 	/**
+	* @brief Calculates and grants turn reinforcement to activePlayer, which has to be set properly before calling this method
+	*
+	* @return int : Amount of reinforcement granted
+	*/
+	int turnReinforcement();
+
+	/**
 	 * @brief Checks if activePlayer owns necessary tokens, spend them, and grants extra reinforcement
 	 *
 	 * @param tok1 : First token used
@@ -212,19 +219,21 @@ private:
 	int updatePlayersStatsInDB();
 
 	/**
-	 * @brief Checks if territories `a` and `b` are neighbors
+	 * @brief Checks if territories a and b are neighbors
 	 *
 	 * @param a : Territory ID of first territory
 	 * @param b : Territory ID of second territory
-	 * @return True : `a` and `b` are adjacent
-	 * @return False : `a` and `b` aren't adjacent
+	 *
+	 * @return True : Territories a and b are adjacent
+	 * @return False : Territories a and b aren't adjacent
 	 */
 	bool areAdjacent(int a, int b);
 
 	/**
 	 * @brief Returns the ID of the owner of the continent `idContinent`
 	 *
-	 * @param idContinent
+	 * @param idContinent : ID of the continent to check for ownership
+	 *
 	 * @return int >= 0 : ID of the player if an owner exists
 	 * @return int -1 : Nobody controls the continent
 	 */
@@ -250,13 +259,6 @@ public:
     /* == Methods == */
 
 	/**
-	 * @brief Calculates and grants turn reinforcement to activePlayer, which has to be set properly before calling this method
-	 * 
-	 * @return int : Amount of reinforcement granted
-	 */
-	int turnReinforcement();
-
-	/**
 	 * @brief toJSON: Gives information about the game instance in json
 	 *
 	 * @return json
@@ -264,118 +266,120 @@ public:
 	json toJSON();
 
 	/**
-	 * @brief
+	 * @brief Checks if the Game currently functions as a lobby or a running game
 	 *
-	 * @return true
-	 * @return false
+	 * @return true : Game is currently running
+	 * @return false : Game is currently not running and functions as a lobby
 	 */
 	bool isRunning();
 
 	/**
-	 * @brief isFull : tells if the Gameroom is full or not
+	 * @brief Checks if the lobby is full
 	 *
-	 * @return true
-	 * @return false
+	 * @return true : Lobby is full and can't allow more players
+	 * @return false : Lobby is not full and can allow more players
 	 */
 	bool isFull();
 
 	/**
-	 * @brief
+	 * @brief Checks if the player name passed as parameter matches the ID of the current active player
 	 *
-	 * @return true
-	 * @return false
+	 * @return true : Named player is currently the active player
+	 * @return false : Named player is currently not the active player
 	 */
 	bool isActivePlayer(string name);
 
 	/**
-	 * @brief addPlayer: adds the player to the game
+	 * @brief Attempts to add the player to the game
 	 *
-	 * @param name of the player
+	 * @param name : Name of the player to add
+	 *
+	 * @return int 0 : Success, named player was added to the game and created as a player entity
+	 * @return int -1 : Error, a new player couldn't be added to the game
 	 */
 	int addPlayer(string name);
 
 	/**
-	 * @brief
+	 * @brief Attempts to remove the player from the game
 	 *
-	 * @param name
+	 * @param name : Name of the player to remove
+	 *
+	 * @return int 0 : Success, named player was removed from the game
+	 * @return int -1 : Error, named player didn't exist in the game and no action was performed
 	 */
 	int removePlayer(string name);
 
 	/**
-	 * @brief Get the player's owned territories
+	 * @brief Gets the player's owned territories
 	 *
-	 * @param int player ID
-	 * @return vector of the player's territories
+	 * @param player : ID of player to check
+	 * @return vector<int> : Vector containing the ID of all the territories owned by player
 	 */
 	vector<int> getPlayerTerritories(int player);
 
 	/**
-	 * @brief Get the player's turn order
+	 * @brief Gets the player's turn order
 	 *
-	 * @param name
-	 * @return int
+	 * @param name : Name of the player to check
+	 *
+	 * @return int >= 0 : Order of the named player
+	 * @return int -1 : Named player wasn't found in the game
 	 */
 	int getPlayerOrder(string name);
 
 	/**
-	 * @brief Get the Id attribute
+	 * @brief Gets the ID attribute of the game
 	 *
-	 * @return ID of the game
+	 * @return int : ID of the game
 	 */
 	int getId();
 
 	/**
-	 * @brief Get the nbPlayers attribute
+	 * @brief Gets the nbPlayers attribute
 	 *
-	 * @return Number of players in the game
+	 * @return int : Number of players in the game
 	 */
 	int getNbPlayers();
 
 	/**
-	 * @brief Get the activePlayer attribute
+	 * @brief Gets the activePlayer attribute
 	 *
-	 * @return ID of the active player
+	 * @return int : ID of the current active player
 	 */
 	int getActivePlayer();
 
 	/**
-	 * @brief Get the board attribute
+	 * @brief Gets the board attribute, containing the current state of all territories
 	 *
-	 * @return vector<TerritoryState>
+	 * @return vector<TerritoryState> : Vector containing the current state of all territories
 	 */
 	vector<TerritoryState> getGameBoard();
 
 	/**
-	 * @brief Get the Password attribute
+	 * @brief Gets the Password attribute
 	 *
-	 * @return Password of the game
+	 * @return string : Password of the game
 	 */
 	string getPassword();
 
 	/**
-	 * @brief getPḧase : getter on phase
+	 * @brief Gets the current phase
 	 *
-	 * @return current phase
+	 * @return int : Current phase
 	 */
 	int getPhase();
 
 	/**
-	 * @brief Get the players attribute
+	 * @brief Gets the players attribute, containing all players involved in the game
 	 *
-	 * @return vector<Player>
+	 * @return vector<Player> : Vector containing all players involved in the game
 	 */
 	vector<Player> getPlayers();
 
 	/**
-	* @brief Send a message to the Game object and process it
-	*
-	* @return vector<json>
-	*/
-	vector<json> message(json message);
-
-	/**
 	 * @brief Puts information about the game in a string
 	 *
+	 * @return string : Strong containing all game info
 	 */
 	string toString();
 
@@ -386,39 +390,146 @@ public:
 	void printGame();
 
 	/**
-	 * @brief toJson : return a json formated string of the game
-	 * @return json formated string of the game
+	 * @brief Returns a json formatted string of the game
+	 *
+	 * @return json : Formatted string of the game
 	 */
 	string toJson();
 
 	/**
-	 * @brief getCombat : getter on the CombatHandler
-	 * @return the CombatHandler;
+	 * @brief Gets the CombatHandler
+	 *
+	 * @return CombatHandler : current state of the game's CombatHandler
 	 */
 	CombatHandler getCombat();
 
     /* == Constructors == */	
 
 	/**
-	 * @brief Construct a new Game object
+	 * @brief Constructs a new Game object
 	 *
-	 * @param mapName
-	 * @param creatorId
-	 * @param maxPlayers
+	 * @param mapName : Name of the desired map
+	 * @param creatorId : Name of the creator of the game, whom will act as first player
+	 * @param maxPlayers : Desired maximum number of players in the game, limited by the map's own capacity
+	 * @param lobbyName : Name of the lobby created
+	 * @param password : Password used for the lobby
+	 *
+	 * @return Game : Reference to the game created
 	 */
 	Game(string mapName, string creatorId, int maxPlayers);
 	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation
 	Game(string mapName, string creatorId, int maxPlayers, string lobbyName, string password);
 
-	// Game logic methods, names are currently placeholders
-	// We'll discuss the return value later
+	/* == Core game logic methods == */
+	// Those methods are called when receiving messages from players, and are necessary to proceed with the game
 
+	/**
+	* @brief Starts the game and makes it start acting as a running game rather than a lobby
+	*
+	* @return int : ID of the player chosen as first player
+	*/
 	int messageStart();
+
+	/**
+	* @brief Ends current phase
+	*
+	* @param player : ID of the player that tried to send this message
+	*
+	* @return int 0 : Success, game proceeded to a new phase
+	* @return int >0 : Success, new game phase is 0, and the returned number is the amount of reinforcement of the new active player
+	* @return int -1 : Error, player does not match the current active player
+	* @return int -2 : Error, active player must spend all remaining reinforcement
+	* @return int -3 : Error, active player must spend tokens to have 4 or less left
+	* @return int -4 : Error, a combat must be resolved
+	*/
 	int messageEndPhase(int player);
+
+	/**
+	* @brief Puts a number of units on desired territory
+	*
+	* @param player : ID of the player that tried to send this message
+	* @param territory : ID of the territory to place units on
+	* @param units : Number of units to put on territory
+	*
+	* @return int 0 : Success, units were successfully placed on territory
+	* @return int >0 : Success, units were successfully placed on territory, new game phase is 0, and the returned number is the amount of reinforcement of the new active player
+	* @return int -1 : Error, player does not match the current active player, or the message was sent during the wrong phase
+	* @return int -2 : Error, in phase -1, units must always be 1
+	* @return int -3 : Error, there are free territories remaining (in phase -1, they must all be occupied before reinforcing the others)
+	* @return int -4 : Error, active player doesn't own the territory, or doesn't have enough reinforcement to put that number on it
+	*/
 	int messagePut(int player, int territory, int units);
+
+	/**
+	* @brief Spends tokens to get reinforcement
+	*
+	* @param player : ID of the player that tried to send this message
+	* @parem token1 : First token used
+	* @parem token2 : Second token used
+	* @parem token3 : Third token used
+	*
+	* @return int >0 : Success, number of reinforcement received
+	* @return int -1 : Error, player does not match the current active player
+	* @return int -2 : Error, message was sent during the wrong phase
+	* @return int -3 : Error, active player doesn't own the required tokens
+	* @return int -4 : Error, tokens used do not form a valid set
+	*/
 	int messageUseTokens(int player, int token1, int token2, int token3);
+
+	/**
+	* @brief Attacks an ennemy territory
+	*
+	* @param player : ID of the player that tried to send this message
+	* @param source : ID of the territory to launch the attack from
+	* @param destination : ID of the territory to attack
+	* @param units : Number of units to send to attack
+	*
+	* @return int 0 : Success, combat is allowed and waiting to be resolved
+	* @return int -1 : Error, player does not match the current active player
+	* @return int -2 : Error, message was sent during the wrong phase
+	* @return int -3 : Error, invalid range of units used for a combat
+	* @return int -4 : Error, a combat must be resolved
+	* @return int -5 : Error, active player doesn't own the source territory
+	* @return int -6 : Error, active player owns the territory he's trying to attack
+	* @return int -7 : Error, source and destination are not adjacent territories
+	* @return int -8 : Error, active player doesn't have enough available units on the attacking territory
+	*/
 	int messageAttack(int player, int source, int destination, int units);
+
+	/**
+	* @brief Defends an attacked territory
+	*
+	* @param player : ID of the player that tried to send this message
+	* @param units : Number of units to use to defend
+	*
+	* @return CombatOutcome : Structure containing all the necessary info about the solved combat, check outcomeType for actual return value
+	* @return int outcomeType 0 : Success, CombatOutcome contains unit loss and involved territories
+	* @return int outcomeType 1 : Success, same as 0, but the defending player was eliminated, granting additional tokens to active player
+	* @return int outcomeType 2 : Success, the last remaining player was eliminated, resulting of the victory of active player
+	* @return int outcomeType -1 : Error, player does not match the current active player
+	* @return int outcomeType -2 : Error, no combat requires solving
+	* @return int outcomeType -3 : Error, message was sent during the wrong phase
+	* @return int outcomeType -4 : Error, invalid range of units used for a combat
+	* @return int outcomeType -5 : Error, defending player doesn't have enough available units on the defending territory
+	*/
 	CombatOutcome messageDefend(int player, int units);
+
+	/**
+	* @brief Moves units between two allied territories
+	*
+	* @param player : ID of the player that tried to send this message
+	* @param source : ID of the territory to move the units from
+	* @param destination : ID of the territory to move the units to
+	* @param units : Number of units to move
+	*
+	* @return int 0 : Success, units are moved from source to destination
+	* @return int -1 : Error, player does not match the current active player
+	* @return int -2 : Error, message was sent during the wrong phase
+	* @return int -3 : Error, in phase 1, the last attack wasn't a capture
+	* @return int -4 : Error, in phase 1, territories were not involved in the last capture
+	* @return int -5 : Error, in phase 2, active player already used his free move
+	* @return int -6 : Error, invalid move
+	*/
 	int messageMove(int player, int source, int destination, int units);
 };
 
