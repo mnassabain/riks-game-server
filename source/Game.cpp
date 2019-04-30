@@ -15,7 +15,7 @@ void Game::start()
 	this->tokens[2] = 14;
 	this->tokens[3] = 14;
 	this->totalExchangedSets = 0;
-	this->deathCount = 0;
+	this->eliminationCount = 0;
 	// Initialization of turn variables
 	resetTurnVariables();
 	// Initialization of combat handler
@@ -104,9 +104,6 @@ int Game::turnReinforcement()
 	return reinforcement;
 }
 
-
-// Return > 0 : Number of reinforcement given
-// Return -3 : player doesn't have set
 int Game::useSet(int tok1, int tok2, int tok3)
 {
 	int result;
@@ -958,9 +955,9 @@ CombatOutcome Game::messageDefend(int player, int units)
 
 			players[combat.defenderId].receiveTokens(result.tokens);
 
-			// Updating deathCount and checking for victory
-			deathCount++;
-			if (deathCount >= nbPlayers - 1) result.outcomeType = 2;
+			// Updating eliminationCount and checking for victory
+			eliminationCount++;
+			if (eliminationCount >= nbPlayers - 1) result.outcomeType = 2;
 		}
 
 		// Updating lastAttackCapture
