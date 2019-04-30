@@ -66,17 +66,12 @@ int Game::nextPlayer()
 	return activePlayer;
 }
 
-// activePlayer must be correct before calling nextPhase
-// returns reinforcement received by the player in phase 0 (Always >= 3)
-// returns 0 if ok
-// returns new current phase if not phase 0 (1 or 2) // currently ignored
 int Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this->phase = (this->phase + 1) % 3;
-	if (this->phase == 0) return turnReinforcement();
-	// else return this->phase;
-	else return 0;
+	
+	return this->phase;
 }
 
 void Game::chooseFirstPlayer()
@@ -481,15 +476,6 @@ vector<Player> Game::getPlayers()
 	return this->players;
 }
 
-// This is where most of the game logic will happen
-// Interpreting actions attempted by players
-// Scrapped, will be removed later
-vector<json> Game::message(json message) // UNDER CONSTRUCTION
-{
-	vector<json> response;
-
-	return response;
-}
 
 string Game::toString()
 {
@@ -634,12 +620,6 @@ int Game::messageStart()
 
 // Allowed when isRunning()
 // Allowed in phase 0, 1, 2
-// returns : 0 -> ok (new phase)
-//           >0 Number of reinforcement given to new activePlayer (phase 0)
-//				  -1 -> not your turn
-//					-2 -> need to spend reinforcement
-//          -3 -> need to spend tokens
-//					-4 -> a combat is not finished
 int Game::messageEndPhase(int player)
 {
 	// Checking if the right player sent the message
@@ -668,17 +648,12 @@ int Game::messageEndPhase(int player)
 		nextPlayer();
 	}
 
-	// Returns 0 if ok or number of reinforcement if applicable
-	return nextPhase();
+	// Returns 0 if ok or number of reinforcement when applicable
+	if (nextPhase() == 0) return turnReinforcement;
+	else return 0;
 }
 
 // Allowed in phase -1, 0
-//returns : 0 -> ok
-//				 >0 -> ok + end of phase -1 and reinforcement of first player
-//				 -1 -> not active player or bad phase
-// 				 -2 -> units >1 (only in phase -1)
-//				 -3 -> not a free territory (only in phase -1 when freeTerritories > 0)
-//				 -4 -> not your territory (or not enough units in phase 0)
 int Game::messagePut(int player, int territory, int units)
 {
 	// Checking if the right player sent the message
@@ -723,7 +698,8 @@ int Game::messagePut(int player, int territory, int units)
 		}
 		if (count == 0)
 		{
-			return nextPhase();
+			if (nextPhase() == 0) return turnReinforcement();
+			else return 0;
 		}
 		return 0;
 	}
@@ -737,11 +713,6 @@ int Game::messagePut(int player, int territory, int units)
 }
 
 // Allowed in phase 0
-// returns the received reinforcement or
-//				  -1 -> not your turn
-//				  -2 -> wrong phase
-//                -3 -> player doesn't have set
-//                -4 -> set is not valid
 int Game::messageUseTokens(int player, int token1, int token2, int token3)
 {
 	// Checking if the right player sent the message
@@ -758,15 +729,6 @@ int Game::messageUseTokens(int player, int token1, int token2, int token3)
 }
 
 // Allowed in phase 1
-// returns : 0 -> ok
-//			 -1 -> not your turn
-//			 -2 -> wrong phase
-//           -3 -> invalid range of units
-//			 -4 -> combat already taking place, defender turn
-//			 -5 -> player doesn't own attacking territory
-//			 -6 -> player owns the territory they're trying to attack
-//			 -7 -> territories are not adjacent
-//			 -8 -> not enough available units
 int Game::messageAttack(int player, int source, int destination, int units)
 {
 	// Checking if the right player sent the message
@@ -837,15 +799,6 @@ int Game::messageAttack(int player, int source, int destination, int units)
 
 // Check combatOutcome.outcomeType for return values
 // Allowed in phase 1
-// returns : 0 -> ok // Unit loss and territories involved are available
-//			 1 -> ok, and player elimination // Tokens transferred are available too
-//			 2 -> ok, and game end
-//
-//			 -1 -> not your turn
-//           -2 -> no combat is taking place
-//			 -3 -> wrong phase
-//			 -4 -> invalid range of units
-//			 -5 -> not enough available units
 CombatOutcome Game::messageDefend(int player, int units)
 {
 	CombatOutcome result;
@@ -854,6 +807,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 	result.defenderLoss = -1;
 	result.source = -1;
 	result.destination = -1;
+	result.capToken = -1;
 
 	// Phase check
 	if (phase != 1)
@@ -898,7 +852,6 @@ CombatOutcome Game::messageDefend(int player, int units)
 	// All checks have been performed, the combat can now be solved
 	combat.defenderUnits = units; // Unnecessary, but kept for consistency for now
 	result = solveCombat(combat.attackerUnits, combat.defenderUnits);
-	result.capToken = -1;
 
 	// Updating result
 	result.outcomeType = 0;
@@ -972,13 +925,6 @@ CombatOutcome Game::messageDefend(int player, int units)
 }
 
 // Allowed in phase 1, 2
-// returns : 0 -> ok
-//			 -1 -> not your turn
-//			 -2 -> wrong phase
-//           -3 -> last attack wasn't a capture
-//			 -4 -> territories were not involved in the last capture
-//			 -5 -> player already used his free move
-//			 -6 -> invalid move
 int Game::messageMove(int player, int source, int destination, int units)
 {
 	// Checking if the right player sent the message
