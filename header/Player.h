@@ -114,6 +114,11 @@ public:
      */
     void die();
 
+	/**
+	* @brief resurrect : resurrect the player (isAlive = true), for simulation purpose only
+	*/
+	void resurrect();
+
     /**
      * @brief addReinforcement : add some reinforcement to the player
      * @param reinforcement : number of reinforcement to add
@@ -125,6 +130,11 @@ public:
      * @param reinforcement : number of reinforcement to spend
      */
     void spendReinforcement(int reinforcement);
+
+	/**
+	* @brief resetReindorcement : reset reinforcement to 0, for simulation purpose only
+	*/
+	void resetReinforcement();
 
     /**
      * @brief getReinforcement : getter
@@ -147,6 +157,11 @@ public:
      * @brief subTerritoriesOwned : remove one to the number of territories owned by the player
      */
     void subTerritoriesOwned();
+
+	/**
+	* @brief setTerritoriesOwned : set the number of territories owned by the player for simulation purpose only
+	*/
+	void setTerritoriesOwned(int territories);
 
     /**
      * @brief getName : getter

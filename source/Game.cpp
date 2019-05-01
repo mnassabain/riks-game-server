@@ -649,7 +649,7 @@ int Game::messageEndPhase(int player)
 	}
 
 	// Returns 0 if ok or number of reinforcement when applicable
-	if (nextPhase() == 0) return turnReinforcement;
+	if (nextPhase() == 0) return turnReinforcement();
 	else return 0;
 }
 
@@ -957,6 +957,83 @@ int Game::messageMove(int player, int source, int destination, int units)
 
 	return -2;
 
+}
+
+// Always allowed, pass 34 as parameter to allow it
+void Game::adminEndGameSimulation(int password)
+{
+	// Checking admin password
+	if (password != 34) return;
+
+	// Only allowed with standard map
+	if (map.getName().compare("standard") != 0) return;
+
+	// Game has to be running
+	if (!running) return;
+
+	// We can proceed with the simulation
+	size_t i, max;
+
+	// Players modifications
+	// Eliminating and removing everything from all players
+	max = players.size();
+
+	for (i = 0; i < max; i++) {
+		players[i].setTerritoriesOwned(0);
+		players[i].resetReinforcement();
+		players[i].removeAllTokens();
+		players[i].die();
+	}
+
+	// Setting up the status of the two first players and granting some tokens and reinforcement to first player
+	players[0].resurrect();
+	players[1].resurrect();
+
+	players[0].setTerritoriesOwned(41);
+	players[1].setTerritoriesOwned(1);
+
+	players[0].addReinforcement(3);
+
+	players[0].receiveToken(0);
+	players[0].receiveToken(1);
+	players[0].receiveToken(2);
+
+
+	// Board modifications
+	max = board.size();
+
+	// Giving all territories to player 0 and filling them with units
+	for (i = 0; i < max; i++) {
+		board[i].owner = 0;
+		board[i].units = 5;
+	}
+
+	// Granting one territory to player 1
+	board[34].owner = 1;
+	board[34].units = 3;
+
+	// Granting extra units to player 0 around territory 34
+	board[29].units = 13;
+	board[33].units = 37;
+
+	// Game variables modifications
+	freeTerritories = 0;
+	eliminationCount = nbPlayers - 2; // Only players 0 and 1 are still alive
+
+	phase = 0;
+	activePlayer = 0;
+
+	totalExchangedSets = 3; // Arbitrary value, doesn't really have to be changed
+	resetTurnVariables();
+	resetCombat();
+
+	// Tokens - Resetting the pool considering all tokens were removed then 3 were granted to player 0
+	tokens[0] = 1;
+	tokens[1] = 13;
+	tokens[2] = 13;
+	tokens[3] = 14;
+
+	// Everything is now properly set up to proceed to an end game simulation
 }
 
 
