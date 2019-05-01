@@ -1,3 +1,8 @@
+/**
+ * @file Game.h
+ * @brief 
+ */
+
 #ifndef GAME_H
 #define GAME_H
 
@@ -439,8 +444,6 @@ public:
 	 *
 	 * @return Game : Reference to the game created
 	 */
-	Game(string mapName, string creatorId, int maxPlayers);
-	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation
 	Game(string mapName, string creatorId, int maxPlayers, string lobbyName, string password);
 
 	/* == Core game logic methods == */
@@ -487,9 +490,9 @@ public:
 	* @brief Spends tokens to get reinforcement
 	*
 	* @param player : ID of the player that tried to send this message
-	* @parem token1 : First token used
-	* @parem token2 : Second token used
-	* @parem token3 : Third token used
+	* @param token1 : First token used
+	* @param token2 : Second token used
+	* @param token3 : Third token used
 	*
 	* @return int >0 : Success, number of reinforcement received
 	* @return int -1 : Error, player does not match the current active player

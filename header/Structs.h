@@ -1,3 +1,8 @@
+/**
+ * @file Structs.h
+ * @brief 
+ */
+
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
