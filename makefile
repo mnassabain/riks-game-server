@@ -4,6 +4,7 @@ CC = g++ -std=c++11
 CFLAGS = -g -Wall -Wno-deprecated-declarations -I./libs/
 DOCKER_APP = ms/riks-server
 DOCKER_CONTAINER = riks-server
+PDF_NAME = MS_-_Riks_documentation_serveur.pdf
 PORT = 9002
 
 .PHONY: default all clean
@@ -31,6 +32,15 @@ docker-run:
 
 docker-stop:
 	docker stop $(DOCKER_CONTAINER)
+
+# DOXYGEN TASKS
+
+doxygen:
+	doxygen Doxyfile
+
+pdf:
+	doxygen Doxyfile && cd latex && make && \
+	mv refman.pdf ../$(PDF_NAME)
 
 clean:
 	-rm -f bin/*.o

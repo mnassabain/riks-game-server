@@ -6,3 +6,6 @@ source/testapp
 bin/*.o
 riks-server
 ./message-sender/message-sender
+html
+latex
+*.pdf
