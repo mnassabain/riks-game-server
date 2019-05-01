@@ -411,6 +411,29 @@ public:
 	 * @param mapName : Name of the desired map
 	 * @param creatorId : Name of the creator of the game, whom will act as first player
 	 * @param maxPlayers : Desired maximum number of players in the game, limited by the map's own capacity
+	 *
+	 * @return Game : Reference to the game created
+	 */
+	Game(string mapName, string creatorId, int maxPlayers);
+
+	/**
+	 * @brief Constructs a new Game object
+	 *
+	 * @param mapName : Name of the desired map
+	 * @param creatorId : Name of the creator of the game, whom will act as first player
+	 * @param maxPlayers : Desired maximum number of players in the game, limited by the map's own capacity
+	 * @param lobbyName : Name of the lobby created
+	 * 
+	 * @return Game : Reference to the game created
+	 */
+	Game(string mapName, string creatorId, int maxPlayers, string lobbyName); // Constructor used on lobby creation
+
+	/**
+	 * @brief Constructs a new Game object
+	 *
+	 * @param mapName : Name of the desired map
+	 * @param creatorId : Name of the creator of the game, whom will act as first player
+	 * @param maxPlayers : Desired maximum number of players in the game, limited by the map's own capacity
 	 * @param lobbyName : Name of the lobby created
 	 * @param password : Password used for the lobby
 	 *
