@@ -1,6 +1,6 @@
 /**
  * @file utils.h
- * @brief 
+ * @brief Class holding utility methods
  */
 
 #ifndef UTILS_H

@@ -1,6 +1,6 @@
 /**
  * @file Map.h
- * @brief 
+ * @brief Class representing a game's map
  */
 
 #ifndef MAP_H
@@ -14,6 +14,12 @@
 #include "utils.h"
 
 using namespace std;
+
+/**
+ * @brief Class representing a game's map
+ * @class Map Map.h "Map"
+ * 
+ */
 class Map {
 private:
   //Attributes
@@ -27,7 +33,7 @@ private:
 
   /**
    * @brief Map : Constructor
-   * @param file : map name
+   * @param name : map name
    */
   Map(string name);
 

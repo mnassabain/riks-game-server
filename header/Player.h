@@ -1,12 +1,6 @@
 /**
  * @file Player.h
- * @author your name (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2019-05-01
- * 
- * @copyright Copyright (c) 2019
- * 
+ * @brief Class representing a player
  */
 
 #ifndef PLAYER_H
@@ -19,7 +13,11 @@
 
 using namespace std;
 
-
+/**
+ * @brief Class representing a player
+ * @class Player Player.h "Player"
+ * 
+ */
 class Player {
 public:
 	// Player status
@@ -192,13 +190,25 @@ public:
      */
     void printPlayer();
 
-		/**
-		 * @brief toJson : return a json formated string of the player (name and tokens)
-		 * @return json formated string of the player
-		 */
-		 string toJson();
+    /**
+     * @brief toJson : return a json formated string of the player (name and tokens)
+     * @return json formated string of the player
+     */
+    string toJson();
 
+    /**
+     * @brief Counts the tokens of a certain type possessed by the player
+     * 
+     * @param type : type of the token
+     * @return int
+     */
 	int countTokensOfType(int type);
+
+    /**
+     * @brief Counts the tokens possessed by the player 
+     * 
+     * @return int 
+     */
 	int countTokens();
 
 private:
