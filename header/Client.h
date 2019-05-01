@@ -26,14 +26,48 @@ class Client
         Connection connection;
 
     public:
+        /**
+         * @brief Construct a new Client object
+         * 
+         * @param name 
+         * @param connection 
+         */
         Client(string name, Connection connection);
 
+        /**
+         * @brief Checks if the client is in a lobby
+         * 
+         * @return true : the client is in a lobby
+         * @return false : the client isn't in a lobby
+         */
         bool inLobby();
 
+        /**
+         * @brief Get the Connection object
+         * 
+         * @return Connection 
+         */
         Connection getConnection();
+
+        /**
+         * @brief Get the Name attribute
+         * 
+         * @return string 
+         */
         string getName();
+
+        /**
+         * @brief Get the Game ID attribute
+         * 
+         * @return int : GameID
+         */
         int getGameID();
 
+        /**
+         * @brief Set the Game ID attribute
+         * 
+         * @param gameID 
+         */
         void setGameID(int gameID);
 };
 
