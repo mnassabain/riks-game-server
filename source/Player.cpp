@@ -1,4 +1,5 @@
 #include "../header/Player.h"
+#include "..\header\Player.h"
 using namespace std;
 
 Player::Player(string name)
@@ -113,6 +114,11 @@ void Player::die()
 	this->isAlive = false;
 }
 
+void Player::resurrect()
+{
+	this->isAlive = true;
+}
+
 void Player::addReinforcement(int reinforcement)
 {
 	this->reinforcement += reinforcement;
@@ -121,6 +127,11 @@ void Player::addReinforcement(int reinforcement)
 void Player::spendReinforcement(int reinforcement)
 {
 	this->reinforcement -= reinforcement;
+}
+
+void Player::resetReinforcement()
+{
+	this->reinforcement = 0;
 }
 
 int Player::getReinforcement()
@@ -141,6 +152,11 @@ void Player::addTerritoriesOwned()
 void Player::subTerritoriesOwned()
 {
 	territoriesOwned--;
+}
+
+void Player::setTerritoriesOwned(int territories)
+{
+	this->territoriesOwned = territories;
 }
 
 int Player::countTokensOfType(int type)

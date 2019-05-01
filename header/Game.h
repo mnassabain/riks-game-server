@@ -531,6 +531,16 @@ public:
 	* @return int -6 : Error, invalid move
 	*/
 	int messageMove(int player, int source, int destination, int units);
+
+	/**
+	* @brief Simulates end game by putting the game in a state close to the end
+	*
+	* @param password : Send 34 to allow the method to proceed
+	*
+	* @return ? : Full game status to be sent to all players
+	*/
+	*/
+	void adminEndGameSimulation(int password);
 };
 
 #endif //GAME_H
