@@ -1,3 +1,8 @@
+/**
+ * @file MessageCode.h
+ * @brief 
+ */
+
 #ifndef MESSAGECODES_H
 #define MESSAGECODES_H
 
