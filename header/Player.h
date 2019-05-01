@@ -190,13 +190,25 @@ public:
      */
     void printPlayer();
 
-		/**
-		 * @brief toJson : return a json formated string of the player (name and tokens)
-		 * @return json formated string of the player
-		 */
-		 string toJson();
+    /**
+     * @brief toJson : return a json formated string of the player (name and tokens)
+     * @return json formated string of the player
+     */
+    string toJson();
 
+    /**
+     * @brief Counts the tokens of a certain type possessed by the player
+     * 
+     * @param type : type of the token
+     * @return int
+     */
 	int countTokensOfType(int type);
+
+    /**
+     * @brief Counts the tokens possessed by the player 
+     * 
+     * @return int 
+     */
 	int countTokens();
 
 private:
