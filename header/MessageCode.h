@@ -1,6 +1,6 @@
 /**
  * @file MessageCode.h
- * @brief 
+ * @brief Holds message codes
  */
 
 #ifndef MESSAGECODES_H

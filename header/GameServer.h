@@ -1,6 +1,6 @@
 /**
  * @file GameServer.h
- * @brief 
+ * @brief Main class of the server, manages the communication with a client
  */
 
 #ifndef GAMESERVER_H

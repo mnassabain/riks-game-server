@@ -1,6 +1,6 @@
 /**
  * @file Structs.h
- * @brief 
+ * @brief Holds the structs needed
  */
 
 #ifndef STRUCTS_H

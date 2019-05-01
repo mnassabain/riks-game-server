@@ -1,12 +1,6 @@
 /**
  * @file Player.h
- * @author your name (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2019-05-01
- * 
- * @copyright Copyright (c) 2019
- * 
+ * @brief Class representing a player
  */
 
 #ifndef PLAYER_H

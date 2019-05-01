@@ -1,6 +1,6 @@
 /**
  * @file Game.h
- * @brief 
+ * @brief Class managing the whole game's logic
  */
 
 #ifndef GAME_H

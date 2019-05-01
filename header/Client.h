@@ -1,6 +1,6 @@
 /**
  * @file Client.h
- * @brief 
+ * @brief Utility class that stores Game/lobby info for a client
  */
 
 #ifndef CLIENT_H

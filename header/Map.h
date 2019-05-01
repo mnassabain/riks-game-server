@@ -1,6 +1,6 @@
 /**
  * @file Map.h
- * @brief 
+ * @brief Class representing a game's map
  */
 
 #ifndef MAP_H
