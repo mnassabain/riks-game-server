@@ -15,7 +15,10 @@ using namespace std;
 
 typedef websocketpp::connection_hdl Connection;
 
-
+/**
+ * @brief Utility class that stores Game/lobby info for a client
+ * @class Client Client.h "Client"
+ */
 class Client
 {
     private:

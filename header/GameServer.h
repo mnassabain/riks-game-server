@@ -36,7 +36,11 @@ typedef websocketpp::connection_hdl Connection;
 typedef map<int, Game>::iterator GameIterator;
 typedef map<void*, Client>::iterator ClientIterator;
 
-
+/**
+ * @brief Main class of the server, manages the communication with a client
+ * @class GameServer GameServer.h "GameServer"
+ * 
+ */
 class GameServer {
 private:
     /* == game data == */

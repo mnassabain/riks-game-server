@@ -22,6 +22,11 @@
 using namespace std;
 using json = nlohmann::json;
 
+/**
+ * @brief Class managing the whole game's logic, checking if the actions requested are valid, ...
+ * @class Game Game.h "Game"
+ * 
+ */
 class Game {
 private:
     /* == Attributes == */

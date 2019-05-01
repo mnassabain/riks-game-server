@@ -13,7 +13,11 @@
 
 using namespace std;
 
-
+/**
+ * @brief Class representing a player
+ * @class Player Player.h "Player"
+ * 
+ */
 class Player {
 public:
 	// Player status
