@@ -1,5 +1,4 @@
 #include "../header/Player.h"
-#include "..\header\Player.h"
 using namespace std;
 
 Player::Player(string name)
