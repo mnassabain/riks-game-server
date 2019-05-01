@@ -10,7 +10,11 @@
 #include <string>
 using namespace std;
 
-//Territory
+/**
+ * @brief Structure representing a territory in the map
+ * @struct Territory Structs.h "Territory"
+ * 
+ */
 struct Territory
 {
   int id;
@@ -18,7 +22,11 @@ struct Territory
 };
 typedef struct Territory Territory;
 
-//Continent
+/**
+ * @brief Structure representing a continent in the map
+ * @struct Continent Structs.h "Continent"
+ * 
+ */
 struct Continent
 {
   int id;
@@ -28,7 +36,11 @@ struct Continent
 };
 typedef struct Continent Continent;
 
-//TerritoryState
+/**
+ * @brief Structure representing the state of a territory in the map
+ * @struct TerritoryState Structs.h "TerritoryState"
+ * 
+ */
 struct TerritoryState
 {
   string toString()
@@ -43,7 +55,11 @@ struct TerritoryState
 };
 typedef struct TerritoryState TerritoryState;
 
-//CombatOutcome
+/**
+ * @brief Structure representing the outcome of a combat
+ * @struct CombatOutcome Structs.h "CombatOutcome"
+ * 
+ */
 struct CombatOutcome
 {
 	// Outcome Type
@@ -65,7 +81,11 @@ struct CombatOutcome
 };
 typedef struct CombatOutcome CombatOutcome;
 
-//CombatHandler
+/**
+ * @brief Structure representing the combat handler
+ * @struct CombatHandler Structs.h "CombatHandler"
+ * 
+ */
 struct CombatHandler
 {
 	int attackerId;

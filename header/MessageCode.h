@@ -6,7 +6,11 @@
 #ifndef MESSAGECODES_H
 #define MESSAGECODES_H
 
-
+/**
+ * @brief Holds message codes
+ * @struct MessageCode MessageCode.h "MessageCode.h"
+ * 
+ */
 typedef enum
 {
     /* general */
