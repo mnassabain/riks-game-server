@@ -192,7 +192,7 @@ private:
 	 * @param attackers : Number of attacking units
 	 * @param defenders : Number of defending units
 	 *
-	 * @param CombatOutcome : A CombatOutcome containing unit loss of involved factions
+	 * @return CombatOutcome : A CombatOutcome containing unit loss of involved factions
 	 */
 	CombatOutcome solveCombat(int attackers, int defenders); // Currently generates wrong probabilities for 3v2, because of the use of rand()
 
@@ -201,7 +201,7 @@ private:
 	 *
 	 * @param source : Territory ID of the source
 	 * @param destination : Territory ID of the destination
-	 * @param Number of units
+	 * @param units : Number of units
 	 *
 	 * @return int 0 : Success, units are moved from source to destination
 	 * @return int -6 : Error, action was not performed

@@ -33,7 +33,7 @@ private:
 
   /**
    * @brief Map : Constructor
-   * @param file : map name
+   * @param name : map name
    */
   Map(string name);
 
