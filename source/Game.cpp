@@ -649,7 +649,7 @@ int Game::messageEndPhase(int player)
 	}
 
 	// Returns 0 if ok or number of reinforcement when applicable
-	if (nextPhase() == 0) return turnReinforcement;
+	if (nextPhase() == 0) return turnReinforcement();
 	else return 0;
 }
 

@@ -539,7 +539,6 @@ public:
 	*
 	* @return ? : Full game status to be sent to all players
 	*/
-	*/
 	void adminEndGameSimulation(int password);
 };
 
