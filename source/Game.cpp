@@ -616,6 +616,7 @@ int Game::messageStart()
 
 	// Debug and test maps
 	if (this->name.compare("endgame") == 0) adminEndGameSimulation(34);
+	if (this->name.compare("autoinit") == 0) adminAutoInitSimulation(34);
 
 	// Returning the player chosen for the first turn
 	return activePlayer;
@@ -1037,6 +1038,95 @@ void Game::adminEndGameSimulation(int password)
 	tokens[3] = 14;
 
 	// Everything is now properly set up to proceed to an end game simulation
+}
+
+// Always allowed, pass 34 as parameter to allow it
+void Game::adminAutoInitSimulation(int password)
+{
+	// Checking admin password
+	if (password != 34) return;
+
+	// Only allowed with standard map
+	if (map.getName().compare("standard") != 0) return;
+
+	// Game has to be running
+	if (!running) return;
+
+	// We can proceed with the simulation
+	size_t i, max;
+	max = players.size();
+
+	// Players modifications
+	// Setting up all players as alive and in a clean state
+
+	for (i = 0; i < max; i++) {
+		players[i].setTerritoriesOwned(0);
+		players[i].resetReinforcement();
+		players[i].removeAllTokens();
+		players[i].resurrect();
+	}
+
+	// Board modifications
+	max = board.size();
+
+	// Resetting all territories to a clean state
+	for (i = 0; i < max; i++) {
+		board[i].owner = -1;
+		board[i].units = 0;
+	}
+
+	// Game variables modifications
+	freeTerritories = board.size();
+	eliminationCount = 0; // All players are alive
+
+	phase = -1;
+	// Active player remains unchanged
+
+	totalExchangedSets = 0; // Not set has been exchanged yet
+	resetTurnVariables();
+	resetCombat();
+
+	// Tokens - Resetting the pool
+	tokens[0] = 2;
+	tokens[1] = 14;
+	tokens[2] = 14;
+	tokens[3] = 14;
+
+	// Everything is now properly reset, we can proceed to simulate the initialization
+	setInitialReinforcement();
+
+	// Allocating all territories
+	// Creating a tracker of all empty territories to allocate them randomly
+	vector <int> emptyTerritories;
+	for (i = 0; i < max; i++) {
+		emptyTerritories.push_back(i);
+	}
+
+	// Allocating territories randomly to players
+	int pick;
+	while (freeTerritories > 0) {
+		// Picking a random territory to allocate to activePlayer
+		pick = rand() % freeTerritories;
+
+		// Allocating the territory to activePlayer
+		messagePut(activePlayer, emptyTerritories[pick], 1); // Updates freeTerritories
+
+		// Removing the picked territory from the list
+		emptyTerritories.erase(emptyTerritories.begin() + pick);
+	}
+
+	// All territories are allocated, proceeding with spending reinforcement
+	do {
+		// Picking a territory within the range of owned territories of activePlayer
+		pick = rand() % players[activePlayer].getTerritoriesOwned();
+
+		// Fetching picked territory
+		for (i = 0; (i < max) && (pick >= 0); i++) {
+			if (board[i].owner == activePlayer) pick--;
+		}
+	} while (messagePut(activePlayer, i - 1, 1) == 0); // If return is >0, activePlayer got his reinforcement for first turn
+
+	// All territories are allocated and reinforcement are spent, proceeding with phase 0
 }
 
 
