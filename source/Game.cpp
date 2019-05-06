@@ -614,6 +614,9 @@ int Game::messageStart()
 	// Setting initial reinforcement for all players
 	setInitialReinforcement();
 
+	// Debug and test maps
+	if (this->name.compare("endgame") != 0) adminEndGameSimulation(int password);
+
 	// Returning the player chosen for the first turn
 	return activePlayer;
 }
