@@ -187,6 +187,16 @@ private:
 	int putUnits(int territory, int units);
 
 	/**
+	 * @brief Simulates a combat with dice rolls and returns unit loss of involved factions
+	 *
+	 * @param attackers  Number of attacking units
+	 * @param defenders  Number of defending units
+	 *
+	 * @return CombatOutcome  A CombatOutcome containing unit loss of involved factions
+	 */
+	CombatOutcome solveCombat(int attackers, int defenders);
+
+	/**
 	 * @brief Simulates a combat and returns unit loss of involved factions
 	 *
 	 * @param attackers  Number of attacking units
@@ -194,7 +204,7 @@ private:
 	 *
 	 * @return CombatOutcome  A CombatOutcome containing unit loss of involved factions
 	 */
-	CombatOutcome solveCombat(int attackers, int defenders); // Currently generates wrong probabilities for 3v2, because of the use of rand()
+	CombatOutcome solveCombatDeprecated(int attackers, int defenders);
 
 	/**
 	 * @brief Moves units from one territory to another

@@ -204,7 +204,84 @@ int Game::putUnits(int territory, int units)
 	else return -4;
 }
 
+// Unit ranges must be valid (checked in messages methods usually)
 CombatOutcome Game::solveCombat(int attackers, int defenders)
+{
+	CombatOutcome result;
+	result.attackerLoss = 0;
+	result.defenderLoss = 0;
+
+	result.outcomeType = 0;
+	result.source = -1;
+	result.destination = -1;
+
+	int limit = 6;
+	int tmp;
+
+	// Initializing the proper amount of rolls
+	size_t i;
+	int attRolls[3] = {0};
+	int defRolls[2] = {0};
+
+	for (i = 0; (int)i < attackers; i++) {
+		attRolls[i] = rand() % limit;
+	}
+
+	for (i = 0; (int)i < defenders; i++) {
+		defRolls[i] = rand() % limit;
+	}
+
+	// Sorting the rolls (in a crude way)
+	// 2 attackers or more
+	if (attackers >= 2) {
+		if (attRolls[1] > attRolls[0]) {
+			tmp = attRolls[0];
+			attRolls[0] = attRolls[1];
+			attRolls[1] = tmp;
+		}
+
+		// 3 attackers, first two rolls are already sorted
+		if (attackers == 3) {
+			if (attRolls[2] > attRolls[1]) {
+				tmp = attRolls[1];
+				attRolls[1] = attRolls[2];
+				attRolls[2] = tmp;
+			}
+
+			if (attRolls[1] > attRolls[0]) {
+				tmp = attRolls[0];
+				attRolls[0] = attRolls[1];
+				attRolls[1] = tmp;
+			}
+		}
+	}
+
+	// 2 defenders
+	if (defenders == 2) {
+		if (defRolls[1] > defRolls[0]) {
+			tmp = defRolls[0];
+			defRolls[0] = defRolls[1];
+			defRolls[1] = tmp;
+		}
+	}
+
+	// Rolls are sorted, we now have to compare them to calcultate combat loss
+	// Comparing the two highest rolls (tie results in attacker loss as stated in the rules)
+	if (attRolls[0] > defRolls[0]) result.defenderLoss++;
+	else result.attackerLoss++;
+	
+	// Comparing the two second highest rolls if they exist
+	if (min(attackers, defenders) >= 2) {
+		if (attRolls[1] > defRolls[1]) result.defenderLoss++;
+		else result.attackerLoss++;
+	}
+
+	return result;
+}
+
+// Probabilities are correct, but results generated are not that close to expected values
+// This is due to the use of rand() with a wide range
+CombatOutcome Game::solveCombatDeprecated(int attackers, int defenders)
 {
 	CombatOutcome result;
 	result.attackerLoss = 0;
