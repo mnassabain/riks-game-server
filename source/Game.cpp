@@ -47,7 +47,9 @@ int Game::nextPlayer()
 	int idPlayer = (this->activePlayer + 1) % this->nbPlayers;
 
 	// don't pass the turn to an eliminated player
-	while (!this->players[idPlayer].isAlive) {
+	// Also skipping disocnnected players' turns
+	// /!\ isAlive is a public attribute of Player
+	while ((!this->players[idPlayer].isAlive) || (!this->players[idPlayer].isConnected())) {
 		idPlayer = (this->activePlayer + 1) % this->nbPlayers;
 	}
 
