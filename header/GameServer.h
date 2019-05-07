@@ -14,6 +14,7 @@
 #include "../header/Game.h"
 #include "../header/MessageCode.h"
 #include "../header/Client.h"
+#include "../header/sha256.h"
 
 #include "../libs/websocketpp/config/asio_no_tls.hpp"
 #include "../libs/websocketpp/server.hpp"
