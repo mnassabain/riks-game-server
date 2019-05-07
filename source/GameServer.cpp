@@ -156,7 +156,8 @@ string GameServer::treatMessage(string message, Connection connection)
 		{
 			string uid = jmessage["data"]["userID"].get<string>();
 			string pwd = jmessage["data"]["userPassword"].get<string>();
-			if(sqlite3_bind_text(stmt,1,uid.c_str(),uid.length(),SQLITE_STATIC) || sqlite3_bind_text(stmt,2,pwd.c_str(),pwd.length(),SQLITE_STATIC) ) //Error while binding parameters
+			string hpwd = sha256(pwd);
+			if(sqlite3_bind_text(stmt,1,uid.c_str(),uid.length(),SQLITE_STATIC) || sqlite3_bind_text(stmt,2,hpwd.c_str(),hpwd.length(),SQLITE_STATIC) ) //Error while binding parameters
 			{
 			  cout<<"SIGN_UP : Binding parmeters error"<<endl;
 			  sqlite3_close(db);
@@ -270,7 +271,7 @@ string GameServer::treatMessage(string message, Connection connection)
 	      }
 	      else //No connection error
 	      {
-		if(sqlite3_prepare_v2(db,"Select * from users where login=?",-1,&stmt,NULL)) //Error when creating request
+		if(sqlite3_prepare_v2(db,"Select * from users where login=? and password=?",-1,&stmt,NULL)) //Error when creating request
 		{
 		  cout<<"CONNECT : Select preparing error"<<endl;
 		  sqlite3_close(db);
@@ -284,8 +285,9 @@ string GameServer::treatMessage(string message, Connection connection)
 		else //No preparing error
 		{
 		  string uid = jmessage["data"]["userID"].get<string>();
-	   	  const char * pwd = jmessage["data"]["userPassword"].get<string>().c_str();
-		  if(sqlite3_bind_text(stmt,1,uid.c_str(),uid.length(),SQLITE_STATIC)) //Error while binding parameters
+		  string pwd = jmessage["data"]["userPassword"].get<string>();
+	   	  string hpwd = sha256(pwd);
+		  if(sqlite3_bind_text(stmt,1,uid.c_str(),uid.length(),SQLITE_STATIC) || sqlite3_bind_text(stmt,2,hpwd.c_str(),hpwd.length(),SQLITE_STATIC) ) //Error while binding parameters
 		  {
 		    cout<<"CONNECT : Binding parmeters error"<<endl;
 		    sqlite3_close(db);
@@ -300,33 +302,20 @@ string GameServer::treatMessage(string message, Connection connection)
 		    returnCode = sqlite3_step(stmt);
 		    if(returnCode == SQLITE_OK || returnCode == SQLITE_ROW)//Found
 		    {
-		      unsigned char * realPwd = (unsigned char*)sqlite3_column_text(stmt,2);//Getting password
-		      if(strcmp(pwd,(char *)realPwd))//True if passwords are different
-		      {
-			cout<<"CONNECT : Bad password"<<endl;
-		    	sqlite3_close(db);
-	  	    	response["type"]= CODE_CONNECT;
-		    	response["data"]["error"]=true;
-		    	response["data"]["response"]="CONNECT Bad password";
-                sqlite3_finalize(stmt);
-                break;
-		      }
-		      else //CONNECT Success
-		      {
             		cout<<"CONNECT : User successfully connected"<<endl;
 			sqlite3_close(db);
 			response["type"] = CODE_CONNECT;
             		response["data"]["error"] = false;
             		response["data"]["response"] = "Success";
-		      }
+		      
 		    }
 		    else //User not found
 		    {
-		      cout<<"CONNECT : Bad Login (user not found)"<<endl;
+		      cout<<"CONNECT : Bad Login or password"<<endl;
 		      sqlite3_close(db);
 	  	      response["type"]= CODE_CONNECT;
 		      response["data"]["error"]=true;
-		      response["data"]["response"]="CONNECT Bad Login (user not found)";
+		      response["data"]["response"]="CONNECT Bad Login or password";
               sqlite3_finalize(stmt);
               break;
 		    }
