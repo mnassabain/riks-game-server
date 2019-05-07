@@ -25,6 +25,7 @@ public:
     int tokens[4];
     int reinforcement;
 	bool isAlive;
+    bool connected;
 	int territoriesOwned;
 
 	// Player stats
@@ -210,6 +211,27 @@ public:
      * @return int 
      */
 	int countTokens();
+
+    /**
+     * @brief Indicates that the player is connected
+     * 
+     * @return int 
+     */
+    int connect();
+
+    /**
+     * @brief Indicates that the player is disconnected
+     * 
+     * @return int 
+     */
+    int disconnect();
+
+    /**
+     * @brief Indicates if the player is connected or not
+     * 
+     * @return bool
+     */
+    bool isConnected();
 
 private:
 };

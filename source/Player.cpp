@@ -14,6 +14,7 @@ Player::Player(string name)
 	// Initialization of player status
 	reinforcement = 0;
 	isAlive = true;
+	connected = true;
 	territoriesOwned = 0;
 	/* initializing of player stats */
 	this->territoriesCaptured = 0;
@@ -166,6 +167,23 @@ int Player::countTokensOfType(int type)
 int Player::countTokens()
 {
 	return tokens[0] + tokens[1] + tokens[2] + tokens[3];
+}
+
+int Player::connect()
+{
+	this->connected = true;
+	return 0;
+}
+
+int Player::disconnect()
+{
+	this->connected = false;
+	return 0;
+}
+
+bool Player::isConnected()
+{
+	return this->connected;
 }
 
 string Player::getName()

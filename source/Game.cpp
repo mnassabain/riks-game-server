@@ -47,7 +47,9 @@ int Game::nextPlayer()
 	int idPlayer = (this->activePlayer + 1) % this->nbPlayers;
 
 	// don't pass the turn to an eliminated player
-	while (!this->players[idPlayer].isAlive) {
+	// Also skipping disocnnected players' turns
+	// /!\ isAlive is a public attribute of Player
+	while ((!this->players[idPlayer].isAlive) || (!this->players[idPlayer].isConnected())) {
 		idPlayer = (this->activePlayer + 1) % this->nbPlayers;
 	}
 
@@ -482,17 +484,34 @@ int Game::addPlayer(string name)
 	return -1;
 }
 
+// Works differently if the game is currently in a lobby stateor is running
 int Game::removePlayer(string name)
 {
-	size_t i;
-	size_t max = players.size();
-	for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
+	// Treatment if the game is still in a lobby state
+	if (!this->running) {
+		size_t i;
+		size_t max = players.size();
+		for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
+		}
+		if (i < max) {
+			this->nbPlayers--;
+			players.erase(players.begin() + i);
+			return 0;
+		}
 	}
-	if (i < max) {
-		this->nbPlayers--;
-		players.erase(players.begin() + i);
-		return 0;
+
+	// Treatment if the game is currently running
+	if (this->running) {
+		size_t i;
+		size_t max = players.size();
+		for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
+		}
+		if (i < max) {
+			players[i].disconnect();
+			return 0;
+		}
 	}
+
 	return -1;
 }
 
