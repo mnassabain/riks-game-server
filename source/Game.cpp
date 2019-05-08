@@ -509,7 +509,7 @@ int Game::removePlayer(string name)
 				// TODO Treatment of phase -1, SUPER TRICKY
 
 				// Proper handling if the player was the current active player (Can only be the case if the player was still alive)
-				if (i == activePlayer) {
+				if ((int)i == activePlayer) {
 					// Handling in phase -1
 					if (this->phase == -1) {
 					}
@@ -519,7 +519,7 @@ int Game::removePlayer(string name)
 
 						// Proceeding to next player's turn
 						nextPlayer();
-						this->phase == 0;
+						this->phase = 0;
 						turnReinforcement();
 
 						resetTurnVariables();
