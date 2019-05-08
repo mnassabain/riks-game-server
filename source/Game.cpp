@@ -40,29 +40,41 @@ void Game::start()
 	this->running = true;
 }
 
-// Returns new activePlayer
+// Returns new activePlayer or -10 if a GAME_STATUS is required
 int Game::nextPlayer()
 {
-	// considering that `activePlayer` can go from 0 to `nbPlayers - 1`
-	int idPlayer = (this->activePlayer + 1) % this->nbPlayers;
+	int pickedPlayer = this->activePlayer;
+	bool aiTurn = false;
 
-	// Skip turns of eliminated and disconnected players
-	// /!\ isAlive is a public attribute of Player
-	while ((!this->players[idPlayer].isAlive) || (!this->players[idPlayer].isConnected())) {
-		idPlayer = (this->activePlayer + 1) % this->nbPlayers;
-	}
 
-	if (idPlayer == this->activePlayer) {
-		// the game ends in that case, nobody is alive except the activePlayer
-		return -1;
-	}
-	else {
-		// we move to the next player
-		this->activePlayer = idPlayer;
-	}
+	do {
+		// Picks a new player and checks if the game is out of available players
+		pickedPlayer = (pickedPlayer + 1) % this->nbPlayers;
+		if (pickedPlayer == this->activePlayer) return -1;
 
+		// Special behavior in phase -1 to handle disconnections
+		if ((phase == -1) && (!players[(size_t)pickedPlayer].isConnected())) {
+			aiTurn = true;
+
+			AIPutUnit(pickedPlayer);
+		}
+
+	} while ((!this->players[idPlayer].isAlive) || (!this->players[idPlayer].isConnected()));
+
+	// Everything is ok, we can proceed to the next player
+	this->activePlayer = pickedPlayer;
 	// Resetting the turn related variables
 	resetTurnVariables();
+
+	// If the AI took action, we have to force a GAME_STATUS and need to forcefully check if we have to proceed to phase 0
+	if (aiTurn) {
+		if (this->players[(size_t)activePlayer].getReinforcement() <= 0) {
+			this->phase = 0;
+			turnReinforcement();
+		}
+
+		return -10;
+	}
 
 	return activePlayer;
 }
@@ -225,6 +237,9 @@ int Game::AIPutUnit(int player)
 				territoryPool.push_back(i);
 			}
 		}
+		
+		// One free territory will be filled
+		freeTerritories--;
 	}
 	// Behavior if there are no free territories
 	else {
@@ -551,7 +566,7 @@ int Game::removePlayer(string name)
 			// Proper handling if the player wasn't already eliminated
 			if (players[i].isAlive) {
 				// Proper handling if the player was required to defend at the time of disconnection
-				if (!players[combat.defenderId].isConnected()) {
+				if (combat.defenderId == (int)i) {
 					messageDefend(combat.defenderId, 1); // 1 unit is always allowed to defend
 				}
 
@@ -559,11 +574,13 @@ int Game::removePlayer(string name)
 				if ((int)i == activePlayer) {
 					// Handling in phase -1 // AI move TODO
 					if (this->phase == -1) {
+						AIPutUnit((int)i);
+						nextPlayer();
 					}
 
 					// Handling in other phases
 					else {
-						players[i].resetReinforcement(); // Possible to add AI handling here thanks to AIPutUnit, but currently decided against
+						players[i].resetReinforcement(); // Possible to add AI handling here thanks to AIPutUnit, but currently decided against to avoid inconsistencies in behavior
 
 						// Proceeding to next player's turn
 						nextPlayer();
@@ -858,8 +875,8 @@ int Game::messagePut(int player, int territory, int units)
 			}
 		}
 
-		// Unit successfully put, we can proceed to next player
-		nextPlayer();
+		// Unit successfully put, we can proceed to next player and return -10 if AI moves happened
+		if (nextPlayer() == -10) return -10;
 
 		// If all players are out of reinforcement, we can finally move to phase 0 and start the game
 		size_t i;
