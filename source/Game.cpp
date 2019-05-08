@@ -59,7 +59,7 @@ int Game::nextPlayer()
 			AIPutUnit(pickedPlayer);
 		}
 
-	} while ((!this->players[idPlayer].isAlive) || (!this->players[idPlayer].isConnected()));
+	} while ((!this->players[pickedPlayer].isAlive) || (!this->players[pickedPlayer].isConnected()));
 
 	// Everything is ok, we can proceed to the next player
 	this->activePlayer = pickedPlayer;
