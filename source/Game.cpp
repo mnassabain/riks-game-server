@@ -46,8 +46,7 @@ int Game::nextPlayer()
 	// considering that `activePlayer` can go from 0 to `nbPlayers - 1`
 	int idPlayer = (this->activePlayer + 1) % this->nbPlayers;
 
-	// don't pass the turn to an eliminated player
-	// Also skipping disocnnected players' turns
+	// Skip turns of eliminated and disconnected players
 	// /!\ isAlive is a public attribute of Player
 	while ((!this->players[idPlayer].isAlive) || (!this->players[idPlayer].isConnected())) {
 		idPlayer = (this->activePlayer + 1) % this->nbPlayers;
@@ -712,6 +711,7 @@ int Game::messageStart()
 
 	// Debug and test maps
 	if (this->name.compare("endgame") == 0) adminEndGameSimulation(34);
+	if (this->name.compare("mpendgame") == 0) adminEndGameMultiplayerSimulation(34);
 	if (this->name.compare("autoinit") == 0) adminAutoInitSimulation(34);
 
 	// Returning the player chosen for the first turn
@@ -1119,6 +1119,79 @@ void Game::adminEndGameSimulation(int password)
 	// Game variables modifications
 	freeTerritories = 0;
 	eliminationCount = nbPlayers - 2; // Only players 0 and 1 are still alive
+
+	phase = 0;
+	activePlayer = 0;
+
+	totalExchangedSets = 3; // Arbitrary value, doesn't really have to be changed
+	resetTurnVariables();
+	resetCombat();
+
+	// Tokens - Resetting the pool considering all tokens were removed then 3 were granted to player 0
+	tokens[0] = 1;
+	tokens[1] = 13;
+	tokens[2] = 13;
+	tokens[3] = 14;
+
+	// Everything is now properly set up to proceed to an end game simulation
+}
+
+// Always allowed, pass 34 as parameter to allow it
+void Game::adminEndGameMultiplayerSimulation(int password)
+{
+	// Checking admin password
+	if (password != 34) return;
+
+	// Only allowed with standard map
+	if (map.getName().compare("standard") != 0) return;
+
+	// Game has to be running
+	if (!running) return;
+
+	// We can proceed with the simulation
+	size_t i, max;
+
+	// Players modifications
+	// Removing everything from all players except one territory and making sure they're alive
+	max = players.size();
+
+	for (i = 0; i < max; i++) {
+		players[i].setTerritoriesOwned(1);
+		players[i].resetReinforcement();
+		players[i].removeAllTokens();
+		players[i].resurrect();
+	}
+
+	// Adding assets to player 0
+	players[0].setTerritoriesOwned(42 - max + 1); // Player 0 will own everything except one territory per other player
+	players[0].addReinforcement(3);
+
+	players[0].receiveToken(0);
+	players[0].receiveToken(1);
+	players[0].receiveToken(2);
+
+
+	// Board modifications
+	max = board.size();
+
+	// Giving all territories to player 0 and filling them with units // Could be done before players modifications as a slight optimization
+	for (i = 0; i < max; i++) {
+		board[i].owner = 0;
+		board[i].units = 5;
+	}
+
+	// Granting one territory to each other player
+	max = players.size();
+
+	for (i = 1; i < max; i++) {
+		board[i*5].owner = i;
+		board[i*5].units = 3;
+	}
+
+
+	// Game variables modifications
+	freeTerritories = 0;
+	eliminationCount = 0; // All players are alive
 
 	phase = 0;
 	activePlayer = 0;

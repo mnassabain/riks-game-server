@@ -581,6 +581,13 @@ public:
 	void adminEndGameSimulation(int password);
 
 	/**
+	* @brief Simulates end game by putting the game in a state close to the end, with more than 2 players alive
+	*
+	* @param password  Send 34 to allow the method to proceed
+	*/
+	void adminEndGameMultiplayerSimulation(int password);
+
+	/**
 	* @brief Simulates a game that starts in phase 0
 	*
 	* @param password  Send 34 to allow the method to proceed
