@@ -31,9 +31,9 @@ void Game::start()
 	for (int i = 0; i < limit; i++) {
 		this->board.push_back(blank);
 	}
-	if(name=="riksForever")//REMOVE_AFTER_DEBUG
+	if (name == "riksForever")//REMOVE_AFTER_DEBUG
 	{
-		int tmp[4]={2,4,3,0};//REMOVE_AFTER_DEBUG
+		int tmp[4] = { 2,4,3,0 };//REMOVE_AFTER_DEBUG
 		players.at(0).receiveTokens(tmp);//REMOVE_AFTER_DEBUG
 	}
 	// Everything is ready to start the game, the lobby now becomes a running game
@@ -54,7 +54,7 @@ int Game::nextPlayer()
 
 	if (idPlayer == this->activePlayer) {
 		// the game ends in that case, nobody is alive except the activePlayer
-		this->end();
+		return -1;
 	}
 	else {
 		// we move to the next player
@@ -71,7 +71,7 @@ int Game::nextPhase()
 {
 	// considering that `phase` can go from 0 to 2
 	this->phase = (this->phase + 1) % 3;
-	
+
 	return this->phase;
 }
 
@@ -171,7 +171,7 @@ int Game::grantToken()
 	total += tokens[1];
 	total += tokens[2];
 	total += tokens[3];
-	int token = -1 ;
+	int token = -1;
 	// Granting a random token to the player
 	if (total > 0) {
 		int roll = rand() % total;
@@ -205,6 +205,51 @@ int Game::putUnits(int territory, int units)
 	else return -4;
 }
 
+// Usable in phase -1 as well as phase 0
+int Game::AIPutUnit(int player)
+{
+	// Checking if selected player has available reinforcement
+	if (players[player].getReinforcement() < 1) return -1;
+
+	// Preparing a list that will contain territories to pick from
+	vector <int> territoryPool;
+	int max = board.size();
+	size_t i;
+	int pick;
+
+	// Behavior if there are free territories
+	if (freeTerritories > 0) {
+		// Preparing the pool by adding empty territories ID
+		for (i = 0; (int)i < max; i++) {
+			if (board[i].owner == -1) {
+				territoryPool.push_back(i);
+			}
+		}
+	}
+	// Behavior if there are no free territories
+	else {
+		// Preparing the pool by adding territories owned by player
+		for (i = 0; (int)i < max; i++) {
+			if (board[i].owner == player) {
+				territoryPool.push_back(i);
+			}
+		}
+	}
+
+	// Pick a territory from the pool
+	pick = rand() % territoryPool.size();
+
+	// Putting the unit on the desired territory
+	board[territoryPool[pick]].units++;
+	board[territoryPool[pick]].owner = player;
+
+	// Updating player reinforcement
+	players[player].spendReinforcement(1);
+
+	// AI successfully added a unit on a territory
+	return 0;
+}
+
 // Unit ranges must be valid (checked in messages methods usually)
 CombatOutcome Game::solveCombat(int attackers, int defenders)
 {
@@ -221,8 +266,8 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 
 	// Initializing the proper amount of rolls
 	size_t i;
-	int attRolls[3] = {0};
-	int defRolls[2] = {0};
+	int attRolls[3] = { 0 };
+	int defRolls[2] = { 0 };
 
 	for (i = 0; (int)i < attackers; i++) {
 		attRolls[i] = rand() % limit;
@@ -270,7 +315,7 @@ CombatOutcome Game::solveCombat(int attackers, int defenders)
 	// Comparing the two highest rolls (tie results in attacker loss as stated in the rules)
 	if (attRolls[0] > defRolls[0]) result.defenderLoss++;
 	else result.attackerLoss++;
-	
+
 	// Comparing the two second highest rolls if they exist
 	if (min(attackers, defenders) >= 2) {
 		if (attRolls[1] > defRolls[1]) result.defenderLoss++;
@@ -371,8 +416,8 @@ int Game::setInitialReinforcement()
 	// each player when playing in a 1v1 map for example
 	int maxPlayersRisk = 6;
 	int reinforcement = 20 + 5 * (maxPlayersRisk - this->nbPlayers); // 20 units + 5 for each missing player
-	if(map.getName()=="1v1test")//REMOVE_AFTER_DEBUG
-		reinforcement=5;//REMOVE_AFTER_DEBUG
+	if (map.getName() == "1v1test")//REMOVE_AFTER_DEBUG
+		reinforcement = 5;//REMOVE_AFTER_DEBUG
 
 	for (int i = 0; i < this->nbPlayers; i++) {
 		players[i].addReinforcement(reinforcement);
@@ -483,32 +528,59 @@ int Game::addPlayer(string name)
 	return -1;
 }
 
-// Works differently if the game is currently in a lobby stateor is running
+// Works differently if the game is currently in a lobby state or is running
+// Can return -10
 int Game::removePlayer(string name)
 {
-	// Treatment if the game is still in a lobby state
-	if (!this->running) {
-		size_t i;
-		size_t max = players.size();
-		for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
-		}
-		if (i < max) {
-			this->nbPlayers--;
-			players.erase(players.begin() + i);
-			return 0;
-		}
+	size_t i;
+	size_t max = players.size();
+	// Searching if the player exists in the list
+	for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
 	}
 
-	// Treatment if the game is currently running
-	if (this->running) {
-		size_t i;
-		size_t max = players.size();
-		for (i = 0; (i < max) && (players[i].getName().compare(name) != 0); i++) {
+	if (i < max) {
+		// Treatment if the game is still in a lobby state
+		if (!this->running) {
+			this->nbPlayers--;
+			players.erase(players.begin() + i);
 		}
-		if (i < max) {
+		// Treatment if the game is currently running
+		if (this->running) {
 			players[i].disconnect();
-			return 0;
+
+			// Proper handling if the player wasn't already eliminated
+			if (players[i].isAlive) {
+				// Proper handling if the player was required to defend at the time of disconnection
+				if (!players[combat.defenderId].isConnected()) {
+					messageDefend(combat.defenderId, 1); // 1 unit is always allowed to defend
+				}
+
+				// Proper handling if the player was the current active player (Can only be the case if the player was still alive)
+				if ((int)i == activePlayer) {
+					// Handling in phase -1 // AI move TODO
+					if (this->phase == -1) {
+					}
+
+					// Handling in other phases
+					else {
+						players[i].resetReinforcement(); // Possible to add AI handling here thanks to AIPutUnit, but currently decided against
+
+						// Proceeding to next player's turn
+						nextPlayer();
+						this->phase = 0;
+						turnReinforcement();
+
+						resetTurnVariables();
+						resetCombat();
+					}
+				}
+
+				// Universal GAME_STATUS request return
+				return -10;
+			}
 		}
+
+		return 0;
 	}
 
 	return -1;
@@ -517,9 +589,9 @@ int Game::removePlayer(string name)
 vector<int> Game::getPlayerTerritories(int player)
 {
 	vector<int> territories;
-	for(int i = 0; i < map.nbTerritories(); i++)
+	for (int i = 0; i < map.nbTerritories(); i++)
 	{
-		if(player == board[i].owner)
+		if (player == board[i].owner)
 			territories.push_back(i);
 	}
 	return territories;
@@ -834,9 +906,9 @@ int Game::messageAttack(int player, int source, int destination, int units)
 	// Checking if the right player sent the message
 	if (player != activePlayer)
 	{
-		cerr << "MSG_ATT: It's not Player" + to_string(player) +\
-		"'s turn, exiting...";
-		 return -1;
+		cerr << "MSG_ATT: It's not Player" + to_string(player) + \
+			"'s turn, exiting...";
+		return -1;
 	}
 
 	// Phase check
@@ -855,8 +927,8 @@ int Game::messageAttack(int player, int source, int destination, int units)
 	if (combat.attackerId != -1)
 	{
 		cerr << "MSG_ATT: Combat already taking place, exiting..."\
-		<< endl;
-	 	return -4;
+			<< endl;
+		return -4;
 	}
 	// Checking if the player owns the source
 	if (board[source].owner != player)
@@ -869,7 +941,7 @@ int Game::messageAttack(int player, int source, int destination, int units)
 	if (board[destination].owner == player)
 	{
 		cerr << "MSG_ATT: You can't attack your own territory, exiting..."\
-		<< endl;
+			<< endl;
 		return -6;
 	}
 	// Checking if the territories are adjacent
@@ -893,6 +965,15 @@ int Game::messageAttack(int player, int source, int destination, int units)
 	combat.destination = destination;
 	combat.attackerUnits = units;
 
+	// Checking if this attack requires AI intervention
+	if (!players[combat.defenderId].isConnected()) {
+		messageDefend(combat.defenderId, 1); // 1 unit is always allowed to defend
+
+		// Players now require a GAME_STATUS to be able to sync with automated actions
+		return -10;
+	}
+
+	// Waiting for a human player to respond
 	return 0;
 
 }
@@ -934,7 +1015,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 	}
 
 	// Checking if units is a valid amount
-	if (units < 1 || units > 2){
+	if (units < 1 || units > 2) {
 		cerr << "MSG_DEF: Units check failed, exiting..." << endl;
 		result.outcomeType = -4;
 		return result;
@@ -944,7 +1025,7 @@ CombatOutcome Game::messageDefend(int player, int units)
 	if (board[combat.destination].units < units)
 	{
 		cerr << "MSG_DEF: Not enough units on the territory, exiting..."\
-		<< endl;
+			<< endl;
 		result.outcomeType = -5;
 		return result;
 	}
@@ -1184,8 +1265,8 @@ void Game::adminEndGameMultiplayerSimulation(int password)
 	max = players.size();
 
 	for (i = 1; i < max; i++) {
-		board[i*5].owner = i;
-		board[i*5].units = 3;
+		board[i * 5].owner = i;
+		board[i * 5].units = 3;
 	}
 
 
@@ -1301,28 +1382,28 @@ void Game::adminAutoInitSimulation(int password)
 
 string Game::toJson()
 {
-	string res="{\"name\":\""+name+"\",\"nbPlayers\":"+to_string(nbPlayers)+",";
-	res+= "\"players\":[";
-				for(size_t i = 0;i<players.size();i++)
-				{
-					res+=players.at(i).toJson();
-					if(i<players.size()-1)
-						res+=",";
-				}
-			res+="],";
-	res+="\"mapName\":\""+map.getName()+"\",";
-	res+="\"board\":[";
-				for(size_t i = 0; i<board.size();i++)
-				{
-					res+="{\"terId\":"+to_string(i)+",\"ownerId\":"+to_string(board.at(i).owner)+",\"nbUnits\":"+to_string(board.at(i).units)+"}";
-					if(i<board.size()-1)
-						res+=",";
-				}
-			res+="],";
-	res+="\"freeTerritories\":"+to_string(freeTerritories)+",";
-	res+="\"phase\":"+to_string(phase)+",";
-	res+="\"activePlayer\":"+to_string(activePlayer)+",";
-	res+="\"totalExchangedSets\":"+to_string(totalExchangedSets)+"}";
+	string res = "{\"name\":\"" + name + "\",\"nbPlayers\":" + to_string(nbPlayers) + ",";
+	res += "\"players\":[";
+	for (size_t i = 0; i < players.size(); i++)
+	{
+		res += players.at(i).toJson();
+		if (i < players.size() - 1)
+			res += ",";
+	}
+	res += "],";
+	res += "\"mapName\":\"" + map.getName() + "\",";
+	res += "\"board\":[";
+	for (size_t i = 0; i < board.size(); i++)
+	{
+		res += "{\"terId\":" + to_string(i) + ",\"ownerId\":" + to_string(board.at(i).owner) + ",\"nbUnits\":" + to_string(board.at(i).units) + "}";
+		if (i < board.size() - 1)
+			res += ",";
+	}
+	res += "],";
+	res += "\"freeTerritories\":" + to_string(freeTerritories) + ",";
+	res += "\"phase\":" + to_string(phase) + ",";
+	res += "\"activePlayer\":" + to_string(activePlayer) + ",";
+	res += "\"totalExchangedSets\":" + to_string(totalExchangedSets) + "}";
 
 	return res;
 }
