@@ -114,7 +114,8 @@ private:
 	/**
 	 * @brief Passes the turn to the next player
 	 *
-	 * @return ID of the new activePlayer
+	 * @return int >=0 ID of the new activePlayer
+	 * @return int -1 Game is over
 	 */
 	int nextPlayer();
 
@@ -326,6 +327,7 @@ public:
 	 *
 	 * @return int 0  Success, named player was removed from the game
 	 * @return int -1  Error, named player didn't exist in the game and no action was performed
+	 * @return int -10 Success, universal return to indicate that the Game requires a GAME_STATUS to be sent to all players involved
 	 */
 	int removePlayer(string name);
 
@@ -498,6 +500,7 @@ public:
 	* @return int -2  Error, in phase -1, units must always be 1
 	* @return int -3  Error, there are free territories remaining (in phase -1, they must all be occupied before reinforcing the others)
 	* @return int -4  Error, active player doesn't own the territory, or doesn't have enough reinforcement to put that number on it
+	* @return int -10 Success, universal return to indicate that the Game requires a GAME_STATUS to be sent to all players involved
 	*/
 	int messagePut(int player, int territory, int units);
 
@@ -534,6 +537,7 @@ public:
 	* @return int -6  Error, active player owns the territory he's trying to attack
 	* @return int -7  Error, source and destination are not adjacent territories
 	* @return int -8  Error, active player doesn't have enough available units on the attacking territory
+	* @return int -10 Success, universal return to indicate that the Game requires a GAME_STATUS to be sent to all players involved
 	*/
 	int messageAttack(int player, int source, int destination, int units);
 
