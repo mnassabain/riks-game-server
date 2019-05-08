@@ -209,7 +209,7 @@ int Game::putUnits(int territory, int units)
 int Game::AIPutUnit(int player)
 {
 	// Checking if selected player has available reinforcement
-	if (players[player].getReinforcement < 1) return -1;
+	if (players[player].getReinforcement() < 1) return -1;
 
 	// Preparing a list that will contain territories to pick from
 	vector <int> territoryPool;
@@ -220,7 +220,7 @@ int Game::AIPutUnit(int player)
 	// Behavior if there are free territories
 	if (freeTerritories > 0) {
 		// Preparing the pool by adding empty territories ID
-		for (i = 0; i < max; i++) {
+		for (i = 0; (int)i < max; i++) {
 			if (board[i].owner == -1) {
 				territoryPool.push_back(i);
 			}
@@ -229,7 +229,7 @@ int Game::AIPutUnit(int player)
 	// Behavior if there are no free territories
 	else {
 		// Preparing the pool by adding territories owned by player
-		for (i = 0; i < max; i++) {
+		for (i = 0; (int)i < max; i++) {
 			if (board[i].owner == player) {
 				territoryPool.push_back(i);
 			}
