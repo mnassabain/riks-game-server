@@ -116,6 +116,7 @@ private:
 	 *
 	 * @return int >=0 ID of the new activePlayer
 	 * @return int -1 Game is over
+	 * @return int -10 AI actions took place and players require a GAME_STATUS to proceed
 	 */
 	int nextPlayer();
 
