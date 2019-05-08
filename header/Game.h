@@ -188,6 +188,15 @@ private:
 	int putUnits(int territory, int units);
 
 	/**
+	* @brief Requests an AI to put one unit as named player
+	*
+	* @param player  Simulated player
+	* @return int 0  Success, units put on the desired territory
+	* @return int -1  Error, player didn't have enough available units
+	*/
+	int AIPutUnit(int player);
+
+	/**
 	 * @brief Simulates a combat with dice rolls and returns unit loss of involved factions
 	 *
 	 * @param attackers  Number of attacking units

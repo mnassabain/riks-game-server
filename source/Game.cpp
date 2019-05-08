@@ -205,6 +205,51 @@ int Game::putUnits(int territory, int units)
 	else return -4;
 }
 
+// Usable in phase -1 as well as phase 0
+int Game::AIPutUnit(int player)
+{
+	// Checking if selected player has available reinforcement
+	if (players[player].getReinforcement < 1) return -1;
+
+	// Preparing a list that will contain territories to pick from
+	vector <int> territoryPool;
+	int max = board.size();
+	size_t i;
+	int pick;
+
+	// Behavior if there are free territories
+	if (freeTerritories > 0) {
+		// Preparing the pool by adding empty territories ID
+		for (i = 0; i < max; i++) {
+			if (board[i].owner == -1) {
+				territoryPool.push_back(i);
+			}
+		}
+	}
+	// Behavior if there are no free territories
+	else {
+		// Preparing the pool by adding territories owned by player
+		for (i = 0; i < max; i++) {
+			if (board[i].owner == player) {
+				territoryPool.push_back(i);
+			}
+		}
+	}
+
+	// Pick a territory from the pool
+	pick = rand() % territoryPool.size();
+
+	// Putting the unit on the desired territory
+	board[territoryPool[pick]].units++;
+	board[territoryPool[pick]].owner = player;
+
+	// Updating player reinforcement
+	players[player].spendReinforcement(1);
+
+	// AI successfully added a unit on a territory
+	return 0;
+}
+
 // Unit ranges must be valid (checked in messages methods usually)
 CombatOutcome Game::solveCombat(int attackers, int defenders)
 {
@@ -518,7 +563,7 @@ int Game::removePlayer(string name)
 
 					// Handling in other phases
 					else {
-						players[i].resetReinforcement();
+						players[i].resetReinforcement(); // Possible to add AI handling here thanks to AIPutUnit, but currently decided against
 
 						// Proceeding to next player's turn
 						nextPlayer();
