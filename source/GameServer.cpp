@@ -392,7 +392,37 @@ string GameServer::treatMessage(string message, Connection connection)
 
                     if (game != games.end())
                     {
-                        game->second.removePlayer(client->second.getName());
+						if (game->second.removePlayer(client->second.getName()) == -10) {
+							// On code -10, all the other players in the game have to be notified
+							//Sending GAME_STATUS and a chat message to all clients in this game
+							json serverNotice;
+							serverNotice["type"] = CODE_CHAT;
+							serverNotice["data"]["name"] = "SERVER";
+							serverNotice["data"]["message"] = "Automated actions were issued by the server, therefore a new GAME_STATUS was sent";
+
+							string status = "{\"type\":" + to_string(CODE_GAME_STATUS) + ",\"data\":" + game->second.toJson() + "}";
+							vector<Player> players = game->second.getPlayers();
+
+							for (unsigned int i = 0; i < players.size(); i++)
+							{
+								ClientIterator player;
+
+								for (player = clients.begin(); player != clients.end();
+									player++)
+								{
+									if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+									{
+										Connection c = player->second.getConnection();
+										endpoint.send(c, serverNotice.dump(),
+											websocketpp::frame::opcode::text);//sending chat
+										endpoint.send(c, status,
+											websocketpp::frame::opcode::text);//sending status
+									}
+								}
+							}
+						}
+
+
                         client->second.setGameID(SERVER_HUB);
                     }
                 }
@@ -715,7 +745,36 @@ string GameServer::treatMessage(string message, Connection connection)
                 }
 
                 /* if we find the game we remove the player from the game */
-                game->second.removePlayer(client->second.getName());
+				if (game->second.removePlayer(client->second.getName()) == -10) {
+					// On code -10, all the other players in the game have to be notified
+					//Sending GAME_STATUS and a chat message to all clients in this game
+					json serverNotice;
+					serverNotice["type"] = CODE_CHAT;
+					serverNotice["data"]["name"] = "SERVER";
+					serverNotice["data"]["message"] = "Automated actions were issued by the server, therefore a new GAME_STATUS was sent";
+
+					string status = "{\"type\":" + to_string(CODE_GAME_STATUS) + ",\"data\":" + game->second.toJson() + "}";
+					vector<Player> players = game->second.getPlayers();
+
+					for (unsigned int i = 0; i < players.size(); i++)
+					{
+						ClientIterator player;
+
+						for (player = clients.begin(); player != clients.end();
+							player++)
+						{
+							if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+							{
+								Connection c = player->second.getConnection();
+								endpoint.send(c, serverNotice.dump(),
+									websocketpp::frame::opcode::text);//sending chat
+								endpoint.send(c, status,
+									websocketpp::frame::opcode::text);//sending status
+							}
+						}
+					}
+				}
+
                 client->second.setGameID(SERVER_HUB);
 
                 /* construct the response */
@@ -1105,6 +1164,45 @@ string GameServer::treatMessage(string message, Connection connection)
               "PUT: You don't own this territory AND/OR don't have enough units");
             break;
         }
+		if (gameReturn == -10)//server issued automated actions
+		{
+			//Sending GAME_STATUS and a chat message to all clients in this game
+			json serverNotice;
+			serverNotice["type"] = CODE_CHAT;
+			serverNotice["data"]["name"] = "SERVER";
+			serverNotice["data"]["message"] = "Automated actions were issued by the server, therefore a new GAME_STATUS was sent";
+
+			string status = "{\"type\":" + to_string(CODE_GAME_STATUS) + ",\"data\":" + game->second.toJson() + "}";
+			vector<Player> players = game->second.getPlayers();
+
+			for (unsigned int i = 0; i < players.size(); i++)
+			{
+				ClientIterator player;
+
+				for (player = clients.begin(); player != clients.end();
+					player++)
+				{
+					if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+					{
+						Connection c = player->second.getConnection();
+						endpoint.send(c, serverNotice.dump(),
+							websocketpp::frame::opcode::text);//sending chat
+						endpoint.send(c, status,
+							websocketpp::frame::opcode::text);//sending status
+					}
+				}
+
+				response["type"] = CODE_CHAT;
+				response["data"]["name"] = "SERVER";
+				response["data"]["message"] = "Automated actions were issued by the server, therefore a new GAME_STATUS was sent";
+
+				Connection c = client->second.getConnection();
+				endpoint.send(c, status,
+					websocketpp::frame::opcode::text);//sending status to sender
+
+			}
+			break;
+		}
 
         //gameReturn == 0 || gameReturn >0
         json put,end,rein;
@@ -1404,6 +1502,46 @@ string GameServer::treatMessage(string message, Connection connection)
             "ATTACK: You have to leave at least 1 unit on your source territory");
           break;
       }
+	  if (gameReturn == -10)//server issued automated actions
+	  {
+		  //Sending GAME_STATUS and a chat message to all clients in this game
+		  json serverNotice;
+		  serverNotice["type"] = CODE_CHAT;
+		  serverNotice["data"]["name"] = "SERVER";
+		  serverNotice["data"]["message"] = "Automated actions were issued by the server, therefore a new GAME_STATUS was sent";
+
+		  string status = "{\"type\":" + to_string(CODE_GAME_STATUS) + ",\"data\":" + game->second.toJson() + "}";
+		  vector<Player> players = game->second.getPlayers();
+
+		  for (unsigned int i = 0; i < players.size(); i++)
+		  {
+			  ClientIterator player;
+
+			  for (player = clients.begin(); player != clients.end();
+				  player++)
+			  {
+				  if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+				  {
+					  Connection c = player->second.getConnection();
+					  endpoint.send(c, serverNotice.dump(),
+						  websocketpp::frame::opcode::text);//sending chat
+					  endpoint.send(c, status,
+						  websocketpp::frame::opcode::text);//sending status
+				  }
+			  }
+
+			  response["type"] = CODE_CHAT;
+			  response["data"]["name"] = "SERVER";
+			  response["data"]["message"] = "Automated actions were issued by the server, therefore a new GAME_STATUS was sent";
+
+			  Connection c = client->second.getConnection();
+			  endpoint.send(c, status,
+				  websocketpp::frame::opcode::text);//sending status to sender
+
+		  }
+		  break;
+	  }
+
 
       //else gameReturn == 0 -> ok
       vector<Player> players = game->second.getPlayers();
@@ -1895,6 +2033,7 @@ int GameServer::createGame(string mapName, string host, int nbPlayers,
 }
 
 
+// Do not use for now, dangerous behavior
 int GameServer::destroyGame(int id)
 {
     GameIterator game;
@@ -2121,8 +2260,36 @@ void GameServer::onCloseConnection(Connection connection)
             }
             else
             {
-                /* .. and if he is remove him from the game */
-                game->second.removePlayer(client->second.getName());
+                /* .. and if he is, remove him from the game */
+				if (game->second.removePlayer(client->second.getName()) == -10) {
+					// On code -10, all the other players in the game have to be notified
+					//Sending GAME_STATUS and a chat message to all clients in this game
+					json serverNotice;
+					serverNotice["type"] = CODE_CHAT;
+					serverNotice["data"]["name"] = "SERVER";
+					serverNotice["data"]["message"] = "Automated actions were issued by the server, therefore a new GAME_STATUS was sent";
+
+					string status = "{\"type\":" + to_string(CODE_GAME_STATUS) + ",\"data\":" + game->second.toJson() + "}";
+					vector<Player> players = game->second.getPlayers();
+
+					for (unsigned int i = 0; i < players.size(); i++)
+					{
+						ClientIterator player;
+
+						for (player = clients.begin(); player != clients.end();
+							player++)
+						{
+							if (player->second.getName() != client->second.getName() && player->second.getName() == players[i].getName())
+							{
+								Connection c = player->second.getConnection();
+								endpoint.send(c, serverNotice.dump(),
+									websocketpp::frame::opcode::text);//sending chat
+								endpoint.send(c, status,
+									websocketpp::frame::opcode::text);//sending status
+							}
+						}
+					}
+				}
             }
         }
 
