@@ -503,19 +503,22 @@ int Game::removePlayer(string name)
 		if (this->running) {
 			players[i].disconnect();
 
-			// Proper handling if the player wasn't already eliminated // Should add victory check // TODO
+			// Proper handling if the player wasn't already eliminated
 			if (players[i].isAlive) {
-				// In phase -1, player will be eliminated and his territories emptied for other players to take control of
-				// TODO Treatment of phase -1, SUPER TRICKY
+				// Proper handling if the player was required to defend at the time of disconnection
+				if (!players[combat.defenderId].isConnected()) {
+					messageDefend(combat.defenderId, 1); // 1 unit is always allowed to defend
+				}
 
 				// Proper handling if the player was the current active player (Can only be the case if the player was still alive)
 				if ((int)i == activePlayer) {
-					// Handling in phase -1
+					// Handling in phase -1 // AI move TODO
 					if (this->phase == -1) {
 					}
+
 					// Handling in other phases
 					else {
-						players[i].resetReinforcement(); // Possible AI placement, currently the focus of the AI is phase -1 and defending
+						players[i].resetReinforcement();
 
 						// Proceeding to next player's turn
 						nextPlayer();
@@ -917,6 +920,15 @@ int Game::messageAttack(int player, int source, int destination, int units)
 	combat.destination = destination;
 	combat.attackerUnits = units;
 
+	// Checking if this attack requires AI intervention
+	if (!players[combat.defenderId].isConnected()) {
+		messageDefend(combat.defenderId, 1); // 1 unit is always allowed to defend
+
+		// Players now require a GAME_STATUS to be able to sync with automated actions
+		return -10;
+	}
+
+	// Waiting for a human player to respond
 	return 0;
 
 }
