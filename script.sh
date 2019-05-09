@@ -17,6 +17,10 @@ do
         exit 1
     fi
 
+    echo "## WAITING BEFORE RELAUNCH... ##"
+
+    sleep 5
+
     echo "## LAUNCHING SERVER ##"
 
     ./riks-server
