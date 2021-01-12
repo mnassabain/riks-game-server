@@ -1,5 +1,7 @@
 # Riks Serveur Jeu
 
+Ce depôt est un fork du depôt originel du Groupe MS: https://git.unistra.fr/ms/riks-game-server
+
 Partie serveur jeu
 
 ## Docker
